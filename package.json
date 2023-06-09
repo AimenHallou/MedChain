@@ -1,0 +1,23 @@
+{
+  "name": "medchain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@oceanprotocol/lib": "^3.0.1",
+    "axios": "^1.4.0",
+    "next": "^13.4.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.9",
+    "typescript": "5.1.3"
+  }
+}
