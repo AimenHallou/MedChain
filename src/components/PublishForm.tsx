@@ -1,18 +1,15 @@
-import React, { FC, useState, FormEvent } from 'react';
-import { getOceanInstance } from '../ocean';
+// src/components/PublishForm.tsx
+import React, { FC, FormEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTitle, setDescription, setPrice } from '../redux/slices/formSlice';
+import { RootState } from '../redux/store';
 
 const PublishForm: FC = () => {
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [price, setPrice] = useState<string>('');
+  const dispatch = useDispatch();
+  const { title, description, price } = useSelector((state: RootState) => state.form);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
-    const ocean = await getOceanInstance();
-    // ... use the `ocean` instance to interact with the Ocean Protocol
-
-    alert(`Title: ${title}\nDescription: ${description}\nPrice: ${price}`);
   };
 
   return (
@@ -22,7 +19,7 @@ const PublishForm: FC = () => {
         id="title"
         type="text"
         value={title}
-        onChange={event => setTitle(event.target.value)}
+        onChange={event => dispatch(setTitle(event.target.value))}
       />
 
       <label htmlFor="description">Description</label>
@@ -30,7 +27,7 @@ const PublishForm: FC = () => {
         id="description"
         type="text"
         value={description}
-        onChange={event => setDescription(event.target.value)}
+        onChange={event => dispatch(setDescription(event.target.value))}
       />
 
       <label htmlFor="price">Price</label>
@@ -38,7 +35,7 @@ const PublishForm: FC = () => {
         id="price"
         type="text"
         value={price}
-        onChange={event => setPrice(event.target.value)}
+        onChange={event => dispatch(setPrice(event.target.value))}
       />
 
       <button type="submit">Publish</button>
