@@ -1,16 +1,10 @@
-// src/components/AssetCard.tsx
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
+import { Asset } from '../objects/types'
 
-interface AssetCardProps {
-  image: string;
-  title: string;
-  description: string;
-  price: string;
-  id: string; // Assuming each asset has a unique ID
-}
+interface AssetCardProps extends Asset {}
 
-const AssetCard: FC<AssetCardProps> = ({ image, title, description, price, id }) => {
+const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate, price, id }) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -21,14 +15,15 @@ const AssetCard: FC<AssetCardProps> = ({ image, title, description, price, id })
     <div onClick={handleClick} style={{ cursor: 'pointer' }}>
       <a style={{ textDecoration: 'none', color: 'inherit' }}>
         <div>
-          <img src={image} alt={title} />
           <h2>{title}</h2>
           <p>{description}</p>
+          <p>Owner: {owner}</p>
+          <p>Created Date: {createdDate}</p>
           <p>{price}</p>
         </div>
       </a>
     </div>
   );
-}
+};
 
 export default AssetCard;

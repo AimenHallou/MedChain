@@ -1,35 +1,26 @@
-// pages/assets/[id].tsx
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
-import testAssets from '../../data/testAssets'; // Adjust the import path accordingly
-
-interface Asset {
-  image: string;
-  title: string;
-  description: string;
-  price: string;
-}
+import testAssets from '../../data/testAssets';
+import { Asset } from '../../objects/types'
 
 const AssetPage: FC = () => {
   const router = useRouter();
-  const { id } = router.query; // This assumes your URL structure is something like /assets/:id
+  const { id } = router.query;
+  const asset = testAssets.find((asset: Asset) => asset.id === id);
 
-  // Find the asset directly
-  const asset = testAssets.find(asset => asset.id === id);
-
-  // If there's no matching asset, return an error message
   if (!asset) {
     return <div>Asset not found</div>;
   }
 
   return (
     <div>
-      <img src={asset.image} alt={asset.title} />
       <h1>{asset.title}</h1>
       <p>{asset.description}</p>
+      <p>Owner: {asset.owner}</p>
+      <p>Created Date: {asset.createdDate}</p>
       <p>{asset.price}</p>
     </div>
   );
-}
+};
 
 export default AssetPage;
