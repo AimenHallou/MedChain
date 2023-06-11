@@ -1,6 +1,7 @@
 // pages/assets/[id].tsx
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { useRouter } from 'next/router';
+import testAssets from '../../data/testAssets'; // Adjust the import path accordingly
 
 interface Asset {
   image: string;
@@ -12,21 +13,13 @@ interface Asset {
 const AssetPage: FC = () => {
   const router = useRouter();
   const { id } = router.query; // This assumes your URL structure is something like /assets/:id
-  const [asset, setAsset] = useState<Asset | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      // Fetch the asset data based on the ID and set it to state
-      // This is just a placeholder, replace it with your actual data fetching logic
-      fetch(`/api/assets/${id}`)
-        .then(response => response.json())
-        .then(data => setAsset(data))
-        .catch(error => console.error(error));
-    }
-  }, [id]);
+  // Find the asset directly
+  const asset = testAssets.find(asset => asset.id === id);
 
+  // If there's no matching asset, return an error message
   if (!asset) {
-    return <div>Loading...</div>;
+    return <div>Asset not found</div>;
   }
 
   return (
