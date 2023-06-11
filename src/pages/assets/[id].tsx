@@ -1,4 +1,4 @@
-// src/components/AssetPage.tsx
+// pages/assets/[id].tsx
 import React, { FC, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 

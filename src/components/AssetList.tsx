@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import AssetCard from './AssetCard';
 
 interface Asset {
+  id: string;
   image: string;
   title: string;
   description: string;

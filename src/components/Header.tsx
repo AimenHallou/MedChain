@@ -11,7 +11,7 @@ const Header: FC = () => {
       </Link>
       <SearchBar />
       <nav style={{ display: 'flex', gap: '1em' }}>
-        <Link href="/marketplace">
+        <Link href="/">
           <span style={{ color: '#fff', textDecoration: 'none' }}>Marketplace</span>
         </Link>
         <Link href="/about">
@@ -22,6 +22,9 @@ const Header: FC = () => {
         </Link>
         <Link href="/publish">
           <span style={{ color: '#fff', textDecoration: 'none' }}>Publish Data</span>
+        </Link>
+        <Link href="/account">
+          <span style={{ color: '#fff', textDecoration: 'none' }}>Account</span>
         </Link>
       </nav>
       <button style={{ padding: '0.5em 1em', background: '#0077b6', color: '#fff', border: 'none', borderRadius: '5px' }}>
