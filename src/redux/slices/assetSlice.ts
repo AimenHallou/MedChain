@@ -16,9 +16,20 @@ export const assetsSlice = createSlice({
     fetchPublishedAssets: (state, action: PayloadAction<string>) => {
       return state.filter(asset => asset.owner === action.payload);
     },
+    updateAsset: (state, action: PayloadAction<Pick<Asset, 'id' | 'title' | 'description' | 'price'| 'content'| 'restricted'>>) => {
+      const { id, title, description, price, content, restricted } = action.payload;
+      const assetIndex = state.findIndex(asset => asset.id === id);
+      if (assetIndex !== -1) {
+        state[assetIndex].title = title;
+        state[assetIndex].description = description;
+        state[assetIndex].price = price;
+        state[assetIndex].content = content;
+        state[assetIndex].restricted = restricted;
+      }
+    },
   },
 });
 
-export const { addAsset, fetchPublishedAssets } = assetsSlice.actions;
+export const { addAsset, fetchPublishedAssets, updateAsset } = assetsSlice.actions;
 
 export default assetsSlice.reducer;
