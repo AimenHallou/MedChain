@@ -7,6 +7,8 @@ const testAssets = [
       owner: 'John Doe',
       createdDate: '2023-06-01',
       price: '0.1 ETH',
+      content: 'DATA:23452345',
+      restricted: false,
     },
     {
       id: '2',
@@ -15,6 +17,8 @@ const testAssets = [
       owner: 'Jane Smith',
       createdDate: '2023-06-02',
       price: '0.2 ETH',
+      content: 'DATA:2345262',
+      restricted: false,
     },
     {
       id: '3',
@@ -23,6 +27,8 @@ const testAssets = [
       owner: 'Alice Johnson',
       createdDate: '2023-06-03',
       price: '0.15 ETH',
+      content: 'DATA:12312314',
+      restricted: true,
     },
     {
       id: '4',
@@ -31,6 +37,8 @@ const testAssets = [
       owner: 'Bob Thompson',
       createdDate: '2023-06-04',
       price: '0.25 ETH',
+      content: 'DATA:1254315',
+      restricted: true,
     },
     {
       id: '5',
@@ -39,6 +47,8 @@ const testAssets = [
       owner: 'Emily Davis',
       createdDate: '2023-06-05',
       price: '0.18 ETH',
+      content: 'DATA:51352346',
+      restricted: true,
     },
     
   ];

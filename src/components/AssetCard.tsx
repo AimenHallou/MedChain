@@ -17,10 +17,10 @@ const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate,
       <a style={{ textDecoration: 'none', color: 'inherit' }}>
         <div>
           <h2>{title}</h2>
-          <p>{description}</p>
+          <p>Description: {description}</p>
           <p>Owner: {owner}</p>
           <p>Created Date: {createdDate}</p>
-          <p>{price}</p>
+          <p>Price: {price}</p>
         </div>
       </a>
     </div>

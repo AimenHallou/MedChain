@@ -13,9 +13,12 @@ export const assetsSlice = createSlice({
       const newId = (state.length + 1).toString();
       state.push({ id: newId, ...action.payload });
     },
+    fetchPublishedAssets: (state, action: PayloadAction<string>) => {
+      return state.filter(asset => asset.owner === action.payload);
+    },
   },
 });
 
-export const { addAsset } = assetsSlice.actions;
+export const { addAsset, fetchPublishedAssets } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

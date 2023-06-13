@@ -6,6 +6,8 @@ export interface Asset {
     owner: string;
     createdDate: string;
     price: string;
+    content: string;
+    restricted: boolean;
   }
 
   export interface AssetListProps {

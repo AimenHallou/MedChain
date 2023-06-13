@@ -21,8 +21,12 @@ const AssetPage: FC = () => {
       <p>Owner: {asset.owner}</p>
       <p>Created Date: {asset.createdDate}</p>
       <p>{asset.price}</p>
+      {!asset.restricted && (
+        <p>{asset.content}</p>
+      )}
     </div>
   );
 };
+
 
 export default AssetPage;

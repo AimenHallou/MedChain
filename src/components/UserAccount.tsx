@@ -3,6 +3,8 @@ import React, { FC, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUsername, setEmail } from '../redux/slices/userSlice';
 import { RootState } from '../redux/store';
+import PublishedAssets from '../components/PublishedAssets';
+import AccessedAssets from '../components/AccessedAssets';
 
 const UserAccount: FC = () => {
   const dispatch = useDispatch();
@@ -23,6 +25,11 @@ const UserAccount: FC = () => {
 
       <p>{email}</p>
       <input type="text" value={email} onChange={handleEmailChange} />
+      <div>
+        <PublishedAssets />
+        <AccessedAssets />
+      </div>
+
     </div>
   );
 }

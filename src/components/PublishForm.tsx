@@ -18,7 +18,8 @@ const PublishForm: FC = () => {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    dispatch(addAsset({ ...form, owner: user.username }));
+    const createdDate = new Date().toISOString();
+    dispatch(addAsset({ ...form, owner: user.username, createdDate }));
     dispatch(resetForm());
     router.push('/');
   };
@@ -43,15 +44,6 @@ const PublishForm: FC = () => {
         onChange={handleChange}
       />
 
-      <label htmlFor="createdDate">Created Date</label>
-      <input
-        id="createdDate"
-        name="createdDate"
-        type="text"
-        value={form.createdDate}
-        onChange={handleChange}
-      />
-
       <label htmlFor="price">Price</label>
       <input
         id="price"
@@ -60,6 +52,26 @@ const PublishForm: FC = () => {
         value={form.price}
         onChange={handleChange}
       />
+
+      <label htmlFor="content">Content</label>
+      <input
+        id="content"
+        name="content"
+        type="text"
+        value={form.content}
+        onChange={handleChange}
+      />
+
+        <label htmlFor="restricted">
+        Restricted
+        <input
+          id="restricted"
+          name="restricted"
+          type="checkbox"
+          checked={form.restricted}
+          onChange={handleChange}
+        />
+      </label>
 
       <button type="submit">Publish</button>
     </form>
