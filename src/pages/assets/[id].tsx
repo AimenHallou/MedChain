@@ -1,12 +1,14 @@
+// src/pages/assets/[id].tsx
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
-import testAssets from '../../data/testAssets';
-import { Asset } from '../../objects/types'
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 const AssetPage: FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const asset = testAssets.find((asset: Asset) => asset.id === id);
+  const assets = useSelector((state: RootState) => state.assets);
+  const asset = assets.find((asset) => asset.id === id);
 
   if (!asset) {
     return <div>Asset not found</div>;

@@ -1,19 +1,28 @@
 // src/components/UserAccount.tsx
-import React, { FC } from 'react';
+import React, { FC, ChangeEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUsername, setEmail } from '../redux/slices/userSlice';
+import { RootState } from '../redux/store';
 
-interface UserAccountProps {
-  username: string;
-  email: string;
-}
+const UserAccount: FC = () => {
+  const dispatch = useDispatch();
+  const { username, email } = useSelector((state: RootState) => state.user);
 
-const UserAccount: FC<UserAccountProps> = ({ username, email }) => {
+  const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch(setUsername(event.target.value));
+  };
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch(setEmail(event.target.value));
+  };
+
   return (
     <div>
       <h2>{username}</h2>
+      <input type="text" value={username} onChange={handleUsernameChange} />
+
       <p>{email}</p>
-      {
-        
-      }
+      <input type="text" value={email} onChange={handleEmailChange} />
     </div>
   );
 }

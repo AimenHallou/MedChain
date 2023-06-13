@@ -1,3 +1,4 @@
+// src/components/AssetCard.tsx
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
 import { Asset } from '../objects/types'
