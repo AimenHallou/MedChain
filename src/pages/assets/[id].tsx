@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { updateAsset, transferOwnership, shareAsset } from '../../redux/slices/assetSlice';
+import { updateAsset, transferOwnership, shareAsset, unshareAsset } from '../../redux/slices/assetSlice';
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -56,6 +56,10 @@ const AssetPage: FC = () => {
     setSharedUsername('');
   };
 
+  const handleUnshare = (username: string) => {
+    dispatch(unshareAsset({ assetId: asset.id, username }));
+  };  
+
   return (
     <div>
       <h1>{asset.title}</h1>
@@ -66,6 +70,7 @@ const AssetPage: FC = () => {
       {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p>Data: {asset.content}</p>}
       {user.username === asset.owner && !isEditing && (
         <>
+        <div>
           <button onClick={handleEdit}>Edit</button>
           <input
           type="text"
@@ -81,6 +86,15 @@ const AssetPage: FC = () => {
             onChange={(e) => setSharedUsername(e.target.value)}
           />
           <button onClick={handleShare}>Share Asset</button>
+        </div>
+        <div>
+          {asset.sharedWith.map((username, index) => (
+          <div key={index}>
+          <span>{username}</span>
+          <button onClick={() => handleUnshare(username)}>X</button>
+          </div>
+        ))}
+        </div>
         </>
       )}
 

@@ -41,9 +41,19 @@ export const assetsSlice = createSlice({
         asset.sharedWith.push(username);
       }
     },
+    unshareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
+      const { assetId, username } = action.payload;
+      const asset = state.find(asset => asset.id === assetId);
+      if (asset && asset.restricted) {
+        const index = asset.sharedWith.indexOf(username);
+        if (index !== -1) {
+          asset.sharedWith.splice(index, 1);
+        }
+      }
+    },    
   },
 });
 
-export const { addAsset, fetchPublishedAssets, updateAsset, transferOwnership, shareAsset } = assetsSlice.actions;
+export const { addAsset, fetchPublishedAssets, updateAsset, transferOwnership, shareAsset, unshareAsset } = assetsSlice.actions;
 
 export default assetsSlice.reducer;
