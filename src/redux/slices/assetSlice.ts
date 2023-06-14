@@ -34,9 +34,16 @@ export const assetsSlice = createSlice({
         state[assetIndex].owner = newOwner;
       }
     },
+    shareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
+      const { assetId, username } = action.payload;
+      const asset = state.find(asset => asset.id === assetId);
+      if (asset && asset.restricted) {
+        asset.sharedWith.push(username);
+      }
+    },
   },
 });
 
-export const { addAsset, fetchPublishedAssets, updateAsset, transferOwnership } = assetsSlice.actions;
+export const { addAsset, fetchPublishedAssets, updateAsset, transferOwnership, shareAsset } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

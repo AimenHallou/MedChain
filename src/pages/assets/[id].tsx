@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { updateAsset, transferOwnership  } from '../../redux/slices/assetSlice';
+import { updateAsset, transferOwnership, shareAsset } from '../../redux/slices/assetSlice';
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -21,6 +21,7 @@ const AssetPage: FC = () => {
   const [editedContent, setEditedContent] = useState(asset?.content || '');
   const [editedRestricted, setEditedRestricted] = useState(asset?.restricted || false);
   const [newOwner, setNewOwner] = useState('');
+  const [sharedUsername, setSharedUsername] = useState('');
 
   if (!asset) {
     return <div>Asset not found</div>;
@@ -50,15 +51,19 @@ const AssetPage: FC = () => {
     setNewOwner('');
   };
 
+  const handleShare = () => {
+    dispatch(shareAsset({ assetId: asset.id, username: sharedUsername }));
+    setSharedUsername('');
+  };
+
   return (
     <div>
       <h1>{asset.title}</h1>
-      <p>{asset.description}</p>
+      <p>Description: {asset.description}</p>
       <p>Owner: {asset.owner}</p>
       <p>Created Date: {asset.createdDate}</p>
-      <p>{asset.price}</p>
-      {!asset.restricted && <p>{asset.content}</p>}
-
+      <p>Price: {asset.price}</p>
+      {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p>Data: {asset.content}</p>}
       {user.username === asset.owner && !isEditing && (
         <>
           <button onClick={handleEdit}>Edit</button>
@@ -69,6 +74,13 @@ const AssetPage: FC = () => {
           onChange={(e) => setNewOwner(e.target.value)}
           />
           <button onClick={handleTransfer}>Transfer Ownership</button>
+          <input
+            type="text"
+            placeholder="Enter username to share with"
+            value={sharedUsername}
+            onChange={(e) => setSharedUsername(e.target.value)}
+          />
+          <button onClick={handleShare}>Share Asset</button>
         </>
       )}
 

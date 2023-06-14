@@ -9,6 +9,7 @@ const testAssets = [
       price: '0.1 ETH',
       content: 'DATA:23452345',
       restricted: false,
+      sharedWith: [],
     },
     {
       id: '2',
@@ -19,6 +20,7 @@ const testAssets = [
       price: '0.2 ETH',
       content: 'DATA:2345262',
       restricted: false,
+      sharedWith: [],
     },
     {
       id: '3',
@@ -29,6 +31,7 @@ const testAssets = [
       price: '0.15 ETH',
       content: 'DATA:12312314',
       restricted: true,
+      sharedWith: [],
     },
     {
       id: '4',
@@ -39,6 +42,7 @@ const testAssets = [
       price: '0.25 ETH',
       content: 'DATA:1254315',
       restricted: true,
+      sharedWith: [],
     },
     {
       id: '5',
@@ -49,6 +53,7 @@ const testAssets = [
       price: '0.18 ETH',
       content: 'DATA:51352346',
       restricted: true,
+      sharedWith: [],
     },
     
   ];

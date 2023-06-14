@@ -2,7 +2,7 @@
 import React, { FC, FormEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { setField, resetForm } from '../redux/slices/formSlice';
+import { setTitle, setDescription, setOwner, setCreatedDate, setPrice, setContent, setRestricted, setSharedWith, resetForm } from '../redux/slices/formSlice';
 import { addAsset } from '../redux/slices/assetSlice';
 import { RootState } from '../redux/store';
 
@@ -12,9 +12,24 @@ const PublishForm: FC = () => {
   const form = useSelector((state: RootState) => state.form);
   const user = useSelector((state: RootState) => state.user);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setField({ field: event.target.name as keyof typeof form, value: event.target.value }));
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const actionMap = {
+      title: setTitle,
+      description: setDescription,
+      price: setPrice,
+      content: setContent,
+      restricted: setRestricted,
+    };
+
+    const action = actionMap[event.target.name];
+    if (action) {
+      const value = event.target.name === 'restricted' && event.target instanceof HTMLInputElement
+        ? event.target.checked
+        : event.target.value;
+      dispatch(action(value));
+    }
   };
+
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();

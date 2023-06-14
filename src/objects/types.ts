@@ -8,6 +8,7 @@ export interface Asset {
     price: string;
     content: string;
     restricted: boolean;
+    sharedWith: string[];
   }
 
   export interface AssetListProps {

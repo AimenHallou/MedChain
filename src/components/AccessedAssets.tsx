@@ -1,22 +1,21 @@
 // src/components/AccessedAssets.tsx
-import React, { FC, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { FC } from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-//import { fetchAccessedAssets } from '../redux/slices/assetSlice';
+import AssetCard from './AssetCard';
 
 const AccessedAssets: FC = () => {
-  const dispatch = useDispatch();
   const { username } = useSelector((state: RootState) => state.user);
-  //const accessedAssets = useSelector((state: RootState) => state.assets.accessed);
+  const assets = useSelector((state: RootState) => state.assets);
 
-  useEffect(() => {
-    //dispatch(fetchAccessedAssets(username));
-  }, [dispatch, username]);
+  const accessedAssets = assets.filter(asset => asset.sharedWith.includes(username));
 
   return (
     <div>
       <h2>Accessed Assets</h2>
-      {/* Render your assets here */}
+      {accessedAssets.map((asset) => (
+        <AssetCard key={asset.id} {...asset} />
+      ))}
     </div>
   );
 };
