@@ -10,6 +10,7 @@ const testAssets = [
       content: 'DATA:23452345',
       restricted: false,
       sharedWith: [],
+      history: [],
     },
     {
       id: '2',
@@ -21,6 +22,7 @@ const testAssets = [
       content: 'DATA:2345262',
       restricted: false,
       sharedWith: [],
+      history: [],
     },
     {
       id: '3',
@@ -32,6 +34,7 @@ const testAssets = [
       content: 'DATA:12312314',
       restricted: true,
       sharedWith: [],
+      history: [],
     },
     {
       id: '4',
@@ -43,6 +46,7 @@ const testAssets = [
       content: 'DATA:1254315',
       restricted: true,
       sharedWith: [],
+      history: [],
     },
     {
       id: '5',
@@ -54,6 +58,7 @@ const testAssets = [
       content: 'DATA:51352346',
       restricted: true,
       sharedWith: [],
+      history: [],
     },
     
   ];

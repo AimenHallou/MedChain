@@ -30,14 +30,14 @@ const PublishForm: FC = () => {
     }
   };
 
+const handleSubmit = async (event: FormEvent) => {
+  event.preventDefault();
+  const createdDate = new Date().toISOString();
+  dispatch(addAsset({ ...form, owner: user.username, createdDate, sharedWith: [], history: [`Asset created on ${createdDate}`] }));
+  dispatch(resetForm());
+  router.push('/');
+};
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    const createdDate = new Date().toISOString();
-    dispatch(addAsset({ ...form, owner: user.username, createdDate }));
-    dispatch(resetForm());
-    router.push('/');
-  };
 
   return (
     <form onSubmit={handleSubmit}>

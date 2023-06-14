@@ -58,7 +58,7 @@ const AssetPage: FC = () => {
 
   const handleUnshare = (username: string) => {
     dispatch(unshareAsset({ assetId: asset.id, username }));
-  };  
+  };
 
   return (
     <div>
@@ -70,34 +70,39 @@ const AssetPage: FC = () => {
       {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p>Data: {asset.content}</p>}
       {user.username === asset.owner && !isEditing && (
         <>
-        <div>
-          <button onClick={handleEdit}>Edit</button>
-          <input
-          type="text"
-          placeholder="Enter new owner's username"
-          value={newOwner}
-          onChange={(e) => setNewOwner(e.target.value)}
-          />
-          <button onClick={handleTransfer}>Transfer Ownership</button>
-          <input
-            type="text"
-            placeholder="Enter username to share with"
-            value={sharedUsername}
-            onChange={(e) => setSharedUsername(e.target.value)}
-          />
-          <button onClick={handleShare}>Share Asset</button>
-        </div>
-        <div>
-          {asset.sharedWith.map((username, index) => (
-          <div key={index}>
-          <span>{username}</span>
-          <button onClick={() => handleUnshare(username)}>X</button>
+          <div>
+            <button onClick={handleEdit}>Edit</button>
+            <input
+              type="text"
+              placeholder="Enter new owner's username"
+              value={newOwner}
+              onChange={(e) => setNewOwner(e.target.value)}
+            />
+            <button onClick={handleTransfer}>Transfer Ownership</button>
+            <input
+              type="text"
+              placeholder="Enter username to share with"
+              value={sharedUsername}
+              onChange={(e) => setSharedUsername(e.target.value)}
+            />
+            <button onClick={handleShare}>Share Asset</button>
           </div>
-        ))}
-        </div>
+          <div>
+            {asset.sharedWith.map((username, index) => (
+              <div key={index}>
+                <span>{username}</span>
+                <button onClick={() => handleUnshare(username)}>X</button>
+              </div>
+            ))}
+          </div>
         </>
       )}
-
+      <div>
+        <h2>Asset History</h2>
+        {asset.history.map((entry, index) => (
+          <p key={index}>{entry}</p>
+        ))}
+      </div>
       {isEditing && (
         <div>
           <label htmlFor="editedTitle">Title</label>
@@ -136,13 +141,15 @@ const AssetPage: FC = () => {
             onChange={(e) => setEditedContent(e.target.value)}
           />
 
-          <label htmlFor="editedRestricted">Restricted<input
-          id="editedRestricted"
-          name="editedRestricted"
-          type="checkbox"
-          checked={editedRestricted}
-          onChange={(e) => setEditedRestricted(e.target.checked)}
-          />
+          <label htmlFor="editedRestricted">
+            Restricted
+            <input
+              id="editedRestricted"
+              name="editedRestricted"
+              type="checkbox"
+              checked={editedRestricted}
+              onChange={(e) => setEditedRestricted(e.target.checked)}
+            />
           </label>
 
           <button onClick={handleSave}>Save</button>

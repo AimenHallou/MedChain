@@ -15,6 +15,7 @@ const initialState: FormState = {
   content: '',
   restricted: false,
   sharedWith: [],
+  history: [],
 };
 
 export const formSlice = createSlice({

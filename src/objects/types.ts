@@ -9,6 +9,7 @@ export interface Asset {
     content: string;
     restricted: boolean;
     sharedWith: string[];
+    history: string[];
   }
 
   export interface AssetListProps {
