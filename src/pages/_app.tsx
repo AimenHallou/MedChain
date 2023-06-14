@@ -10,7 +10,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <Header />
-      <Component {...pageProps} />
+      <main className="bg-dark text-light">
+        <Component {...pageProps} />
+      </main>
       <Footer />
     </Provider>
   );

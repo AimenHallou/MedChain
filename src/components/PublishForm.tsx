@@ -1,5 +1,5 @@
 // src/components/PublishForm.tsx
-import React, { FC, FormEvent } from 'react';
+import React, { FC, FormEvent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { setTitle, setDescription, setOwner, setCreatedDate, setPrice, setContent, setRestricted, setSharedWith, resetForm } from '../redux/slices/formSlice';
@@ -11,6 +11,8 @@ const PublishForm: FC = () => {
   const router = useRouter();
   const form = useSelector((state: RootState) => state.form);
   const user = useSelector((state: RootState) => state.user);
+  const [shareWith, setShareWith] = useState('');
+  const [sharedUsers, setSharedUsers] = useState<string[]>([]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const actionMap = {
@@ -30,18 +32,30 @@ const PublishForm: FC = () => {
     }
   };
 
+  const handleShareWithChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShareWith(event.target.value);
+  };
+
+  const handleAddSharedUser = () => {
+    setSharedUsers([...sharedUsers, shareWith]);
+    setShareWith('');
+  };
+
+  const handleRemoveSharedUser = (username: string) => {
+    setSharedUsers(sharedUsers.filter(user => user !== username));
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
-    dispatch(addAsset({ ...form, owner: user.username, createdDate, sharedWith: [], history: [`Asset created on ${createdDate}`] }));
+    dispatch(addAsset({ ...form, owner: user.username, createdDate, sharedWith: sharedUsers, history: [`Asset created on ${createdDate}`] }));
     dispatch(resetForm());
     router.push('/');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto mt-5">
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+    <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto mt-5">      <div className="mb-4">
+        <label className="block text-white font-bold mb-2" htmlFor="title">
           Title
         </label>
         <input
@@ -50,12 +64,12 @@ const PublishForm: FC = () => {
           type="text"
           value={form.title}
           onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+        <label className="block text-white font-bold mb-2" htmlFor="description">
           Description
         </label>
         <input
@@ -64,12 +78,12 @@ const PublishForm: FC = () => {
           type="text"
           value={form.description}
           onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+        <label className="block text-white font-bold mb-2" htmlFor="price">
           Price
         </label>
         <input
@@ -78,12 +92,12 @@ const PublishForm: FC = () => {
           type="text"
           value={form.price}
           onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="content">
+        <label className="block text-white font-bold mb-2" htmlFor="content">
           Content
         </label>
         <input
@@ -92,12 +106,12 @@ const PublishForm: FC = () => {
           type="text"
           value={form.content}
           onChange={handleChange}
-          className="shadow appearance-noneborder rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
         />
       </div>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="restricted">
+      <div className="mb-4 flex items-center">
+        <label className="text-white font-bold mr-2" htmlFor="restricted">
           Restricted
         </label>
         <input
@@ -106,14 +120,48 @@ const PublishForm: FC = () => {
           type="checkbox"
           checked={form.restricted}
           onChange={handleChange}
-          className="shadow  border rounded  py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="form-checkbox h-5 w-5 text-blue-500"
         />
       </div>
+
+      {form.restricted && (
+  <div className="mb-4">
+    <input
+      type="text"
+      placeholder="Enter username to share with"
+      value={shareWith}
+      onChange={handleShareWithChange}
+      className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+    />
+    <button 
+      type="button" 
+      onClick={handleAddSharedUser} 
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    >
+      Add User
+    </button>
+    <div>
+      {sharedUsers.map((username, index) => (
+        <div key={index}>
+          <span>{username}</span>
+          <button 
+            type="button" 
+            onClick={() => handleRemoveSharedUser(username)} 
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Remove User
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+    )}
       <div className="flex items-center justify-between">
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
           Publish
         </button>
       </div>
+
     </form>
   );
 };

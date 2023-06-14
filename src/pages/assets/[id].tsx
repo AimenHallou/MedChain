@@ -61,18 +61,18 @@ const AssetPage: FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-blue-900">
-    <div className="px-4 py-2 flex md:flex-row flex-col">
-      <div className="md:w-2/3 w-full">
-        <h1 className="text-lg font-semibold text-gray-800">{asset.title}</h1>
-        <p className="text-sm text-gray-700">Description: {asset.description}</p>
-        <p className="text-sm text-gray-700">Owner: {asset.owner}</p>
-        <p className="text-sm text-gray-700">Created Date: {asset.createdDate}</p>
-        <p className="text-sm text-gray-700">Price: {asset.price}</p>
-        {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p className="text-sm text-gray-700">Data: {asset.content}</p>}
-      </div>
-      {user.username === asset.owner && !isEditing && (
-        <div className="md:w-1/3 w-full md:ml-4">
+    <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-gray-600">
+      <div className="px-4 py-2 flex md:flex-row flex-col">
+        <div className="md:w-2/3 w-full">
+          <h1 className="text-lg font-bold text-white">{asset.title}</h1>
+          <p className="text-sm text-white">Description: {asset.description}</p>
+          <p className="text-sm text-white">Owner: {asset.owner}</p>
+          <p className="text-sm text-white">Created Date: {asset.createdDate}</p>
+          <p className="text-sm text-white">Price: {asset.price}</p>
+          {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p className="text-sm text-white">Data: {asset.content}</p>}
+        </div>
+        {user.username === asset.owner && !isEditing && (
+          <div className="md:w-1/3 w-full md:ml-4">
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
             type="text"
@@ -101,68 +101,82 @@ const AssetPage: FC = () => {
       )}
     </div>
     {user.username === asset.owner && !isEditing && (
-      <div className="px-4 py-2 bg-white flex justify-center">
+      <div className="px-4 py-2 bg-gray-900 flex justify-center">
         <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleEdit}>Edit</button>
       </div>
     )}
-    <div className="px-4 py-2 bg-white">
-      <h2 className="text-lg font-semibold text-gray-800">Asset History</h2>
+    <div className="px-4 py-2 bg-gray-900">
+      <h2 className="text-lg font-bold text-white">Asset History</h2>
       {asset.history.map((entry, index) => (
-        <p key={index} className="text-sm text-gray-700">{entry}</p>
+        <p key={index} className="text-sm text-white">{entry}</p>
       ))}
     </div>
-      {isEditing && (
-        <div className="px-4 py-2 bg-white">
-        <label htmlFor="editedTitle">Title</label>
-          <input
-            id="editedTitle"
-            name="editedTitle"
-            type="text"
-            value={editedTitle}
-            onChange={(e) => setEditedTitle(e.target.value)}
-          />
+    {isEditing && (
+  <div className="px-4 py-2 bg-gray-900">
+    <div className="mb-4">
+      <label htmlFor="editedTitle" className="text-white font-bold">Title</label>
+      <input
+        id="editedTitle"
+        name="editedTitle"
+        type="text"
+        value={editedTitle}
+        onChange={(e) => setEditedTitle(e.target.value)}
+        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+      />
+    </div>
 
-          <label htmlFor="editedDescription">Description</label>
-          <input
-            id="editedDescription"
-            name="editedDescription"
-            type="text"
-            value={editedDescription}
-            onChange={(e) => setEditedDescription(e.target.value)}
-          />
+    <div className="mb-4">
+      <label htmlFor="editedDescription" className="text-white font-bold">Description</label>
+      <input
+        id="editedDescription"
+        name="editedDescription"
+        type="text"
+        value={editedDescription}
+        onChange={(e) => setEditedDescription(e.target.value)}
+        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+      />
+    </div>
 
-          <label htmlFor="editedPrice">Price</label>
-          <input
-            id="editedPrice"
-            name="editedPrice"
-            type="text"
-            value={editedPrice}
-            onChange={(e) => setEditedPrice(e.target.value)}
-          />
+    <div className="mb-4">
+      <label htmlFor="editedPrice" className="text-white font-bold">Price</label>
+      <input
+        id="editedPrice"
+        name="editedPrice"
+        type="text"
+        value={editedPrice}
+        onChange={(e) => setEditedPrice(e.target.value)}
+        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+      />
+    </div>
 
-          <label htmlFor="editedContent">Content</label>
-          <input
-            id="editedContent"
-            name="editedContent"
-            type="text"
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-          />
+    <div className="mb-4">
+      <label htmlFor="editedContent" className="text-white font-bold">Content</label>
+      <input
+        id="editedContent"
+        name="editedContent"
+        type="text"
+        value={editedContent}
+        onChange={(e) => setEditedContent(e.target.value)}
+        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+      />
+    </div>
 
-          <label htmlFor="editedRestricted">
-            Restricted
-            <input
-              id="editedRestricted"
-              name="editedRestricted"
-              type="checkbox"
-              checked={editedRestricted}
-              onChange={(e) => setEditedRestricted(e.target.checked)}
-            />
-          </label>
+    <div className="mb-4 flex items-center">
+      <label htmlFor="editedRestricted" className="text-white font-bold mr-2">Restricted</label>
+      <input
+        id="editedRestricted"
+        name="editedRestricted"
+        type="checkbox"
+        checked={editedRestricted}
+        onChange={(e) => setEditedRestricted(e.target.checked)}
+        className="form-checkbox h-5 w-5 text-blue-500"
+      />
+    </div>
 
-          <button onClick={handleSave}>Save</button>
-        </div>
-      )}
+    <button onClick={handleSave} className="w-full px-3 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">Save</button>
+  </div>
+)}
+
     </div>
   );
 };

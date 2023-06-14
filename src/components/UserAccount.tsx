@@ -20,34 +20,35 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-lg max-w-lg mx-auto mt-10">
+    <div className="bg-gray-900 p-6 rounded shadow-lg max-w-lg mx-auto mt-10 text-white">
       <h2 className="text-2xl font-bold mb-2">{username}</h2>
       <input
         type="text"
         value={username}
-        defaultValue={"Username"}
+        placeholder="Username"
         onChange={handleUsernameChange}
-        className="block border border-gray-200 rounded p-2 w-full mb-4"
+        className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
 
-      <p className="text-gray-700 mb-2">{email}</p>
+      <p className="text-gray-300 mb-2">{email}</p>
       <input
         type="text"
         value={email}
+        placeholder="Email"
         onChange={handleEmailChange}
-        className="block border border-gray-200 rounded p-2 w-full mb-4"
+        className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
 
       <div className="flex justify-between mb-4">
         <button
           onClick={() => setShowSection('published')}
-          className={`py-2 px-4 rounded ${showSection === 'published' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`py-2 px-4 rounded ${showSection === 'published' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}
         >
           Published Assets
         </button>
         <button
           onClick={() => setShowSection('accessed')}
-          className={`py-2 px-4 rounded ${showSection === 'accessed' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`py-2 px-4 rounded ${showSection === 'accessed' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}
         >
           Accessed Assets
         </button>

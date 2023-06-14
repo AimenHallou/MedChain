@@ -2,3 +2,29 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+/* The base color scheme */
+body {
+    color: #fff;
+    background-color: #111827;
+    transition: background-color 0.5s ease-out;
+  }
+  
+  /* Text colors */
+  .text-dark {
+    color: #111827;
+  }
+  
+  .text-light {
+    color: #f3f4f6;
+  }
+  
+  /* Background colors */
+  .bg-dark {
+    background-color: #111827;
+  }
+  
+  .bg-light {
+    background-color: #f3f4f6;
+  }
+  

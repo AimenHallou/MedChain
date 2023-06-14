@@ -13,15 +13,18 @@ const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate,
   };
 
   return (
-    <div onClick={handleClick} className="cursor-pointer w-full max-w-xs mx-auto bg-white shadow-md rounded-md overflow-hidden md:max-w-2xl m-4 border-2 border-blue-900">
+    <div 
+      onClick={handleClick} 
+      className="cursor-pointer w-80 bg-gray-800 text-white shadow-md rounded-md overflow-hidden my-2 mx-4 border-2 border-gray-600 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-100"
+    >
       <div className="px-4 py-2">
-        <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-lg font-bold text-white">{title}</h2>
       </div>
-      <div className="px-4 py-2 bg-white">
-        <p className="text-sm text-gray-700">Description: {description}</p>
-        <p className="text-sm text-gray-700">Owner: {owner}</p>
-        <p className="text-sm text-gray-700">Created Date: {createdDate}</p>
-        <p className="text-sm text-gray-700">Price: {price}</p>
+      <div className="px-4 py-2 bg-gray-900">
+        <p className="text-sm text-white">Description: {description}</p>
+        <p className="text-sm text-white">Owner: {owner}</p>
+        <p className="text-sm text-white">Created Date: {createdDate}</p>
+        <p className="text-sm text-white">Price: {price}</p>
       </div>
     </div>
   );
