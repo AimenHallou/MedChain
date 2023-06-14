@@ -61,51 +61,59 @@ const AssetPage: FC = () => {
   };
 
   return (
-    <div>
-      <h1>{asset.title}</h1>
-      <p>Description: {asset.description}</p>
-      <p>Owner: {asset.owner}</p>
-      <p>Created Date: {asset.createdDate}</p>
-      <p>Price: {asset.price}</p>
-      {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p>Data: {asset.content}</p>}
+    <div className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-blue-900">
+    <div className="px-4 py-2 flex md:flex-row flex-col">
+      <div className="md:w-2/3 w-full">
+        <h1 className="text-lg font-semibold text-gray-800">{asset.title}</h1>
+        <p className="text-sm text-gray-700">Description: {asset.description}</p>
+        <p className="text-sm text-gray-700">Owner: {asset.owner}</p>
+        <p className="text-sm text-gray-700">Created Date: {asset.createdDate}</p>
+        <p className="text-sm text-gray-700">Price: {asset.price}</p>
+        {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p className="text-sm text-gray-700">Data: {asset.content}</p>}
+      </div>
       {user.username === asset.owner && !isEditing && (
-        <>
-          <div>
-            <button onClick={handleEdit}>Edit</button>
-            <input
-              type="text"
-              placeholder="Enter new owner's username"
-              value={newOwner}
-              onChange={(e) => setNewOwner(e.target.value)}
-            />
-            <button onClick={handleTransfer}>Transfer Ownership</button>
-            <input
-              type="text"
-              placeholder="Enter username to share with"
-              value={sharedUsername}
-              onChange={(e) => setSharedUsername(e.target.value)}
-            />
-            <button onClick={handleShare}>Share Asset</button>
-          </div>
-          <div>
+        <div className="md:w-1/3 w-full md:ml-4">
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
+            type="text"
+            placeholder="Enter new owner's username"
+            value={newOwner}
+            onChange={(e) => setNewOwner(e.target.value)}
+          />
+          <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" onClick={handleTransfer}>Transfer Ownership</button>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
+            type="text"
+            placeholder="Enter username to share with"
+            value={sharedUsername}
+            onChange={(e) => setSharedUsername(e.target.value)}
+          />
+          <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" onClick={handleShare}>Share Asset</button>
+          <div className="py-2">
             {asset.sharedWith.map((username, index) => (
-              <div key={index}>
-                <span>{username}</span>
-                <button onClick={() => handleUnshare(username)}>X</button>
+              <div key={index} className="flex items-center space-x-2">
+                <span className="text-sm text-gray-700">{username}</span>
+                <button className="text-sm bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline" onClick={() => handleUnshare(username)}>X</button>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
-      <div>
-        <h2>Asset History</h2>
-        {asset.history.map((entry, index) => (
-          <p key={index}>{entry}</p>
-        ))}
+    </div>
+    {user.username === asset.owner && !isEditing && (
+      <div className="px-4 py-2 bg-white flex justify-center">
+        <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleEdit}>Edit</button>
       </div>
+    )}
+    <div className="px-4 py-2 bg-white">
+      <h2 className="text-lg font-semibold text-gray-800">Asset History</h2>
+      {asset.history.map((entry, index) => (
+        <p key={index} className="text-sm text-gray-700">{entry}</p>
+      ))}
+    </div>
       {isEditing && (
-        <div>
-          <label htmlFor="editedTitle">Title</label>
+        <div className="px-4 py-2 bg-white">
+        <label htmlFor="editedTitle">Title</label>
           <input
             id="editedTitle"
             name="editedTitle"

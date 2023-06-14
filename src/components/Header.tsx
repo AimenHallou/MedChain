@@ -5,31 +5,24 @@ import SearchBar from './SearchBar';
 
 const Header: FC = () => {
   return (
-    <header style={{ display: 'flex', justifyContent: 'space-between', padding: '1em', background: '#0a2d5e' }}>
-      <Link href="/">
-        <h1 style={{ color: '#fff', textDecoration: 'none' }}>MedChain</h1>
-      </Link>
-      <SearchBar />
-      <nav style={{ display: 'flex', gap: '1em' }}>
+    <header className="flex justify-between px-4 py-2 bg-blue-900 text-white items-center">
+      <nav className="flex gap-4">
         <Link href="/">
-          <span style={{ color: '#fff', textDecoration: 'none' }}>Marketplace</span>
-        </Link>
-        <Link href="/about">
-          <span style={{ color: '#fff', textDecoration: 'none' }}>About</span>
-        </Link>
-        <Link href="/docs">
-          <span style={{ color: '#fff', textDecoration: 'none' }}>Docs</span>
+          <span className="text-3xl font-bold text-white cursor-pointer">MedChain</span>
         </Link>
         <Link href="/publish">
-          <span style={{ color: '#fff', textDecoration: 'none' }}>Publish Data</span>
+          <span className="text-lg text-white cursor-pointer">Publish Data</span>
         </Link>
         <Link href="/account">
-          <span style={{ color: '#fff', textDecoration: 'none' }}>Account</span>
+          <span className="text-lg text-white cursor-pointer">Account</span>
         </Link>
       </nav>
-      <button style={{ padding: '0.5em 1em', background: '#0077b6', color: '#fff', border: 'none', borderRadius: '5px' }}>
-        Connect Wallet
-      </button>
+      <div className="flex gap-4">
+        <SearchBar />
+        <button className="px-4 py-2 bg-blue-700 text-white rounded">
+          Connect Wallet
+        </button>
+      </div>
     </header>
   );
 }

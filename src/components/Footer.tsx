@@ -3,20 +3,16 @@ import React, { FC } from 'react';
 
 const Footer: FC = () => {
   return (
-    <footer style={{ display: 'flex', justifyContent: 'space-between', padding: '1em', background: '#0a2d5e', color: '#fff' }}>
+    <footer className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-4 py-2 bg-blue-900 text-white">
       <a href="/">
-        <img src="/logo.png" alt="Logo" />
+        <img src="/logo.png" alt="Logo" className="h-8 mr-3" />
       </a>
-      <nav style={{ display: 'flex', gap: '1em' }}>
-        <a href="/marketplace" style={{ color: '#fff', textDecoration: 'none' }}>Marketplace</a>
-        <a href="/about" style={{ color: '#fff', textDecoration: 'none' }}>About</a>
-        <a href="/docs" style={{ color: '#fff', textDecoration: 'none' }}>Docs</a>
+      <nav className="flex items-center justify-center gap-4">
+        <a href="/marketplace" className="text-white hover:underline">Marketplace</a>
+        <a href="/about" className="text-white hover:underline">About</a>
+        <a href="/docs" className="text-white hover:underline">Docs</a>
       </nav>
-      <div>
-        <a href="https://twitter.com/" style={{ color: '#fff', textDecoration: 'none' }}>Twitter</a>
-        <a href="https://github.com/" style={{ color: '#fff', textDecoration: 'none' }}>GitHub</a>
-      </div>
-      <p>© 2023 MedChain. All rights reserved.</p>
+      <p className="text-sm">© 2023 MedChain. All rights reserved.</p>
     </footer>
   );
 }
