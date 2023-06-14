@@ -1,6 +1,6 @@
 // src/redux/slices/assetsSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Asset } from '../../objects/types'; // Replace with the actual path to types.ts
+import { Asset } from '../../objects/types';
 import testAssets from '../../data/testAssets';
 
 const initialState: Asset[] = testAssets;
@@ -27,9 +27,16 @@ export const assetsSlice = createSlice({
         state[assetIndex].restricted = restricted;
       }
     },
+    transferOwnership: (state, action: PayloadAction<{ assetId: string, newOwner: string }>) => {
+      const { assetId, newOwner } = action.payload;
+      const assetIndex = state.findIndex(asset => asset.id === assetId);
+      if (assetIndex !== -1) {
+        state[assetIndex].owner = newOwner;
+      }
+    },
   },
 });
 
-export const { addAsset, fetchPublishedAssets, updateAsset } = assetsSlice.actions;
+export const { addAsset, fetchPublishedAssets, updateAsset, transferOwnership } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

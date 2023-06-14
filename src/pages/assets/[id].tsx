@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { updateAsset } from '../../redux/slices/assetSlice';
+import { updateAsset, transferOwnership  } from '../../redux/slices/assetSlice';
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -20,6 +20,7 @@ const AssetPage: FC = () => {
   const [editedPrice, setEditedPrice] = useState(asset?.price || '');
   const [editedContent, setEditedContent] = useState(asset?.content || '');
   const [editedRestricted, setEditedRestricted] = useState(asset?.restricted || false);
+  const [newOwner, setNewOwner] = useState('');
 
   if (!asset) {
     return <div>Asset not found</div>;
@@ -44,6 +45,11 @@ const AssetPage: FC = () => {
     setIsEditing(false);
   };
 
+  const handleTransfer = () => {
+    dispatch(transferOwnership({ assetId: asset.id, newOwner }));
+    setNewOwner('');
+  };
+
   return (
     <div>
       <h1>{asset.title}</h1>
@@ -54,7 +60,16 @@ const AssetPage: FC = () => {
       {!asset.restricted && <p>{asset.content}</p>}
 
       {user.username === asset.owner && !isEditing && (
-        <button onClick={handleEdit}>Edit</button>
+        <>
+          <button onClick={handleEdit}>Edit</button>
+          <input
+          type="text"
+          placeholder="Enter new owner's username"
+          value={newOwner}
+          onChange={(e) => setNewOwner(e.target.value)}
+          />
+          <button onClick={handleTransfer}>Transfer Ownership</button>
+        </>
       )}
 
       {isEditing && (
