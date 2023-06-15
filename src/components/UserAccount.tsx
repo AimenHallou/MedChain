@@ -36,16 +36,17 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
-      <h2 className="text-2xl font-bold mb-2">User Account</h2>
-      {currentUser && (
-        <>
-          <h3 className="text-xl mb-2">{currentUser.address}</h3>
-          <h3 className="text-xl mb-2">{currentUser.title}</h3>
-        </>
-      )}
+    <div className="flex bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
+      <div className="flex-grow">
+        <h2 className="text-2xl font-bold mb-2">User Account</h2>
+        {currentUser && (
+          <>
+            <h3 className="text-xl mb-2">{currentUser.address}</h3>
+            <h3 className="text-xl mb-2">{currentUser.title}</h3>
+          </>
+        )}
 
-      <h2 className="text-2xl font-bold mb-2">Add User</h2>
+        <h2 className="text-2xl font-bold mb-2">Add User</h2>
       <input
         type="text"
         value={newUserAddress}
@@ -60,51 +61,52 @@ const UserAccount: FC = () => {
         onChange={handleNewUserTitleChange}
         className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
-      <button
-        onClick={handleAddUser}
-        className="block bg-blue-500 text-white py-2 px-4 rounded mb-4"
-      >
-        Add User
-      </button>
+        <button
+          onClick={handleAddUser}
+          className="block bg-blue-500 text-white py-2 px-4 rounded mb-4"
+        >
+          Add User
+        </button>
+        
+        <div className="flex justify-between mb-4">
+          <button
+            onClick={() => setShowSection("published")}
+            className={`py-2 px-4 rounded ${
+              showSection === "published"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-700 text-white"
+            }`}
+          >
+            Published Assets
+          </button>
+          <button
+            onClick={() => setShowSection("accessed")}
+            className={`py-2 px-4 rounded ${
+              showSection === "accessed"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-700 text-white"
+            }`}
+          >
+            Accessed Assets
+          </button>
+        </div>
+
+        {showSection === "published" && <PublishedAssets />}
+        {showSection === "accessed" && <AccessedAssets />}
+      </div>
 
       {users.length > 0 && (
-        <>
+        <div className="ml-4">
           <h2 className="text-2xl font-bold mb-2">Switch User</h2>
           <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
             {users.map((user) => (
               <option key={user.address} value={user.address}>
-                {user.address}
+                {user.title} ({user.address})
               </option>
             ))}
           </select>
-        </>
+        </div>
       )}
-
-      <div className="flex justify-between mb-4">
-        <button
-          onClick={() => setShowSection("published")}
-          className={`py-2 px-4 rounded ${
-            showSection === "published"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-700 text-white"
-          }`}
-        >
-          Published Assets
-        </button>
-        <button
-          onClick={() => setShowSection("accessed")}
-          className={`py-2 px-4 rounded ${
-            showSection === "accessed"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-700 text-white"
-          }`}
-        >
-          Accessed Assets
-        </button>
-      </div>
-
-      {showSection === "published" && <PublishedAssets />}
-      {showSection === "accessed" && <AccessedAssets />}
     </div>
   );
 };

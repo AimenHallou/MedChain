@@ -79,6 +79,16 @@ export const assetsSlice = createSlice({
         }
       }
     },
+    requestAccess: (
+      state,
+      action: PayloadAction<{ assetId: string }>
+    ) => {
+      const { assetId } = action.payload;
+      const asset = state.find((asset) => asset.id === assetId);
+      if (asset) {
+        // implement logic for requesting access to an asset
+      }
+    },
   },
 });
 
@@ -89,6 +99,7 @@ export const {
   transferOwnership,
   shareAsset,
   unshareAsset,
+  requestAccess,
 } = assetsSlice.actions;
 
 export default assetsSlice.reducer;
