@@ -5,7 +5,7 @@ import { Asset } from '../objects/types'
 
 interface AssetCardProps extends Asset {}
 
-const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate, price, id }) => {
+const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate, id }) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -24,7 +24,6 @@ const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate,
         <p className="text-sm text-white">Description: {description}</p>
         <p className="text-sm text-white">Owner: {owner}</p>
         <p className="text-sm text-white">Created Date: {createdDate}</p>
-        <p className="text-sm text-white">Price: {price}</p>
       </div>
     </div>
   );

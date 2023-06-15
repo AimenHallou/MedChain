@@ -5,7 +5,6 @@ export interface Asset {
   description: string;
   owner: string;
   createdDate: string;
-  price: string;
   content: string;
   restricted: boolean;
   sharedWith: string[];

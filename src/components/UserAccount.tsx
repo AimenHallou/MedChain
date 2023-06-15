@@ -1,15 +1,15 @@
-import React, { FC, ChangeEvent, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUsername, setEmail } from '../redux/slices/userSlice';
-import { RootState } from '../redux/store';
-import PublishedAssets from '../components/PublishedAssets';
-import AccessedAssets from '../components/AccessedAssets';
+import React, { FC, ChangeEvent, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUsername, setEmail } from "../redux/slices/userSlice";
+import { RootState } from "../redux/store";
+import PublishedAssets from "../components/PublishedAssets";
+import AccessedAssets from "../components/AccessedAssets";
 
 const UserAccount: FC = () => {
   const dispatch = useDispatch();
   const { username, email } = useSelector((state: RootState) => state.user);
 
-  const [showSection, setShowSection] = useState('published');
+  const [showSection, setShowSection] = useState("published");
 
   const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
     dispatch(setUsername(event.target.value));
@@ -41,21 +41,29 @@ const UserAccount: FC = () => {
 
       <div className="flex justify-between mb-4">
         <button
-          onClick={() => setShowSection('published')}
-          className={`py-2 px-4 rounded ${showSection === 'published' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}
+          onClick={() => setShowSection("published")}
+          className={`py-2 px-4 rounded ${
+            showSection === "published"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-700 text-white"
+          }`}
         >
           Published Assets
         </button>
         <button
-          onClick={() => setShowSection('accessed')}
-          className={`py-2 px-4 rounded ${showSection === 'accessed' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}
+          onClick={() => setShowSection("accessed")}
+          className={`py-2 px-4 rounded ${
+            showSection === "accessed"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-700 text-white"
+          }`}
         >
           Accessed Assets
         </button>
       </div>
 
-      {showSection === 'published' && <PublishedAssets />}
-      {showSection === 'accessed' && <AccessedAssets />}
+      {showSection === "published" && <PublishedAssets />}
+      {showSection === "accessed" && <AccessedAssets />}
     </div>
   );
 };

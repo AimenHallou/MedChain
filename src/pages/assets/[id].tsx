@@ -17,7 +17,6 @@ const AssetPage: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(asset?.title || '');
   const [editedDescription, setEditedDescription] = useState(asset?.description || '');
-  const [editedPrice, setEditedPrice] = useState(asset?.price || '');
   const [editedContent, setEditedContent] = useState(asset?.content || '');
   const [editedRestricted, setEditedRestricted] = useState(asset?.restricted || false);
   const [newOwner, setNewOwner] = useState('');
@@ -37,7 +36,6 @@ const AssetPage: FC = () => {
         id: asset.id,
         title: editedTitle,
         description: editedDescription,
-        price: editedPrice,
         content: editedContent,
         restricted: editedRestricted,
       })
@@ -68,7 +66,6 @@ const AssetPage: FC = () => {
           <p className="text-sm text-white">Description: {asset.description}</p>
           <p className="text-sm text-white">Owner: {asset.owner}</p>
           <p className="text-sm text-white">Created Date: {asset.createdDate}</p>
-          <p className="text-sm text-white">Price: {asset.price}</p>
           {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p className="text-sm text-white">Data: {asset.content}</p>}
         </div>
         {user.username === asset.owner && !isEditing && (
@@ -133,18 +130,6 @@ const AssetPage: FC = () => {
         type="text"
         value={editedDescription}
         onChange={(e) => setEditedDescription(e.target.value)}
-        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-      />
-    </div>
-
-    <div className="mb-4">
-      <label htmlFor="editedPrice" className="text-white font-bold">Price</label>
-      <input
-        id="editedPrice"
-        name="editedPrice"
-        type="text"
-        value={editedPrice}
-        onChange={(e) => setEditedPrice(e.target.value)}
         className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
       />
     </div>
