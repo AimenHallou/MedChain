@@ -1,11 +1,18 @@
 // src/components/AssetCard.tsx
-import React, { FC } from 'react';
-import { useRouter } from 'next/router';
-import { Asset } from '../objects/types'
+import React, { FC } from "react";
+import { useRouter } from "next/router";
+import { Asset } from "../objects/types";
 
 interface AssetCardProps extends Asset {}
 
-const AssetCard: FC<AssetCardProps> = ({ title, description, owner, ownerTitle, createdDate, id }) => {
+const AssetCard: FC<AssetCardProps> = ({
+  title,
+  description,
+  owner,
+  ownerTitle,
+  createdDate,
+  id,
+}) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -13,8 +20,8 @@ const AssetCard: FC<AssetCardProps> = ({ title, description, owner, ownerTitle, 
   };
 
   return (
-    <div 
-      onClick={handleClick} 
+    <div
+      onClick={handleClick}
       className="cursor-pointer w-80 bg-gray-800 text-white shadow-md rounded-md overflow-hidden my-2 mx-4 border-2 border-gray-600 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-100"
     >
       <div className="px-4 py-2">

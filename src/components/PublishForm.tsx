@@ -78,7 +78,9 @@ const PublishForm: FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto mt-5">
-      <h1 className="text-2xl font-bold text-white mb-4 text-center">Publish Data</h1>
+      <h1 className="text-2xl font-bold text-white mb-4 text-center">
+        Publish Data
+      </h1>
       <div className="mb-4">
         <label className="block text-white font-bold mb-2" htmlFor="title">
           Title
@@ -138,9 +140,9 @@ const PublishForm: FC = () => {
           onChange={handleShareWithChange}
           className="w-2/3 px-3 py-2 text-white placeholder-white bg-gray-700 rounded-l outline-none focus:bg-gray-600"
         />
-        <button 
-          type="button" 
-          onClick={handleAddSharedUser} 
+        <button
+          type="button"
+          onClick={handleAddSharedUser}
           className="w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r"
         >
           Add User
@@ -149,11 +151,14 @@ const PublishForm: FC = () => {
 
       <div className="mb-4">
         {sharedUsers.map((address, index) => (
-          <div key={index} className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mt-2">
+          <div
+            key={index}
+            className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mt-2"
+          >
             <span className="text-white">{address}</span>
-            <button 
-              type="button" 
-              onClick={() => handleRemoveSharedUser(address)} 
+            <button
+              type="button"
+              onClick={() => handleRemoveSharedUser(address)}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
             >
               X

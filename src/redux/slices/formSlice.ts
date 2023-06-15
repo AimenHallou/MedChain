@@ -1,24 +1,24 @@
 // src/redux/slices/formSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Asset } from '../../objects/types'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Asset } from "../../objects/types";
 
-interface FormState extends Omit<Asset, 'id'> {
+interface FormState extends Omit<Asset, "id"> {
   content: string;
 }
 
 const initialState: FormState = {
-  title: '',
-  description: '',
-  owner: '',
-  ownerTitle: '',
-  createdDate: '',
-  content: '',
+  title: "",
+  description: "",
+  owner: "",
+  ownerTitle: "",
+  createdDate: "",
+  content: "",
   sharedWith: [],
   history: [],
 };
 
 export const formSlice = createSlice({
-  name: 'form',
+  name: "form",
   initialState,
   reducers: {
     setTitle: (state, action: PayloadAction<string>) => {
@@ -43,6 +43,14 @@ export const formSlice = createSlice({
   },
 });
 
-export const { setTitle, setDescription, setOwner, setCreatedDate, setContent, setSharedWith, resetForm } = formSlice.actions;
+export const {
+  setTitle,
+  setDescription,
+  setOwner,
+  setCreatedDate,
+  setContent,
+  setSharedWith,
+  resetForm,
+} = formSlice.actions;
 
 export default formSlice.reducer;

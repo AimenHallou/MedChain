@@ -1,15 +1,15 @@
 // src/redux/slices/userSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserState, UserNotification } from '../../objects/types'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { UserState, UserNotification } from "../../objects/types";
 
 const initialState: UserState = {
-  address: '',
-  title: '',
+  address: "",
+  title: "",
   notifications: [],
 };
 
 export const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     setAddress: (state, action: PayloadAction<string>) => {
@@ -22,11 +22,14 @@ export const userSlice = createSlice({
       state.title = action.payload;
     },
     removeNotification: (state, action: PayloadAction<string>) => {
-      state.notifications = state.notifications.filter(notification => notification.id !== action.payload);
+      state.notifications = state.notifications.filter(
+        (notification) => notification.id !== action.payload
+      );
     },
   },
 });
 
-export const { setAddress, addNotification, removeNotification, setTitle } = userSlice.actions;
+export const { setAddress, addNotification, removeNotification, setTitle } =
+  userSlice.actions;
 
 export default userSlice.reducer;

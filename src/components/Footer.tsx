@@ -1,5 +1,5 @@
 // src/components/Footer.tsx
-import React, { FC } from 'react';
+import React, { FC } from "react";
 
 const Footer: FC = () => {
   return (
@@ -8,13 +8,19 @@ const Footer: FC = () => {
         <img src="/logo.png" alt="Logo" className="h-8 mr-3" />
       </a>
       <nav className="flex items-center justify-center gap-4">
-        <a href="/marketplace" className="text-white hover:underline">Marketplace</a>
-        <a href="/about" className="text-white hover:underline">About</a>
-        <a href="/docs" className="text-white hover:underline">Docs</a>
+        <a href="/marketplace" className="text-white hover:underline">
+          Marketplace
+        </a>
+        <a href="/about" className="text-white hover:underline">
+          About
+        </a>
+        <a href="/docs" className="text-white hover:underline">
+          Docs
+        </a>
       </nav>
       <p className="text-sm">© 2023 MedChain. All rights reserved.</p>
     </footer>
   );
-}
+};
 
 export default Footer;
