@@ -20,7 +20,7 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="bg-gray-900 p-6 rounded shadow-lg max-w-lg mx-auto mt-10 text-white">
+    <div className="bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
       <h2 className="text-2xl font-bold mb-2">{username}</h2>
       <input
         type="text"
