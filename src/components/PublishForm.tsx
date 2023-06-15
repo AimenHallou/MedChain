@@ -12,7 +12,9 @@ import {
   resetForm,
 } from "../redux/slices/formSlice";
 import { addAsset } from "../redux/slices/assetSlice";
+import { addNotification } from "../redux/slices/userSlice"
 import { RootState } from "../redux/store";
+import { uuid } from 'uuidv4';
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch();
@@ -66,12 +68,26 @@ const PublishForm: FC = () => {
       addAsset({
         ...form,
         owner: user.address,
-        ownerTitle: user.title,
+        ownerTitle: user.address,
         createdDate,
         sharedWith: sharedUsers,
         history: [`Asset created on ${createdDate}`],
       })
     );
+
+    sharedUsers.forEach((sharedUser) => {
+      dispatch(
+        addNotification({
+            id: uuid(),
+            read: false,
+            message: `You have been added as a shared user to the asset titled "${form.title}".`,
+        })
+      );
+    });
+    
+    
+
+
     dispatch(resetForm());
     router.push("/");
   };
