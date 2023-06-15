@@ -6,12 +6,17 @@ import SearchBar from "./SearchBar";
 import NotificationDropdown from "./NotificationDropdown";
 
 const Header: FC = () => {
-  const notifications = useSelector(
-    (state: RootState) => state.user.notifications
+  const { users, currentUserAddress } = useSelector(
+    (state: RootState) => state.user
   );
-  const unreadNotifications = notifications.filter(
+  const currentUser = users.find((user) => user.address === currentUserAddress);
+
+  const notifications = currentUser?.notifications;
+  
+  const unreadNotifications = notifications?.filter(
     (notification) => !notification.read
-  );
+  ) || [];
+
 
   return (
     <header className="flex justify-between px-4 py-2 bg-blue-900 text-white items-center">

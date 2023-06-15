@@ -21,8 +21,13 @@ export interface UserNotification {
   read: boolean;
 }
 
-export interface UserState {
+export interface User {
   address: string;
   title: string;
   notifications: UserNotification[];
+}
+
+export interface UsersState {
+  users: User[];
+  currentUserAddress: string | null;
 }

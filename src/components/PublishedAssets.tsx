@@ -5,10 +5,12 @@ import { RootState } from "../redux/store";
 import AssetCard from "./AssetCard";
 
 const PublishedAssets: FC = () => {
-  const { address } = useSelector((state: RootState) => state.user);
+  const { users, currentUserAddress } = useSelector((state: RootState) => state.user);
   const assets = useSelector((state: RootState) => state.assets);
 
-  const publishedAssets = assets.filter((asset) => asset.owner === address);
+  const currentUser = users.find(user => user.address === currentUserAddress);
+  
+  const publishedAssets = assets.filter((asset) => asset.owner === currentUser?.address);
 
   return (
     <div>

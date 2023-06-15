@@ -1,5 +1,5 @@
 // src/pages/assets/[id].tsx
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -20,13 +20,19 @@ const AssetPage: FC = () => {
   const asset = assets.find((asset) => asset.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(asset?.title || "");
-  const [editedDescription, setEditedDescription] = useState(
-    asset?.description || ""
-  );
-  const [editedContent, setEditedContent] = useState(asset?.content || "");
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
+  const [editedContent, setEditedContent] = useState("");
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
+
+  useEffect(() => {
+    if (asset) {
+      setEditedTitle(asset.title);
+      setEditedDescription(asset.description);
+      setEditedContent(asset.content);
+    }
+  }, [asset]);
 
   if (!asset) {
     return <div>Asset not found</div>;
@@ -74,11 +80,11 @@ const AssetPage: FC = () => {
           <p className="text-sm text-white">
             Created Date: {asset.createdDate}
           </p>
-          {asset.sharedWith.includes(user.address) && (
+          {asset.sharedWith.includes(user.currentUserAddress) && (
             <p className="text-sm text-white">Data: {asset.content}</p>
           )}
         </div>
-        {user.address === asset.owner && !isEditing && (
+        {user.currentUserAddress === asset.owner && !isEditing && (
           <div className="md:w-1/3 w-full md:ml-4">
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
@@ -122,7 +128,7 @@ const AssetPage: FC = () => {
           </div>
         )}
       </div>
-      {user.address === asset.owner && !isEditing && (
+      {user.currentUserAddress === asset.owner && !isEditing && (
         <div className="px-4 py-2 bg-gray-900 flex justify-center">
           <button
             className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

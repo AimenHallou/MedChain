@@ -4,17 +4,36 @@ import { RootState } from "../redux/store";
 
 const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const notifications = useSelector(
-    (state: RootState) => state.user.notifications
+
+  const { users, currentUserAddress } = useSelector(
+    (state: RootState) => state.user
   );
-  const unreadNotifications = notifications.filter(
+  const currentUser = users.find((user) => user.address === currentUserAddress);
+
+  const notifications = currentUser?.notifications;
+
+  const unreadNotifications = notifications?.filter(
     (notification) => !notification.read
-  );
+  ) || [];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  const ref = useRef(null);
+  const handleClickOutside = (event) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
+
   return (
-    <div className="relative" >
+    <div className="relative" ref={ref}>
       <button onClick={toggleDropdown}>
         <img src="/images/bell.png" alt="Notification" className="h-10 w-10" />
         {unreadNotifications.length > 0 && (

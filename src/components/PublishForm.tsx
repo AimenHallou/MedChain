@@ -12,17 +12,20 @@ import {
   resetForm,
 } from "../redux/slices/formSlice";
 import { addAsset } from "../redux/slices/assetSlice";
-import { addNotification } from "../redux/slices/userSlice"
+import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
-import { uuid } from 'uuidv4';
+import { uuid } from "uuidv4";
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const form = useSelector((state: RootState) => state.form);
-  const user = useSelector((state: RootState) => state.user);
   const [shareWith, setShareWith] = useState("");
   const [sharedUsers, setSharedUsers] = useState<string[]>([]);
+  const { users, currentUserAddress } = useSelector(
+    (state: RootState) => state.user
+  );
+  const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const handleChange = (
     event: React.ChangeEvent<
@@ -67,8 +70,8 @@ const PublishForm: FC = () => {
     dispatch(
       addAsset({
         ...form,
-        owner: user.address,
-        ownerTitle: user.address,
+        owner: currentUser?.address,
+        ownerTitle: currentUser?.address,
         createdDate,
         sharedWith: sharedUsers,
         history: [`Asset created on ${createdDate}`],
@@ -78,15 +81,15 @@ const PublishForm: FC = () => {
     sharedUsers.forEach((sharedUser) => {
       dispatch(
         addNotification({
+          address: sharedUser,
+          notification: {
             id: uuid(),
             read: false,
             message: `You have been added as a shared user to the asset titled "${form.title}".`,
+          },
         })
       );
     });
-    
-    
-
 
     dispatch(resetForm());
     router.push("/");
