@@ -14,6 +14,8 @@ import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
+import { addNotification } from "../../redux/slices/userSlice";
+import { v4 as uuid } from "uuid";
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -29,6 +31,7 @@ const AssetPage: FC = () => {
   const [editedContent, setEditedContent] = useState("");
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
+  const currentUserAddress = useSelector((state: RootState) => state.user.currentUserAddress);
 
   useEffect(() => {
     if (asset) {
@@ -74,7 +77,23 @@ const AssetPage: FC = () => {
   };
 
   const handleRequestAccess = () => {
-    dispatch(requestAccess({ assetId: asset.id, requestor: user.currentUserAddress }));
+    const requestPending = asset.accessRequests.includes(currentUserAddress);
+
+    if (!requestPending) {
+      dispatch(
+        addNotification({
+          address: asset.owner,
+          notification: {
+            id: uuid(),
+            read: false,
+            message: `User ${currentUserAddress} has requested access to your asset titled "${asset.title}".`,
+          },
+        })
+      );
+      dispatch(
+        requestAccess({ assetId: asset.id, requestor: currentUserAddress })
+      );
+    }
   };
 
   return (
@@ -96,7 +115,12 @@ const AssetPage: FC = () => {
         {user.currentUserAddress !== asset.owner &&
           !asset.sharedWith.includes(user.currentUserAddress) && (
             <div className="px-4">
-              <AssetRequestAccess handleRequestAccess={handleRequestAccess} />
+              <AssetRequestAccess
+                handleRequestAccess={handleRequestAccess}
+                requestPending={asset.accessRequests.includes(
+                  currentUserAddress
+                )}
+              />
             </div>
           )}
       </div>
