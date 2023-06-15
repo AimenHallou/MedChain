@@ -18,7 +18,6 @@ const AssetPage: FC = () => {
   const [editedTitle, setEditedTitle] = useState(asset?.title || '');
   const [editedDescription, setEditedDescription] = useState(asset?.description || '');
   const [editedContent, setEditedContent] = useState(asset?.content || '');
-  const [editedRestricted, setEditedRestricted] = useState(asset?.restricted || false);
   const [newOwner, setNewOwner] = useState('');
   const [sharedUsername, setSharedUsername] = useState('');
 
@@ -37,7 +36,6 @@ const AssetPage: FC = () => {
         title: editedTitle,
         description: editedDescription,
         content: editedContent,
-        restricted: editedRestricted,
       })
     );
 
@@ -65,8 +63,9 @@ const AssetPage: FC = () => {
           <h1 className="text-lg font-bold text-white">{asset.title}</h1>
           <p className="text-sm text-white">Description: {asset.description}</p>
           <p className="text-sm text-white">Owner: {asset.owner}</p>
+          <p className="text-sm text-white">Title: {asset.ownerTitle}</p>
           <p className="text-sm text-white">Created Date: {asset.createdDate}</p>
-          {(!asset.restricted || asset.sharedWith.includes(user.username)) && <p className="text-sm text-white">Data: {asset.content}</p>}
+          {(asset.sharedWith.includes(user.username)) && <p className="text-sm text-white">Data: {asset.content}</p>}
         </div>
         {user.username === asset.owner && !isEditing && (
           <div className="md:w-1/3 w-full md:ml-4">
@@ -143,18 +142,6 @@ const AssetPage: FC = () => {
         value={editedContent}
         onChange={(e) => setEditedContent(e.target.value)}
         className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-      />
-    </div>
-
-    <div className="mb-4 flex items-center">
-      <label htmlFor="editedRestricted" className="text-white font-bold mr-2">Restricted</label>
-      <input
-        id="editedRestricted"
-        name="editedRestricted"
-        type="checkbox"
-        checked={editedRestricted}
-        onChange={(e) => setEditedRestricted(e.target.checked)}
-        className="form-checkbox h-5 w-5 text-blue-500"
       />
     </div>
 

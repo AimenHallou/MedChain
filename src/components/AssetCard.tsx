@@ -5,7 +5,7 @@ import { Asset } from '../objects/types'
 
 interface AssetCardProps extends Asset {}
 
-const AssetCard: FC<AssetCardProps> = ({ title, description, owner, createdDate, id }) => {
+const AssetCard: FC<AssetCardProps> = ({ title, description, owner, ownerTitle, createdDate, id }) => {
   const router = useRouter();
 
   const handleClick = () => {

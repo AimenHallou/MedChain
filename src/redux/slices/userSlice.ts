@@ -4,7 +4,7 @@ import { UserState, UserNotification } from '../../objects/types'
 
 const initialState: UserState = {
   username: '',
-  email: '',
+  title: '',
   notifications: [],
 };
 
@@ -15,11 +15,11 @@ export const userSlice = createSlice({
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;
     },
-    setEmail: (state, action: PayloadAction<string>) => {
-      state.email = action.payload;
-    },
     addNotification: (state, action: PayloadAction<UserNotification>) => {
       state.notifications.push(action.payload);
+    },
+    setTitle(state, action: PayloadAction<string>) {
+      state.title = action.payload;
     },
     removeNotification: (state, action: PayloadAction<string>) => {
       state.notifications = state.notifications.filter(notification => notification.id !== action.payload);
@@ -27,6 +27,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUsername, setEmail, addNotification, removeNotification } = userSlice.actions;
+export const { setUsername, addNotification, removeNotification, setTitle } = userSlice.actions;
 
 export default userSlice.reducer;

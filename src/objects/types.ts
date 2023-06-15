@@ -4,9 +4,9 @@ export interface Asset {
   title: string;
   description: string;
   owner: string;
+  ownerTitle: string;
   createdDate: string;
   content: string;
-  restricted: boolean;
   sharedWith: string[];
   history: string[];
 }
@@ -23,6 +23,6 @@ export interface UserNotification {
 
 export interface UserState {
   username: string;
-  email: string;
+  title: string;
   notifications: UserNotification[];
 }

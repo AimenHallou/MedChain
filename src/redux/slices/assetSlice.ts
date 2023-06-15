@@ -16,14 +16,13 @@ export const assetsSlice = createSlice({
     fetchPublishedAssets: (state, action: PayloadAction<string>) => {
       return state.filter(asset => asset.owner === action.payload);
     },
-    updateAsset: (state, action: PayloadAction<Pick<Asset, 'id' | 'title' | 'description' | 'content'| 'restricted'>>) => {
-      const { id, title, description, content, restricted } = action.payload;
+    updateAsset: (state, action: PayloadAction<Pick<Asset, 'id' | 'title' | 'description' | 'content'>>) => {
+      const { id, title, description, content } = action.payload;
       const assetIndex = state.findIndex(asset => asset.id === id);
       if (assetIndex !== -1) {
         state[assetIndex].title = title;
         state[assetIndex].description = description;
         state[assetIndex].content = content;
-        state[assetIndex].restricted = restricted;
         state[assetIndex].history.push(`Asset updated on ${new Date().toISOString()}`);
       }
     },
@@ -38,7 +37,7 @@ export const assetsSlice = createSlice({
     shareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
       const { assetId, username } = action.payload;
       const asset = state.find(asset => asset.id === assetId);
-      if (asset && asset.restricted) {
+      if (asset) {
         asset.sharedWith.push(username);
         asset.history.push(`Asset shared with ${username} on ${new Date().toISOString()}`);
       }
@@ -46,7 +45,7 @@ export const assetsSlice = createSlice({
     unshareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
       const { assetId, username } = action.payload;
       const asset = state.find(asset => asset.id === assetId);
-      if (asset && asset.restricted) {
+      if (asset) {
         const index = asset.sharedWith.indexOf(username);
         if (index !== -1) {
           asset.sharedWith.splice(index, 1);

@@ -10,10 +10,9 @@ const initialState: FormState = {
   title: '',
   description: '',
   owner: '',
+  ownerTitle: '',
   createdDate: '',
-  price: '',
   content: '',
-  restricted: false,
   sharedWith: [],
   history: [],
 };
@@ -34,14 +33,8 @@ export const formSlice = createSlice({
     setCreatedDate: (state, action: PayloadAction<string>) => {
       state.createdDate = action.payload;
     },
-    setPrice: (state, action: PayloadAction<string>) => {
-      state.price = action.payload;
-    },
     setContent: (state, action: PayloadAction<string>) => {
       state.content = action.payload;
-    },
-    setRestricted: (state, action: PayloadAction<boolean>) => {
-      state.restricted = action.payload;
     },
     setSharedWith: (state, action: PayloadAction<string[]>) => {
       state.sharedWith = action.payload;
@@ -50,6 +43,6 @@ export const formSlice = createSlice({
   },
 });
 
-export const { setTitle, setDescription, setOwner, setCreatedDate, setPrice, setContent, setRestricted, setSharedWith, resetForm } = formSlice.actions;
+export const { setTitle, setDescription, setOwner, setCreatedDate, setContent, setSharedWith, resetForm } = formSlice.actions;
 
 export default formSlice.reducer;

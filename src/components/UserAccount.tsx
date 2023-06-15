@@ -1,13 +1,13 @@
 import React, { FC, ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUsername, setEmail } from "../redux/slices/userSlice";
+import { setUsername, setTitle } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import PublishedAssets from "../components/PublishedAssets";
 import AccessedAssets from "../components/AccessedAssets";
 
 const UserAccount: FC = () => {
   const dispatch = useDispatch();
-  const { username, email } = useSelector((state: RootState) => state.user);
+  const { username, title } = useSelector((state: RootState) => state.user);
 
   const [showSection, setShowSection] = useState("published");
 
@@ -15,8 +15,8 @@ const UserAccount: FC = () => {
     dispatch(setUsername(event.target.value));
   };
 
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    dispatch(setEmail(event.target.value));
+  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch(setTitle(event.target.value));
   };
 
   return (
@@ -29,16 +29,14 @@ const UserAccount: FC = () => {
         onChange={handleUsernameChange}
         className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
-
-      <p className="text-gray-300 mb-2">{email}</p>
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
       <input
         type="text"
-        value={email}
-        placeholder="Email"
-        onChange={handleEmailChange}
+        value={title}
+        placeholder="Title"
+        onChange={handleTitleChange}
         className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
-
       <div className="flex justify-between mb-4">
         <button
           onClick={() => setShowSection("published")}
