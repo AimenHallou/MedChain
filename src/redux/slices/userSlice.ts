@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserState, UserNotification } from '../../objects/types'
 
 const initialState: UserState = {
-  username: '',
+  address: '',
   title: '',
   notifications: [],
 };
@@ -12,8 +12,8 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
+    setAddress: (state, action: PayloadAction<string>) => {
+      state.address = action.payload;
     },
     addNotification: (state, action: PayloadAction<UserNotification>) => {
       state.notifications.push(action.payload);
@@ -27,6 +27,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUsername, addNotification, removeNotification, setTitle } = userSlice.actions;
+export const { setAddress, addNotification, removeNotification, setTitle } = userSlice.actions;
 
 export default userSlice.reducer;

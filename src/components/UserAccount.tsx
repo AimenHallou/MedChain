@@ -1,18 +1,18 @@
 import React, { FC, ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUsername, setTitle } from "../redux/slices/userSlice";
+import { setAddress, setTitle } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import PublishedAssets from "../components/PublishedAssets";
 import AccessedAssets from "../components/AccessedAssets";
 
 const UserAccount: FC = () => {
   const dispatch = useDispatch();
-  const { username, title } = useSelector((state: RootState) => state.user);
+  const { address, title } = useSelector((state: RootState) => state.user);
 
   const [showSection, setShowSection] = useState("published");
 
-  const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    dispatch(setUsername(event.target.value));
+  const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch(setAddress(event.target.value));
   };
 
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -21,12 +21,12 @@ const UserAccount: FC = () => {
 
   return (
     <div className="bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
-      <h2 className="text-2xl font-bold mb-2">{username}</h2>
+      <h2 className="text-2xl font-bold mb-2">{address}</h2>
       <input
         type="text"
-        value={username}
-        placeholder="Username"
-        onChange={handleUsernameChange}
+        value={address}
+        placeholder="Address"
+        onChange={handleAddressChange}
         className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
       />
       <h2 className="text-2xl font-bold mb-2">{title}</h2>

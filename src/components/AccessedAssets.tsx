@@ -5,10 +5,10 @@ import { RootState } from '../redux/store';
 import AssetCard from './AssetCard';
 
 const AccessedAssets: FC = () => {
-  const { username } = useSelector((state: RootState) => state.user);
+  const { address } = useSelector((state: RootState) => state.user);
   const assets = useSelector((state: RootState) => state.assets);
 
-  const accessedAssets = assets.filter(asset => asset.sharedWith.includes(username));
+  const accessedAssets = assets.filter(asset => asset.sharedWith.includes(address));
 
   return (
     <div>

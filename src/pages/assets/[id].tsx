@@ -19,7 +19,7 @@ const AssetPage: FC = () => {
   const [editedDescription, setEditedDescription] = useState(asset?.description || '');
   const [editedContent, setEditedContent] = useState(asset?.content || '');
   const [newOwner, setNewOwner] = useState('');
-  const [sharedUsername, setSharedUsername] = useState('');
+  const [sharedAddress, setSharedAddress] = useState('');
 
   if (!asset) {
     return <div>Asset not found</div>;
@@ -48,12 +48,12 @@ const AssetPage: FC = () => {
   };
 
   const handleShare = () => {
-    dispatch(shareAsset({ assetId: asset.id, username: sharedUsername }));
-    setSharedUsername('');
+    dispatch(shareAsset({ assetId: asset.id, address: sharedAddress }));
+    setSharedAddress('');
   };
 
-  const handleUnshare = (username: string) => {
-    dispatch(unshareAsset({ assetId: asset.id, username }));
+  const handleUnshare = (address: string) => {
+    dispatch(unshareAsset({ assetId: asset.id, address }));
   };
 
   return (
@@ -65,14 +65,14 @@ const AssetPage: FC = () => {
           <p className="text-sm text-white">Owner: {asset.owner}</p>
           <p className="text-sm text-white">Title: {asset.ownerTitle}</p>
           <p className="text-sm text-white">Created Date: {asset.createdDate}</p>
-          {(asset.sharedWith.includes(user.username)) && <p className="text-sm text-white">Data: {asset.content}</p>}
+          {(asset.sharedWith.includes(user.address)) && <p className="text-sm text-white">Data: {asset.content}</p>}
         </div>
-        {user.username === asset.owner && !isEditing && (
+        {user.address === asset.owner && !isEditing && (
           <div className="md:w-1/3 w-full md:ml-4">
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
             type="text"
-            placeholder="Enter new owner's username"
+            placeholder="Enter new owner's address"
             value={newOwner}
             onChange={(e) => setNewOwner(e.target.value)}
           />
@@ -80,23 +80,23 @@ const AssetPage: FC = () => {
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
             type="text"
-            placeholder="Enter username to share with"
-            value={sharedUsername}
-            onChange={(e) => setSharedUsername(e.target.value)}
+            placeholder="Enter address to share with"
+            value={sharedAddress}
+            onChange={(e) => setSharedAddress(e.target.value)}
           />
           <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" onClick={handleShare}>Share Asset</button>
           <div className="py-2">
-            {asset.sharedWith.map((username, index) => (
+            {asset.sharedWith.map((address, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <span className="text-sm text-gray-700">{username}</span>
-                <button className="text-sm bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline" onClick={() => handleUnshare(username)}>X</button>
+                <span className="text-sm text-gray-700">{address}</span>
+                <button className="text-sm bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline" onClick={() => handleUnshare(address)}>X</button>
               </div>
             ))}
           </div>
         </div>
       )}
     </div>
-    {user.username === asset.owner && !isEditing && (
+    {user.address === asset.owner && !isEditing && (
       <div className="px-4 py-2 bg-gray-900 flex justify-center">
         <button className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleEdit}>Edit</button>
       </div>

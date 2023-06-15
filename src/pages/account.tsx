@@ -6,8 +6,8 @@ import UserAccount from '../components/UserAccount';
 
 export default function AccountPage() {
   const userData = {
-    username: 'John Doe',
-    email: 'john.doe@example.com',
+    address: 'John Doe',
+    title: 'Mr',
   };
 
   return (

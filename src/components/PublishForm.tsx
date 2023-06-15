@@ -55,8 +55,8 @@ const PublishForm: FC = () => {
     setShareWith("");
   };
 
-  const handleRemoveSharedUser = (username: string) => {
-    setSharedUsers(sharedUsers.filter((user) => user !== username));
+  const handleRemoveSharedUser = (address: string) => {
+    setSharedUsers(sharedUsers.filter((user) => user !== address));
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -65,7 +65,7 @@ const PublishForm: FC = () => {
     dispatch(
       addAsset({
         ...form,
-        owner: user.username,
+        owner: user.address,
         ownerTitle: user.title,
         createdDate,
         sharedWith: sharedUsers,
@@ -125,7 +125,7 @@ const PublishForm: FC = () => {
       </div>
 
       <div className="mb-4">
-        <label className="block text-white font-bold mb-2" htmlFor="price">
+        <label className="block text-white font-bold mb-2" htmlFor="share">
           Share
         </label>
       </div>
@@ -133,7 +133,7 @@ const PublishForm: FC = () => {
       <div className="mb-4 flex items-center">
         <input
           type="text"
-          placeholder="Enter username to share with"
+          placeholder="Enter address to share with"
           value={shareWith}
           onChange={handleShareWithChange}
           className="w-2/3 px-3 py-2 text-white placeholder-white bg-gray-700 rounded-l outline-none focus:bg-gray-600"
@@ -148,12 +148,12 @@ const PublishForm: FC = () => {
       </div>
 
       <div className="mb-4">
-        {sharedUsers.map((username, index) => (
+        {sharedUsers.map((address, index) => (
           <div key={index} className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mt-2">
-            <span className="text-white">{username}</span>
+            <span className="text-white">{address}</span>
             <button 
               type="button" 
-              onClick={() => handleRemoveSharedUser(username)} 
+              onClick={() => handleRemoveSharedUser(address)} 
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
             >
               X

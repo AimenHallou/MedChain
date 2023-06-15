@@ -22,7 +22,7 @@ export interface UserNotification {
 }
 
 export interface UserState {
-  username: string;
+  address: string;
   title: string;
   notifications: UserNotification[];
 }

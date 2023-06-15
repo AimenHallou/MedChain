@@ -34,22 +34,22 @@ export const assetsSlice = createSlice({
         state[assetIndex].history.push(`Ownership transferred to ${newOwner} on ${new Date().toISOString()}`);
       }
     },
-    shareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
-      const { assetId, username } = action.payload;
+    shareAsset: (state, action: PayloadAction<{ assetId: string; address: string }>) => {
+      const { assetId, address } = action.payload;
       const asset = state.find(asset => asset.id === assetId);
       if (asset) {
-        asset.sharedWith.push(username);
-        asset.history.push(`Asset shared with ${username} on ${new Date().toISOString()}`);
+        asset.sharedWith.push(address);
+        asset.history.push(`Asset shared with ${address} on ${new Date().toISOString()}`);
       }
     },
-    unshareAsset: (state, action: PayloadAction<{ assetId: string; username: string }>) => {
-      const { assetId, username } = action.payload;
+    unshareAsset: (state, action: PayloadAction<{ assetId: string; address: string }>) => {
+      const { assetId, address } = action.payload;
       const asset = state.find(asset => asset.id === assetId);
       if (asset) {
-        const index = asset.sharedWith.indexOf(username);
+        const index = asset.sharedWith.indexOf(address);
         if (index !== -1) {
           asset.sharedWith.splice(index, 1);
-          asset.history.push(`Asset unshared with ${username} on ${new Date().toISOString()}`);
+          asset.history.push(`Asset unshared with ${address} on ${new Date().toISOString()}`);
         }
       }
     },    
