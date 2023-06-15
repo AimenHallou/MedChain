@@ -74,7 +74,7 @@ const AssetPage: FC = () => {
   };
 
   const handleRequestAccess = () => {
-    dispatch(requestAccess({ assetId: asset.id }));
+    dispatch(requestAccess({ assetId: asset.id, requestor: user.currentUserAddress }));
   };
 
   return (

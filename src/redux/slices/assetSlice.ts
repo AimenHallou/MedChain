@@ -14,6 +14,7 @@ export const assetsSlice = createSlice({
       state.push({
         id: newId,
         history: [`Asset created on ${new Date().toISOString()}`],
+        accessRequests: [],
         ...action.payload,
       });
     },
@@ -81,12 +82,15 @@ export const assetsSlice = createSlice({
     },
     requestAccess: (
       state,
-      action: PayloadAction<{ assetId: string }>
+      action: PayloadAction<{ assetId: string; requestor: string }>
     ) => {
-      const { assetId } = action.payload;
+      const { assetId, requestor } = action.payload;
       const asset = state.find((asset) => asset.id === assetId);
-      if (asset) {
-        // implement logic for requesting access to an asset
+      if (asset && !asset.accessRequests.includes(requestor)) {
+        asset.accessRequests.push(requestor);
+        asset.history.push(
+          `Access requested by ${requestor} on ${new Date().toISOString()}`
+        );
       }
     },
   },
