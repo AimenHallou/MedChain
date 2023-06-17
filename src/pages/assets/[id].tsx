@@ -138,7 +138,21 @@ const AssetPage: FC = () => {
             <p className="text-sm text-white">Data: {asset.content}</p>
           )}
         </div>
-        <div className="px-4">
+        <div className="md:w-1/3 w-full px-4">
+          {user.currentUserAddress === asset.owner && !isEditing && (
+            <AssetOwnerActions
+              isEditing={isEditing}
+              newOwner={newOwner}
+              setNewOwner={setNewOwner}
+              handleTransfer={handleTransfer}
+              sharedAddress={sharedAddress}
+              setSharedAddress={setSharedAddress}
+              handleShare={handleShare}
+              sharedWith={asset.sharedWith}
+              handleUnshare={handleUnshare}
+            />
+          )}
+          <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
           <AssetRequestAccess
             assetId={id as string}
             handleRequestAccess={handleRequestAccess}
@@ -151,19 +165,6 @@ const AssetPage: FC = () => {
           />
         </div>
       </div>
-      {user.currentUserAddress === asset.owner && !isEditing && (
-        <AssetOwnerActions
-          isEditing={isEditing}
-          newOwner={newOwner}
-          setNewOwner={setNewOwner}
-          handleTransfer={handleTransfer}
-          sharedAddress={sharedAddress}
-          setSharedAddress={setSharedAddress}
-          handleShare={handleShare}
-          sharedWith={asset.sharedWith}
-          handleUnshare={handleUnshare}
-        />
-      )}
       <AssetHistory history={asset.history} />
       {isEditing && (
         <AssetEditForm

@@ -36,38 +36,45 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="flex bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
-      <div className="flex-grow">
-        <h2 className="text-2xl font-bold mb-2">User Account</h2>
+    <div className="flex flex-col bg-gray-900 p-6 rounded max-w-lg mx-auto mt-10 text-white">
+      <div className="text-center mb-6">
+        <h2 className="text-3xl font-bold">User Account</h2>
+      </div>
+      
+      <div className="mb-4">
         {currentUser && (
           <>
             <h3 className="text-xl mb-2">{currentUser.address}</h3>
             <h3 className="text-xl mb-2">{currentUser.title}</h3>
           </>
         )}
-
-        <h2 className="text-2xl font-bold mb-2">Add User</h2>
-      <input
-        type="text"
-        value={newUserAddress}
-        placeholder="Address"
-        onChange={handleNewUserAddressChange}
-        className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
-      />
-      <input
-        type="text"
-        value={newUserTitle}
-        placeholder="Title"
-        onChange={handleNewUserTitleChange}
-        className="block bg-gray-700 placeholder-white text-white border border-gray-600 rounded p-2 w-full mb-4"
-      />
-        <button
-          onClick={handleAddUser}
-          className="block bg-blue-500 text-white py-2 px-4 rounded mb-4"
-        >
-          Add User
-        </button>
-        
+  
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold mb-2">Add User</h2>
+          <input
+            type="text"
+            value={newUserAddress}
+            placeholder="Address"
+            onChange={handleNewUserAddressChange}
+            className="block bg-gray-700 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
+          />
+          <input
+            type="text"
+            value={newUserTitle}
+            placeholder="Title"
+            onChange={handleNewUserTitleChange}
+            className="block bg-gray-700 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
+          />
+          <button
+            onClick={handleAddUser}
+            className="block bg-blue-500 text-white py-2 px-4 rounded"
+          >
+            Add User
+          </button>
+        </div>
+      </div>
+      
+      <div className="mb-4">
         <div className="flex justify-between mb-4">
           <button
             onClick={() => setShowSection("published")}
@@ -90,13 +97,13 @@ const UserAccount: FC = () => {
             Accessed Assets
           </button>
         </div>
-
+  
         {showSection === "published" && <PublishedAssets />}
         {showSection === "accessed" && <AccessedAssets />}
       </div>
-
+      
       {users.length > 0 && (
-        <div className="ml-4">
+        <div className="mt-4">
           <h2 className="text-2xl font-bold mb-2">Switch User</h2>
           <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
             {users.map((user) => (
@@ -108,7 +115,7 @@ const UserAccount: FC = () => {
         </div>
       )}
     </div>
-  );
+  );  
 };
 
 export default UserAccount;

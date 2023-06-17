@@ -27,7 +27,7 @@ const AssetOwnerActions: FC<AssetOwnerActionsProps> = ({
   if (isEditing) return null;
 
   return (
-    <div className="md:w-1/3 w-full md:ml-4">
+    <div className=" w-full">
       <input
         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
         type="text"
