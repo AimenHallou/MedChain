@@ -37,12 +37,12 @@ const AssetRequestAccess: FC<AssetRequestAccessProps> = ({
       {currentUserAddress === assetOwner && accessRequests.map((requestor) => (
         <div key={`${assetId}-${requestor}`} className="flex justify-between items-center">
           <p>{requestor}</p>
-          <div>
-            <button onClick={() => handleAcceptRequest(requestor)}>
-              <img src="/images/check.png" alt="Accept" style={{ width: '40px', height: '40px' }} />
+          <div className="flex">
+            <button onClick={() => handleAcceptRequest(requestor)} className="w-10">
+              <img src="/images/check.png" alt="Accept"  />
             </button>
-            <button onClick={() => handleRejectRequest(requestor)}>
-              <img src="/images/close.png" alt="Reject" style={{ width: '30px', height: '30px' }} />
+            <button onClick={() => handleRejectRequest(requestor)} className="w-7">
+              <img src="/images/close.png" alt="Reject"  />
             </button>
           </div>
         </div>
