@@ -18,8 +18,10 @@ export interface AssetListProps {
 
 export interface UserNotification {
   id: string;
-  message: string;
   read: boolean;
+  message: string;
+  accepted?: boolean;
+  rejected?: boolean;
 }
 
 export interface User {
@@ -31,4 +33,8 @@ export interface User {
 export interface UsersState {
   users: User[];
   currentUserAddress: string | null;
+}
+
+export interface AssetsState {
+  assets: Asset[];
 }

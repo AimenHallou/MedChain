@@ -93,6 +93,37 @@ export const assetsSlice = createSlice({
         );
       }
     },
+    acceptAccessRequest: (
+      state,
+      action: PayloadAction<{ assetId: string; requestor: string }>
+    ) => {
+      const { assetId, requestor } = action.payload;
+      const asset = state.find((asset) => asset.id === assetId);
+      if (asset && asset.accessRequests.includes(requestor)) {
+        asset.accessRequests = asset.accessRequests.filter(
+          (request) => request !== requestor
+        );
+        asset.sharedWith.push(requestor);
+        asset.history.push(
+          `Access request accepted for ${requestor} on ${new Date().toISOString()}`
+        );
+      }
+    },
+    rejectAccessRequest: (
+      state,
+      action: PayloadAction<{ assetId: string; requestor: string }>
+    ) => {
+      const { assetId, requestor } = action.payload;
+      const asset = state.find((asset) => asset.id === assetId);
+      if (asset && asset.accessRequests.includes(requestor)) {
+        asset.accessRequests = asset.accessRequests.filter(
+          (request) => request !== requestor
+        );
+        asset.history.push(
+          `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+        );
+      }
+    },
   },
 });
 
@@ -104,6 +135,8 @@ export const {
   shareAsset,
   unshareAsset,
   requestAccess,
+  acceptAccessRequest,
+  rejectAccessRequest,
 } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

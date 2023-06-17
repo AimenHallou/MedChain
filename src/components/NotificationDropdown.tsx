@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
 
 const NotificationDropdown: React.FC = () => {
@@ -9,12 +9,9 @@ const NotificationDropdown: React.FC = () => {
     (state: RootState) => state.user
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
-
   const notifications = currentUser?.notifications;
-
-  const unreadNotifications = notifications?.filter(
-    (notification) => !notification.read
-  ) || [];
+  const unreadNotifications =
+    notifications?.filter((notification) => !notification.read) || [];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -44,13 +41,12 @@ const NotificationDropdown: React.FC = () => {
       {isOpen && (
         <div className="absolute right-0 w-64 mt-2 py-2 bg-white border rounded shadow-xl z-50">
           {notifications?.map((notification) => (
-            <a
-              href="#"
-              className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white"
+            <div
+              className="px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white"
               key={notification.id}
             >
-              {notification.message}
-            </a>
+              <p>{notification.message}</p>
+            </div>
           ))}
         </div>
       )}

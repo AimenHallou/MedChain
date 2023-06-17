@@ -8,14 +8,15 @@ import {
   transferOwnership,
   shareAsset,
   unshareAsset,
+  acceptAccessRequest,
+  rejectAccessRequest,
   requestAccess,
 } from "../../redux/slices/assetSlice";
+
 import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
-import { addNotification } from "../../redux/slices/userSlice";
-import { v4 as uuid } from "uuid";
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -31,7 +32,9 @@ const AssetPage: FC = () => {
   const [editedContent, setEditedContent] = useState("");
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
-  const currentUserAddress = useSelector((state: RootState) => state.user.currentUserAddress);
+  const currentUserAddress = useSelector(
+    (state: RootState) => state.user.currentUserAddress
+  );
 
   useEffect(() => {
     if (asset) {
@@ -78,22 +81,21 @@ const AssetPage: FC = () => {
 
   const handleRequestAccess = () => {
     const requestPending = asset.accessRequests.includes(currentUserAddress);
-
     if (!requestPending) {
-      dispatch(
-        addNotification({
-          address: asset.owner,
-          notification: {
-            id: uuid(),
-            read: false,
-            message: `User ${currentUserAddress} has requested access to your asset titled "${asset.title}".`,
-          },
-        })
-      );
+      console.log("we in baba");
+      console.log(currentUserAddress, requestPending, handleRequestAccess);
       dispatch(
         requestAccess({ assetId: asset.id, requestor: currentUserAddress })
       );
     }
+  };
+
+  const handleAcceptRequest = (requestor: string) => {
+    dispatch(acceptAccessRequest({ assetId: asset.id, requestor }));
+  };
+
+  const handleRejectRequest = (requestor: string) => {
+    dispatch(rejectAccessRequest({ assetId: asset.id, requestor }));
   };
 
   return (
@@ -112,17 +114,18 @@ const AssetPage: FC = () => {
             <p className="text-sm text-white">Data: {asset.content}</p>
           )}
         </div>
-        {user.currentUserAddress !== asset.owner &&
-          !asset.sharedWith.includes(user.currentUserAddress) && (
-            <div className="px-4">
-              <AssetRequestAccess
-                handleRequestAccess={handleRequestAccess}
-                requestPending={asset.accessRequests.includes(
-                  currentUserAddress
-                )}
-              />
-            </div>
-          )}
+        <div className="px-4">
+          <AssetRequestAccess
+            assetId={id as string}
+            handleRequestAccess={handleRequestAccess}
+            requestPending={asset.accessRequests.includes(currentUserAddress)}
+            accessRequests={asset.accessRequests}
+            handleAcceptRequest={handleAcceptRequest}
+            handleRejectRequest={handleRejectRequest}
+            currentUserAddress={currentUserAddress}
+            assetOwner={asset.owner}
+          />
+        </div>
       </div>
       {user.currentUserAddress === asset.owner && !isEditing && (
         <AssetOwnerActions

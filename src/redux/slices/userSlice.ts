@@ -1,6 +1,7 @@
 // src/redux/slices/userSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UsersState, UserNotification, User } from "../../objects/types";
+import { RootState } from '../store';
 
 const initialState: UsersState = {
   users: [],
@@ -12,8 +13,11 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     addUser: (state, action: PayloadAction<User>) => {
-      state.users.push(action.payload);
-    },
+      const newUser = {
+        ...action.payload,
+      };
+      state.users.push(newUser);
+    },    
     setCurrentUser: (state, action: PayloadAction<string>) => {
       state.currentUserAddress = action.payload;
     },
