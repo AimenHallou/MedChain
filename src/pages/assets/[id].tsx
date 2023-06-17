@@ -17,6 +17,8 @@ import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
+import { addNotification } from "../../redux/slices/userSlice";
+import { v4 as uuid } from "uuid";
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -82,20 +84,42 @@ const AssetPage: FC = () => {
   const handleRequestAccess = () => {
     const requestPending = asset.accessRequests.includes(currentUserAddress);
     if (!requestPending) {
-      console.log("we in baba");
-      console.log(currentUserAddress, requestPending, handleRequestAccess);
       dispatch(
         requestAccess({ assetId: asset.id, requestor: currentUserAddress })
       );
+      dispatch(addNotification({
+        address: asset.owner,
+        notification: {
+          id: uuid(),
+          read: false,
+          message: `${currentUserAddress} has requested access to asset ${asset.title}`
+        }
+      }));
     }
   };
 
   const handleAcceptRequest = (requestor: string) => {
     dispatch(acceptAccessRequest({ assetId: asset.id, requestor }));
+    dispatch(addNotification({
+      address: requestor,
+      notification: {
+        id: uuid(),
+        read: false,
+        message: `Your access request to asset ${asset.title} has been accepted`
+      }
+    }));
   };
 
   const handleRejectRequest = (requestor: string) => {
     dispatch(rejectAccessRequest({ assetId: asset.id, requestor }));
+    dispatch(addNotification({
+      address: requestor,
+      notification: {
+        id: uuid(),
+        read: false,
+        message: `Your access request to asset ${asset.title} has been rejected`
+      }
+    }));
   };
 
   return (
