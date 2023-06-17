@@ -6,8 +6,8 @@ interface AssetEditFormProps {
   setEditedTitle: (value: string) => void;
   editedDescription: string;
   setEditedDescription: (value: string) => void;
-  editedContent: File;
-  setEditedContent: (value: File) => void;
+  editedContent: File[];
+  setEditedContent: (value: File[]) => void;
   handleSave: () => void;
 }
 
@@ -57,9 +57,10 @@ const AssetEditForm: FC<AssetEditFormProps> = ({
         id="editedContent"
         name="editedContent"
         type="file"
+        multiple
         onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
-            setEditedContent(e.target.files[0]);
+          if (e.target.files) {
+            setEditedContent(Array.from(e.target.files));
           }
         }}
         className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"

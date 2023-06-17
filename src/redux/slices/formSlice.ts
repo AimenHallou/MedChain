@@ -3,8 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Asset } from "../../objects/types";
 
 interface FormState extends Omit<Asset, "id"> {
-  content: File | null;
-  base64Content: string; 
+  content: File[] | null;
+  base64Content: string[]; 
 }
 
 const initialState: FormState = {
@@ -14,7 +14,7 @@ const initialState: FormState = {
   ownerTitle: "",
   createdDate: "",
   content: null,
-  base64Content: "",
+  base64Content: null,
   sharedWith: [],
   history: [],
 };
@@ -35,14 +35,14 @@ export const formSlice = createSlice({
     setCreatedDate: (state, action: PayloadAction<string>) => {
       state.createdDate = action.payload;
     },
-    setContent: (state, action: PayloadAction<File | null>) => {
+    setContent: (state, action: PayloadAction<File[] | null>) => {
       state.content = action.payload;
+    },
+    setBase64Content: (state, action: PayloadAction<string[]>) => {
+      state.base64Content = action.payload;
     },
     setSharedWith: (state, action: PayloadAction<string[]>) => {
       state.sharedWith = action.payload;
-    },
-    setBase64Content: (state, action: PayloadAction<string>) => {
-      state.base64Content = action.payload;
     },
     resetForm: () => initialState,
   },

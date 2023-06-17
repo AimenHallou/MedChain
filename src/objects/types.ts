@@ -6,7 +6,7 @@ export interface Asset {
   owner: string;
   ownerTitle: string;
   createdDate: string;
-  content: File | string | null;
+  content: File[] | string[] | null;
   sharedWith: string[];
   history: string[];
   accessRequests?: string[];

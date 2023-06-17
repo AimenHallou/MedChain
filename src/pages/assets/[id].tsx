@@ -31,9 +31,7 @@ const AssetPage: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
-  const [editedContent, setEditedContent] = useState(
-    new File([""], "filename")
-  );
+  const [editedContent, setEditedContent] = useState<File[]>([]);
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
   const currentUserAddress = useSelector(
@@ -44,11 +42,16 @@ const AssetPage: FC = () => {
     if (asset) {
       setEditedTitle(asset.title);
       setEditedDescription(asset.description);
-      if (typeof asset.content === "string") {
-        let decodedData = Buffer.from(asset.content, "base64");
-        setEditedContent(new File([new Blob([decodedData])], "filename"));
-      } else {
-        setEditedContent(asset.content);
+      if (Array.isArray(asset.content)) {
+        const files = asset.content.map((item) => {
+          if (typeof item === "string") {
+            let decodedData = Buffer.from(item, "base64");
+            return new File([new Blob([decodedData])], "filename");
+          } else {
+            return item;
+          }
+        });
+        setEditedContent(files);
       }
     }
   }, [asset]);
