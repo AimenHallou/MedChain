@@ -1,3 +1,4 @@
+// src/components/Header.tsx
 import React, { FC } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
@@ -12,11 +13,9 @@ const Header: FC = () => {
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const notifications = currentUser?.notifications;
-  
-  const unreadNotifications = notifications?.filter(
-    (notification) => !notification.read
-  ) || [];
 
+  const unreadNotifications =
+    notifications?.filter((notification) => !notification.read) || [];
 
   return (
     <header className="flex justify-between px-4 py-2 bg-blue-900 text-white items-center">
