@@ -2,6 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Asset } from "../../objects/types";
 import testAssets from "../../data/testAssets";
+import { v4 as uuid } from "uuid";
 
 const initialState: Asset[] = testAssets;
 
@@ -10,12 +11,13 @@ export const assetsSlice = createSlice({
   initialState,
   reducers: {
     addAsset: (state, action: PayloadAction<Omit<Asset, "id">>) => {
-      const newId = (state.length + 1).toString();
+      const newId = uuid();
       state.push({
         id: newId,
         history: [`Asset created on ${new Date().toISOString()}`],
         accessRequests: [],
         ...action.payload,
+        content: action.payload.content,
       });
     },
     fetchPublishedAssets: (state, action: PayloadAction<string>) => {

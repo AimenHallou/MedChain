@@ -31,7 +31,9 @@ const AssetPage: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
-  const [editedContent, setEditedContent] = useState("");
+  const [editedContent, setEditedContent] = useState(
+    new File([""], "filename")
+  );
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
   const currentUserAddress = useSelector(
@@ -42,7 +44,12 @@ const AssetPage: FC = () => {
     if (asset) {
       setEditedTitle(asset.title);
       setEditedDescription(asset.description);
-      setEditedContent(asset.content);
+      if (typeof asset.content === "string") {
+        let decodedData = Buffer.from(asset.content, "base64");
+        setEditedContent(new File([new Blob([decodedData])], "filename"));
+      } else {
+        setEditedContent(asset.content);
+      }
     }
   }, [asset]);
 
@@ -87,39 +94,45 @@ const AssetPage: FC = () => {
       dispatch(
         requestAccess({ assetId: asset.id, requestor: currentUserAddress })
       );
-      dispatch(addNotification({
-        address: asset.owner,
-        notification: {
-          id: uuid(),
-          read: false,
-          message: `${currentUserAddress} has requested access to asset ${asset.title}`
-        }
-      }));
+      dispatch(
+        addNotification({
+          address: asset.owner,
+          notification: {
+            id: uuid(),
+            read: false,
+            message: `${currentUserAddress} has requested access to asset ${asset.title}`,
+          },
+        })
+      );
     }
   };
 
   const handleAcceptRequest = (requestor: string) => {
     dispatch(acceptAccessRequest({ assetId: asset.id, requestor }));
-    dispatch(addNotification({
-      address: requestor,
-      notification: {
-        id: uuid(),
-        read: false,
-        message: `Your access request to asset ${asset.title} has been accepted`
-      }
-    }));
+    dispatch(
+      addNotification({
+        address: requestor,
+        notification: {
+          id: uuid(),
+          read: false,
+          message: `Your access request to asset ${asset.title} has been accepted`,
+        },
+      })
+    );
   };
 
   const handleRejectRequest = (requestor: string) => {
     dispatch(rejectAccessRequest({ assetId: asset.id, requestor }));
-    dispatch(addNotification({
-      address: requestor,
-      notification: {
-        id: uuid(),
-        read: false,
-        message: `Your access request to asset ${asset.title} has been rejected`
-      }
-    }));
+    dispatch(
+      addNotification({
+        address: requestor,
+        notification: {
+          id: uuid(),
+          read: false,
+          message: `Your access request to asset ${asset.title} has been rejected`,
+        },
+      })
+    );
   };
 
   return (
@@ -135,7 +148,7 @@ const AssetPage: FC = () => {
           </p>
           {(asset.sharedWith.includes(user.currentUserAddress) ||
             user.currentUserAddress === asset.owner) && (
-            <p className="text-sm text-white">Data: {asset.content}</p>
+            <p className="text-sm text-white">Data: [File Content]</p>
           )}
         </div>
         <div className="md:w-1/3 w-full px-4">

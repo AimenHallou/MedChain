@@ -10,6 +10,7 @@ import {
   setContent,
   setSharedWith,
   resetForm,
+  setBase64Content,
 } from "../redux/slices/formSlice";
 import { addAsset } from "../redux/slices/assetSlice";
 import { addNotification } from "../redux/slices/userSlice";
@@ -64,6 +65,21 @@ const PublishForm: FC = () => {
     setSharedUsers(sharedUsers.filter((user) => user !== address));
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setBase64Content(reader.result);
+        } else {
+          console.error('Unexpected result type from FileReader');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
@@ -77,7 +93,7 @@ const PublishForm: FC = () => {
         history: [`Asset created on ${createdDate}`],
       })
     );
-
+  
     sharedUsers.forEach((sharedUser) => {
       dispatch(
         addNotification({
@@ -90,10 +106,11 @@ const PublishForm: FC = () => {
         })
       );
     });
-
+  
     dispatch(resetForm());
     router.push("/");
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto mt-5">
@@ -138,9 +155,8 @@ const PublishForm: FC = () => {
         <input
           id="content"
           name="content"
-          type="text"
-          value={form.content}
-          onChange={handleChange}
+          type="file"
+          onChange={handleFileChange}
           className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
         />
       </div>
