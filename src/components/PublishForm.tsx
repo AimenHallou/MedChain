@@ -2,91 +2,28 @@
 import React, { FC, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import {
-  setTitle,
-  setDescription,
-  setOwner,
-  setCreatedDate,
-  setContent,
-  setSharedWith,
-  resetForm,
-  setBase64Content,
-} from "../redux/slices/formSlice";
+import { setTitle, resetForm } from "../redux/slices/formSlice";
 import { addAsset } from "../redux/slices/assetSlice";
 import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import { uuid } from "uuidv4";
+import ContentSection from "./publish/ContentSection";
+import DescriptionSection from "./publish/DescriptionSection";
+import ShareSection from "./publish/ShareSection";
+import TitleSection from "./publish/TitleSection";
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const form = useSelector((state: RootState) => state.form);
-  const [shareWith, setShareWith] = useState("");
   const [sharedUsers, setSharedUsers] = useState<string[]>([]);
   const { users, currentUserAddress } = useSelector(
     (state: RootState) => state.user
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
-  const handleChange = (
-    event: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const actionMap = {
-      title: setTitle,
-      description: setDescription,
-      content: setContent,
-    };
-
-    const action = actionMap[event.target.name];
-    if (action) {
-      const value =
-        event.target.name === "restricted" &&
-        event.target instanceof HTMLInputElement
-          ? event.target.checked
-          : event.target.value;
-      dispatch(action(value));
-    }
-  };
-
-  const handleShareWithChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setShareWith(event.target.value);
-  };
-
-  const handleAddSharedUser = () => {
-    setSharedUsers([...sharedUsers, shareWith]);
-    setShareWith("");
-  };
-
-  const handleRemoveSharedUser = (address: string) => {
-    setSharedUsers(sharedUsers.filter((user) => user !== address));
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = Array.from(event.target.files);
-      let fileContents: string[] = [];
-  
-      files.forEach((file, index) => {
-        const reader = new FileReader();
-  
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            fileContents.push(reader.result);
-            if (fileContents.length === files.length) {
-              dispatch(setBase64Content(fileContents));
-            }
-          } else {
-            console.error("Unexpected result type from FileReader");
-          }
-        };
-  
-        reader.readAsDataURL(file);
-      });
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setTitle(event.target.value));
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -125,91 +62,11 @@ const PublishForm: FC = () => {
       <h1 className="text-2xl font-bold text-white mb-4 text-center">
         Publish Data
       </h1>
-      <div className="mb-4">
-        <label className="block text-white font-bold mb-2" htmlFor="title">
-          Title
-        </label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-        />
-      </div>
+      <TitleSection />
+      <DescriptionSection />
+      <ContentSection />
+      <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
 
-      <div className="mb-4">
-        <label
-          className="block text-white font-bold mb-2"
-          htmlFor="description"
-        >
-          Description
-        </label>
-        <input
-          id="description"
-          name="description"
-          type="text"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-white font-bold mb-2" htmlFor="content">
-          Content
-        </label>
-        <input
-          id="content"
-          name="content"
-          type="file"
-          onChange={handleFileChange}
-          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-          multiple
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-white font-bold mb-2" htmlFor="share">
-          Share
-        </label>
-      </div>
-
-      <div className="mb-4 flex items-center">
-        <input
-          type="text"
-          placeholder="Enter address to share with"
-          value={shareWith}
-          onChange={handleShareWithChange}
-          className="w-2/3 px-3 py-2 text-white placeholder-white bg-gray-700 rounded-l outline-none focus:bg-gray-600"
-        />
-        <button
-          type="button"
-          onClick={handleAddSharedUser}
-          className="w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r"
-        >
-          Add User
-        </button>
-      </div>
-
-      <div className="mb-4">
-        {sharedUsers.map((address, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mt-2"
-          >
-            <span className="text-white">{address}</span>
-            <button
-              type="button"
-              onClick={() => handleRemoveSharedUser(address)}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-            >
-              X
-            </button>
-          </div>
-        ))}
-      </div>
       <div className="flex items-center justify-between">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
