@@ -22,7 +22,7 @@ const AssetCard: FC<AssetCardProps> = ({
   return (
     <div
       onClick={handleClick}
-      className="cursor-pointer w-80 bg-gray-800 text-white shadow-md rounded-md overflow-hidden my-2 mx-4 border-2 border-gray-600 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-100"
+      className="cursor-pointer w-full bg-gray-800 text-white shadow-md rounded-md overflow-hidden border-2 border-gray-600 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-100"
     >
       <div className="px-4 py-2">
         <h2 className="text-lg font-bold text-white">{title}</h2>
