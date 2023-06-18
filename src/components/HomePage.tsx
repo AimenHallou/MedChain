@@ -2,10 +2,14 @@
 import React, { FC } from "react";
 import AssetList from "./AssetList";
 
-const HomePage: FC = () => {
+interface HomePageProps {
+  searchTerm: string;
+}
+
+const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
   return (
     <div>
-      <AssetList />
+      <AssetList searchTerm={searchTerm} />
     </div>
   );
 };

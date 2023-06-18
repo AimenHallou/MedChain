@@ -1,28 +1,28 @@
 // src/components/SearchBar.tsx
 import React, { FC, useState } from "react";
 
-const SearchBar: FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+interface SearchBarProps {
+  onSearch: (term: string) => void;
+}
+
+const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    // handle search logic here
+    onSearch(event.target.value);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex">
+    <div className="flex">
       <input
         type="text"
         placeholder="Search"
         value={searchTerm}
         onChange={handleChange}
-        className="rounded-l px-4 py-2"
+        className="rounded-l px-4 py-2 text-black"  
       />
-      <button type="submit" className="bg-blue-700 px-4 py-2 rounded-r">
+      <div className="bg-blue-700 px-4 py-2 rounded-r">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -37,8 +37,8 @@ const SearchBar: FC = () => {
             d="M21 21l-6-6m2-6a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-      </button>
-    </form>
+      </div>
+    </div>
   );
 };
 

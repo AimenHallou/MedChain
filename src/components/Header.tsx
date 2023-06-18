@@ -6,10 +6,15 @@ import { RootState } from "../redux/store";
 import SearchBar from "./SearchBar";
 import NotificationDropdown from "./NotificationDropdown";
 
-const Header: FC = () => {
+interface HeaderProps {
+  onSearch: (term: string) => void;
+}
+
+const Header: FC<HeaderProps> = ({ onSearch }) => {
   const { users, currentUserAddress } = useSelector(
     (state: RootState) => state.user
   );
+
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const notifications = currentUser?.notifications;
@@ -35,7 +40,7 @@ const Header: FC = () => {
         </Link>
       </nav>
       <div className="flex gap-4">
-        <SearchBar />
+        <SearchBar onSearch={onSearch} />
         <div>
           <span className="relative inline-block cursor-pointer">
             <NotificationDropdown />
