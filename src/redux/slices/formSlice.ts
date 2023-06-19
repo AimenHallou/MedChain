@@ -1,10 +1,9 @@
 // src/redux/slices/formSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Asset } from "../../objects/types";
+import { Asset, FileData } from "../../objects/types";
 
 interface FormState extends Omit<Asset, "id"> {
-  content: File[] | null;
-  base64Content: string[]; 
+  base64Content: FileData[] | null; 
 }
 
 const initialState: FormState = {
@@ -35,14 +34,17 @@ export const formSlice = createSlice({
     setCreatedDate: (state, action: PayloadAction<string>) => {
       state.createdDate = action.payload;
     },
-    setContent: (state, action: PayloadAction<File[] | null>) => {
+    setContent: (state, action: PayloadAction<FileData[] | null>) => {  // FileData used here
       state.content = action.payload;
     },
-    setBase64Content: (state, action: PayloadAction<string[]>) => {
+    setBase64Content: (state, action: PayloadAction<FileData[] | null>) => {  // FileData used here
       state.base64Content = action.payload;
     },
     setSharedWith: (state, action: PayloadAction<string[]>) => {
       state.sharedWith = action.payload;
+    },
+    setFormContent: (state, action: PayloadAction<FileData[]>) => {
+      state.content = action.payload;
     },
     resetForm: () => initialState,
   },
@@ -57,6 +59,7 @@ export const {
   setSharedWith,
   resetForm,
   setBase64Content,
+  setFormContent,
 } = formSlice.actions;
 
 export default formSlice.reducer;

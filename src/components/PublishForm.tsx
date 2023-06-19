@@ -11,6 +11,7 @@ import ContentSection from "./publish/ContentSection";
 import DescriptionSection from "./publish/DescriptionSection";
 import ShareSection from "./publish/ShareSection";
 import TitleSection from "./publish/TitleSection";
+import FileCardsSection from "./publish/FileCardsSection";
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch();
@@ -58,24 +59,30 @@ const PublishForm: FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto mt-5">
-      <h1 className="text-2xl font-bold text-white mb-4 text-center">
-        Publish Data
-      </h1>
-      <TitleSection />
-      <DescriptionSection />
-      <ContentSection />
-      <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
+    <div className="flex flex-col md:flex-row justify-center md:justify-between bg-gray-900 p-4 md:p-8 text-white">
+      <form onSubmit={handleSubmit} className="w-full md:w-4/5 mx-auto md:mx-0 mt-5 md:mt-0">
+        <h1 className="text-2xl font-bold mb-4 text-center">
+          Publish Data
+        </h1>
+        <TitleSection />
+        <DescriptionSection />
+        <ContentSection />
+        <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
 
-      <div className="flex items-center justify-between">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          type="submit"
-        >
-          Publish
-        </button>
+        <div className="flex items-center justify-center mt-5">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="submit"
+          >
+            Publish
+          </button>
+        </div>
+      </form>
+
+      <div className="w-full md:w-3/5 mt-8 md:mt-0">
+        <FileCardsSection />
       </div>
-    </form>
+    </div>
   );
 };
 

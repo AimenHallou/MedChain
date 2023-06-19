@@ -12,13 +12,13 @@ import {
   rejectAccessRequest,
   requestAccess,
 } from "../../redux/slices/assetSlice";
+import { v4 as uuid } from "uuid";
 
 import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
 import { addNotification } from "../../redux/slices/userSlice";
-import { v4 as uuid } from "uuid";
 
 const AssetPage: FC = () => {
   const router = useRouter();
@@ -43,13 +43,16 @@ const AssetPage: FC = () => {
       setEditedTitle(asset.title);
       setEditedDescription(asset.description);
       if (Array.isArray(asset.content)) {
-        const files = asset.content.map((item) => {
-          if (typeof item === "string") {
-            let decodedData = Buffer.from(item, "base64");
-            return new File([new Blob([decodedData])], "filename");
-          } else {
-            return item;
+        const files = asset.content.map((fileData) => {
+          const base64String = fixBase64Padding(fileData.base64);
+          const decodedData = atob(base64String);
+          const array = new Uint8Array(decodedData.length);
+          for (let i = 0; i < decodedData.length; i++) {
+            array[i] = decodedData.charCodeAt(i);
           }
+          const blob = new Blob([array.buffer]);
+          const file = new File([blob], fileData.name);
+          return file;
         });
         setEditedContent(files);
       }
@@ -64,18 +67,42 @@ const AssetPage: FC = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const fileDataArray = await Promise.all(editedContent.map(async (file) => {
+      const base64 = await toBase64(file);
+      return {
+        base64: base64.split(',')[1],
+        name: file.name,
+      };
+    }));
+
     dispatch(
       updateAsset({
         id: asset.id,
         title: editedTitle,
         description: editedDescription,
-        content: editedContent,
+        content: fileDataArray,
       })
     );
 
     setIsEditing(false);
-  };
+};
+
+const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+});
+
+const fixBase64Padding = (base64String: string): string => {
+  let paddedBase64 = base64String;
+  while (paddedBase64.length % 4 !== 0) {
+    paddedBase64 += '=';
+  }
+  return paddedBase64;
+};
+
 
   const handleTransfer = () => {
     dispatch(transferOwnership({ assetId: asset.id, newOwner }));

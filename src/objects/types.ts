@@ -1,4 +1,9 @@
 // src/objects/types.ts
+export interface FileData {
+  base64: string;
+  name: string;
+}
+
 export interface Asset {
   id: string;
   title: string;
@@ -6,7 +11,7 @@ export interface Asset {
   owner: string;
   ownerTitle: string;
   createdDate: string;
-  content: File[] | string[] | null;
+  content: FileData[] | null;  // FileData used here
   sharedWith: string[];
   history: string[];
   accessRequests?: string[];

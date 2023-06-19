@@ -13,18 +13,20 @@ const DescriptionSection: React.FC = () => {
   };
 
   return (
-    <div className="mb-4">
-      <label className="block text-white font-bold mb-2" htmlFor="description">
-        Description
-      </label>
-      <input
-        id="description"
-        name="description"
-        type="text"
-        value={form.description}
-        onChange={handleChange}
-        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-      />
+    <div className="flex justify-center mb-4">
+      <div className="w-1/2">
+        <label className="block text-white font-bold mb-2" htmlFor="description">
+          Description
+        </label>
+        <input
+          id="description"
+          name="description"
+          type="text"
+          value={form.description}
+          onChange={handleChange}
+          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+        />
+      </div>
     </div>
   );
 };
