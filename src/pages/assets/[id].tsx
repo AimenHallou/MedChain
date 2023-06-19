@@ -18,6 +18,7 @@ import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
+import AssetFileSection from '../../pages/assets/AssetFileSection';
 import { addNotification } from "../../redux/slices/userSlice";
 
 const AssetPage: FC = () => {
@@ -180,6 +181,7 @@ const fixBase64Padding = (base64String: string): string => {
             user.currentUserAddress === asset.owner) && (
             <p className="text-sm text-white">Data: [File Content]</p>
           )}
+          <AssetFileSection />
         </div>
         <div className="md:w-1/3 w-full px-4">
           {user.currentUserAddress === asset.owner && !isEditing && (
@@ -221,7 +223,7 @@ const fixBase64Padding = (base64String: string): string => {
         />
       )}
     </div>
-  );
+  );  
 };
 
 export default AssetPage;

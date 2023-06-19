@@ -11,7 +11,7 @@ export interface Asset {
   owner: string;
   ownerTitle: string;
   createdDate: string;
-  content: FileData[] | null;  // FileData used here
+  content: FileData[] | null;
   sharedWith: string[];
   history: string[];
   accessRequests?: string[];
