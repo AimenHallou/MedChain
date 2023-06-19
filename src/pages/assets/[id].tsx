@@ -18,7 +18,7 @@ import AssetEditForm from "../../pages/assets/AssetEditForm";
 import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
 import AssetHistory from "../../pages/assets/AssetHistory";
 import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
-import AssetFileSection from '../../pages/assets/AssetFileSection';
+import AssetFileSection from "../../pages/assets/AssetFileSection";
 import { addNotification } from "../../redux/slices/userSlice";
 
 const AssetPage: FC = () => {
@@ -69,13 +69,15 @@ const AssetPage: FC = () => {
   };
 
   const handleSave = async () => {
-    const fileDataArray = await Promise.all(editedContent.map(async (file) => {
-      const base64 = await toBase64(file);
-      return {
-        base64: base64.split(',')[1],
-        name: file.name,
-      };
-    }));
+    const fileDataArray = await Promise.all(
+      editedContent.map(async (file) => {
+        const base64 = await toBase64(file);
+        return {
+          base64: base64.split(",")[1],
+          name: file.name,
+        };
+      })
+    );
 
     dispatch(
       updateAsset({
@@ -87,23 +89,23 @@ const AssetPage: FC = () => {
     );
 
     setIsEditing(false);
-};
+  };
 
-const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-});
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-const fixBase64Padding = (base64String: string): string => {
-  let paddedBase64 = base64String;
-  while (paddedBase64.length % 4 !== 0) {
-    paddedBase64 += '=';
-  }
-  return paddedBase64;
-};
-
+  const fixBase64Padding = (base64String: string): string => {
+    let paddedBase64 = base64String;
+    while (paddedBase64.length % 4 !== 0) {
+      paddedBase64 += "=";
+    }
+    return paddedBase64;
+  };
 
   const handleTransfer = () => {
     dispatch(transferOwnership({ assetId: asset.id, newOwner }));
@@ -179,9 +181,9 @@ const fixBase64Padding = (base64String: string): string => {
           </p>
           {(asset.sharedWith.includes(user.currentUserAddress) ||
             user.currentUserAddress === asset.owner) && (
-            <p className="text-sm text-white">Data: [File Content]</p>
+              // <p className="text-sm text-white">Data: </p>
+              <AssetFileSection assetId={id as string} />
           )}
-          <AssetFileSection />
         </div>
         <div className="md:w-1/3 w-full px-4">
           {user.currentUserAddress === asset.owner && !isEditing && (
@@ -223,7 +225,7 @@ const fixBase64Padding = (base64String: string): string => {
         />
       )}
     </div>
-  );  
+  );
 };
 
 export default AssetPage;
