@@ -4,8 +4,6 @@ import React, { FC } from "react";
 interface AssetEditFormProps {
   editedTitle: string;
   setEditedTitle: (value: string) => void;
-  editedDescription: string;
-  setEditedDescription: (value: string) => void;
   editedContent: File[];
   setEditedContent: (value: File[]) => void;
   handleSave: () => void;
@@ -14,8 +12,6 @@ interface AssetEditFormProps {
 const AssetEditForm: FC<AssetEditFormProps> = ({
   editedTitle,
   setEditedTitle,
-  editedDescription,
-  setEditedDescription,
   editedContent,
   setEditedContent,
   handleSave,
@@ -31,20 +27,6 @@ const AssetEditForm: FC<AssetEditFormProps> = ({
         type="text"
         value={editedTitle}
         onChange={(e) => setEditedTitle(e.target.value)}
-        className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
-      />
-    </div>
-
-    <div className="mb-4">
-      <label htmlFor="editedDescription" className="text-white font-bold">
-        Description
-      </label>
-      <input
-        id="editedDescription"
-        name="editedDescription"
-        type="text"
-        value={editedDescription}
-        onChange={(e) => setEditedDescription(e.target.value)}
         className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
       />
     </div>

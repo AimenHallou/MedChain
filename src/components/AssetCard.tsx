@@ -7,7 +7,6 @@ interface AssetCardProps extends Asset {}
 
 const AssetCard: FC<AssetCardProps> = ({
   title,
-  description,
   owner,
   ownerTitle,
   createdDate,
@@ -28,7 +27,6 @@ const AssetCard: FC<AssetCardProps> = ({
         <h2 className="text-lg font-bold text-white">{title}</h2>
       </div>
       <div className="px-4 py-2 bg-gray-900">
-        <p className="text-sm text-white">Description: {description}</p>
         <p className="text-sm text-white">Owner: {owner}</p>
         <p className="text-sm text-white">Created Date: {createdDate}</p>
       </div>

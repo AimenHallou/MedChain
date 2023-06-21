@@ -26,14 +26,13 @@ export const assetsSlice = createSlice({
     updateAsset: (
       state,
       action: PayloadAction<
-        Pick<Asset, "id" | "title" | "description" | "content">
+        Pick<Asset, "id" | "title" | "content">
       >
     ) => {
-      const { id, title, description, content } = action.payload;
+      const { id, title, content } = action.payload;
       const assetIndex = state.findIndex((asset) => asset.id === id);
       if (assetIndex !== -1) {
         state[assetIndex].title = title;
-        state[assetIndex].description = description;
         state[assetIndex].content = content;
         state[assetIndex].history.push(
           `Asset updated on ${new Date().toISOString()}`

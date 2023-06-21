@@ -8,7 +8,6 @@ import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import { uuid } from "uuidv4";
 import ContentSection from "./publish/ContentSection";
-import DescriptionSection from "./publish/DescriptionSection";
 import ShareSection from "./publish/ShareSection";
 import TitleSection from "./publish/TitleSection";
 import FileCardsSection from "./publish/FileCardsSection";
@@ -65,7 +64,6 @@ const PublishForm: FC = () => {
           Publish Data
         </h1>
         <TitleSection />
-        <DescriptionSection />
         <ContentSection />
         <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
 

@@ -12,7 +12,6 @@ const AssetList: FC<AssetListProps> = ({ searchTerm }) => {
   const assets = useSelector((state: RootState) => state.assets);
   const filteredAssets = assets.filter(asset =>
     asset.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.owner.toLowerCase().includes(searchTerm.toLowerCase())
   );
   

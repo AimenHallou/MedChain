@@ -3,7 +3,6 @@ const testAssets = [
     {
       id: '1',
       title: 'Patient Medical Record 1',
-      description: 'This is a comprehensive medical record for patient 1, including medical history, diagnoses, treatments, and more.',
       owner: 'John Doe',
       ownerTitle: 'Dr',
       createdDate: '2023-06-01',
@@ -15,7 +14,6 @@ const testAssets = [
     {
       id: '2',
       title: 'Patient Medical Record 2',
-      description: 'This is a comprehensive medical record for patient 2, including medical history, diagnoses, treatments, and more.',
       owner: 'Jane Smith',
       ownerTitle: 'Ms',
       createdDate: '2023-06-02',
@@ -27,7 +25,6 @@ const testAssets = [
     {
       id: '3',
       title: 'Patient Medical Record 3',
-      description: 'This is a comprehensive medical record for patient 3, including medical history, diagnoses, treatments, and more.',
       owner: 'Alice Johnson',
       ownerTitle: 'Drs',
       createdDate: '2023-06-03',
@@ -39,7 +36,6 @@ const testAssets = [
     {
       id: '4',
       title: 'Patient Medical Record 4',
-      description: 'This is a comprehensive medical record for patient 4, including medical history, diagnoses, treatments, and more.',
       owner: 'Bob Thompson',
       ownerTitle: 'Drs',
       createdDate: '2023-06-04',
@@ -51,7 +47,6 @@ const testAssets = [
     {
       id: '5',
       title: 'Patient Medical Record 5',
-      description: 'This is a comprehensive medical record for patient 5, including medical history, diagnoses, treatments, and more.',
       owner: 'Emily Davis',
       ownerTitle: 'Mr',
       createdDate: '2023-06-05',

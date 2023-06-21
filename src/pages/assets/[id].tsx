@@ -31,7 +31,6 @@ const AssetPage: FC = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
-  const [editedDescription, setEditedDescription] = useState("");
   const [editedContent, setEditedContent] = useState<File[]>([]);
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -42,7 +41,6 @@ const AssetPage: FC = () => {
   useEffect(() => {
     if (asset) {
       setEditedTitle(asset.title);
-      setEditedDescription(asset.description);
       if (Array.isArray(asset.content)) {
         const files = asset.content.map((fileData) => {
           const base64String = fixBase64Padding(fileData.base64);
@@ -83,7 +81,6 @@ const AssetPage: FC = () => {
       updateAsset({
         id: asset.id,
         title: editedTitle,
-        description: editedDescription,
         content: fileDataArray,
       })
     );
@@ -173,7 +170,6 @@ const AssetPage: FC = () => {
       <div className="px-4 py-2 flex md:flex-row flex-col">
         <div className="md:w-2/3 w-full">
           <h1 className="text-lg font-bold text-white">{asset.title}</h1>
-          <p className="text-sm text-white">Description: {asset.description}</p>
           <p className="text-sm text-white">Owner: {asset.owner}</p>
           <p className="text-sm text-white">Title: {asset.ownerTitle}</p>
           <p className="text-sm text-white">
@@ -217,8 +213,6 @@ const AssetPage: FC = () => {
         <AssetEditForm
           editedTitle={editedTitle}
           setEditedTitle={setEditedTitle}
-          editedDescription={editedDescription}
-          setEditedDescription={setEditedDescription}
           editedContent={editedContent}
           setEditedContent={setEditedContent}
           handleSave={handleSave}

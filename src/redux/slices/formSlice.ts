@@ -8,7 +8,6 @@ interface FormState extends Omit<Asset, "id"> {
 
 const initialState: FormState = {
   title: "",
-  description: "",
   owner: "",
   ownerTitle: "",
   createdDate: "",
@@ -24,9 +23,6 @@ export const formSlice = createSlice({
   reducers: {
     setTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
-    },
-    setDescription: (state, action: PayloadAction<string>) => {
-      state.description = action.payload;
     },
     setOwner: (state, action: PayloadAction<string>) => {
       state.owner = action.payload;
@@ -52,7 +48,6 @@ export const formSlice = createSlice({
 
 export const {
   setTitle,
-  setDescription,
   setOwner,
   setCreatedDate,
   setContent,
