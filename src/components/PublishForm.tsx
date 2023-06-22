@@ -2,14 +2,14 @@
 import React, { FC, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { setTitle, resetForm } from "../redux/slices/formSlice";
+import { setPatient_id, resetForm } from "../redux/slices/formSlice";
 import { addPatient } from "../redux/slices/patientSlice";
 import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import { uuid } from "uuidv4";
 import ContentSection from "./publish/ContentSection";
 import ShareSection from "./publish/ShareSection";
-import TitleSection from "./publish/TitleSection";
+import Patient_idSection from "./publish/Patient_idSection";
 import FileCardsSection from "./publish/FileCardsSection";
 
 const PublishForm: FC = () => {
@@ -23,7 +23,7 @@ const PublishForm: FC = () => {
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setTitle(event.target.value));
+    dispatch(setPatient_id(event.target.value));
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -47,7 +47,7 @@ const PublishForm: FC = () => {
           notification: {
             id: uuid(),
             read: false,
-            message: `You have been added as a shared user to the patient with id "${form.title}".`,
+            message: `You have been added as a shared user to the patient with id "${form.patient_id}".`,
           },
         })
       );
@@ -63,7 +63,7 @@ const PublishForm: FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center">
           Create Patient Data
         </h1>
-        <TitleSection />
+        <Patient_idSection />
         <ContentSection />
         <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
 

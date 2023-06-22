@@ -2,31 +2,31 @@
 import React, { FC } from "react";
 
 interface PatientEditFormProps {
-  editedTitle: string;
-  setEditedTitle: (value: string) => void;
+  editedPatient_id: string;
+  setEditedPatient_id: (value: string) => void;
   editedContent: File[];
   setEditedContent: (value: File[]) => void;
   handleSave: () => void;
 }
 
 const PatientEditForm: FC<PatientEditFormProps> = ({
-  editedTitle,
-  setEditedTitle,
+  editedPatient_id,
+  setEditedPatient_id,
   editedContent,
   setEditedContent,
   handleSave,
 }) => (
   <div className="px-4 py-2 bg-gray-900">
     <div className="mb-4">
-      <label htmlFor="editedTitle" className="text-white font-bold">
-        Title
+      <label htmlFor="editedPatient_id" className="text-white font-bold">
+      Patient ID
       </label>
       <input
-        id="editedTitle"
-        name="editedTitle"
+        id="editedPatient_id"
+        name="editedPatient_id"
         type="text"
-        value={editedTitle}
-        onChange={(e) => setEditedTitle(e.target.value)}
+        value={editedPatient_id}
+        onChange={(e) => setEditedPatient_id(e.target.value)}
         className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
       />
     </div>

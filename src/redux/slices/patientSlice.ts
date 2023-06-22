@@ -26,13 +26,13 @@ export const patientSlice = createSlice({
     updatePatient: (
       state,
       action: PayloadAction<
-        Pick<Patient, "id" | "title" | "content">
+        Pick<Patient, "id" | "patient_id" | "content">
       >
     ) => {
-      const { id, title, content } = action.payload;
+      const { id, patient_id, content } = action.payload;
       const patientIndex = state.findIndex((patient) => patient.id === id);
       if (patientIndex !== -1) {
-        state[patientIndex].title = title;
+        state[patientIndex].patient_id = patient_id;
         state[patientIndex].content = content;
         state[patientIndex].history.push(
           `Patient updated on ${new Date().toISOString()}`

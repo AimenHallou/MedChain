@@ -2,7 +2,7 @@
 const testPatients = [
     {
       id: '1',
-      title: 'Patient Medical Record 1',
+      patient_id: 'Patient Medical Record 1',
       owner: 'John Doe',
       ownerTitle: 'Dr',
       createdDate: '2023-06-01',
@@ -13,7 +13,7 @@ const testPatients = [
     },
     {
       id: '2',
-      title: 'Patient Medical Record 2',
+      patient_id: 'Patient Medical Record 2',
       owner: 'Jane Smith',
       ownerTitle: 'Ms',
       createdDate: '2023-06-02',
@@ -24,7 +24,7 @@ const testPatients = [
     },
     {
       id: '3',
-      title: 'Patient Medical Record 3',
+      patient_id: 'Patient Medical Record 3',
       owner: 'Alice Johnson',
       ownerTitle: 'Drs',
       createdDate: '2023-06-03',
@@ -35,7 +35,7 @@ const testPatients = [
     },
     {
       id: '4',
-      title: 'Patient Medical Record 4',
+      patient_id: 'Patient Medical Record 4',
       owner: 'Bob Thompson',
       ownerTitle: 'Drs',
       createdDate: '2023-06-04',
@@ -46,7 +46,7 @@ const testPatients = [
     },
     {
       id: '5',
-      title: 'Patient Medical Record 5',
+      patient_id: 'Patient Medical Record 5',
       owner: 'Emily Davis',
       ownerTitle: 'Mr',
       createdDate: '2023-06-05',

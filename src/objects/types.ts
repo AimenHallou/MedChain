@@ -6,7 +6,7 @@ export interface FileData {
 
 export interface Patient {
   id: string;
-  title: string;
+  patient_id: string;
   owner: string;
   ownerTitle: string;
   createdDate: string;

@@ -11,7 +11,7 @@ interface PatientListProps {
 const PatientList: FC<PatientListProps> = ({ searchTerm }) => {
   const patients = useSelector((state: RootState) => state.patients);
   const filteredPatients = patients.filter(patient =>
-    patient.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.patient_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.owner.toLowerCase().includes(searchTerm.toLowerCase())
   );
   

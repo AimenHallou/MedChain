@@ -7,7 +7,7 @@ interface FormState extends Omit<Patient, "id"> {
 }
 
 const initialState: FormState = {
-  title: "",
+  patient_id: "",
   owner: "",
   ownerTitle: "",
   createdDate: "",
@@ -21,8 +21,8 @@ export const formSlice = createSlice({
   name: "form",
   initialState,
   reducers: {
-    setTitle: (state, action: PayloadAction<string>) => {
-      state.title = action.payload;
+    setPatient_id: (state, action: PayloadAction<string>) => {
+      state.patient_id = action.payload;
     },
     setOwner: (state, action: PayloadAction<string>) => {
       state.owner = action.payload;
@@ -47,7 +47,7 @@ export const formSlice = createSlice({
 });
 
 export const {
-  setTitle,
+  setPatient_id,
   setOwner,
   setCreatedDate,
   setContent,

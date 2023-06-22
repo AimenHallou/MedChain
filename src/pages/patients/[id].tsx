@@ -30,7 +30,7 @@ const PatientPage: FC = () => {
   const patient = patients.find((patient) => patient.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState("");
+  const [editedPatient_id, setEditedPatient_id] = useState("");
   const [editedContent, setEditedContent] = useState<File[]>([]);
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -40,7 +40,7 @@ const PatientPage: FC = () => {
 
   useEffect(() => {
     if (patient) {
-      setEditedTitle(patient.title);
+      setEditedPatient_id(patient.patient_id);
       if (Array.isArray(patient.content)) {
         const files = patient.content.map((fileData) => {
           const base64String = fixBase64Padding(fileData.base64);
@@ -80,7 +80,7 @@ const PatientPage: FC = () => {
     dispatch(
       updatePatient({
         id: patient.id,
-        title: editedTitle,
+        patient_id: editedPatient_id,
         content: fileDataArray,
       })
     );
@@ -130,7 +130,7 @@ const PatientPage: FC = () => {
           notification: {
             id: uuid(),
             read: false,
-            message: `${currentUserAddress} has requested access to patient ${patient.title}`,
+            message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
           },
         })
       );
@@ -145,7 +145,7 @@ const PatientPage: FC = () => {
         notification: {
           id: uuid(),
           read: false,
-          message: `Your access request to patient ${patient.title} has been accepted`,
+          message: `Your access request to patient ${patient.patient_id} has been accepted`,
         },
       })
     );
@@ -159,7 +159,7 @@ const PatientPage: FC = () => {
         notification: {
           id: uuid(),
           read: false,
-          message: `Your access request to patient ${patient.title} has been rejected`,
+          message: `Your access request to patient ${patient.patient_id} has been rejected`,
         },
       })
     );
@@ -169,7 +169,7 @@ const PatientPage: FC = () => {
     <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-gray-600">
       <div className="px-4 py-2 flex md:flex-row flex-col">
         <div className="md:w-2/3 w-full">
-          <h1 className="text-lg font-bold text-white">{patient.title}</h1>
+          <h1 className="text-lg font-bold text-white">{patient.patient_id}</h1>
           <p className="text-sm text-white">Owner: {patient.owner}</p>
           <p className="text-sm text-white">Title: {patient.ownerTitle}</p>
           <p className="text-sm text-white">
@@ -177,8 +177,8 @@ const PatientPage: FC = () => {
           </p>
           {(patient.sharedWith.includes(user.currentUserAddress) ||
             user.currentUserAddress === patient.owner) && (
-              // <p className="text-sm text-white">Data: </p>
-              <PatientFileSection patientId={id as string} />
+            // <p className="text-sm text-white">Data: </p>
+            <PatientFileSection patientId={id as string} />
           )}
         </div>
         <div className="md:w-1/3 w-full px-4">
@@ -211,8 +211,8 @@ const PatientPage: FC = () => {
       <PatientHistory history={patient.history} />
       {isEditing && (
         <PatientEditForm
-          editedTitle={editedTitle}
-          setEditedTitle={setEditedTitle}
+          editedPatient_id={editedPatient_id}
+          setEditedPatient_id={setEditedPatient_id}
           editedContent={editedContent}
           setEditedContent={setEditedContent}
           handleSave={handleSave}
