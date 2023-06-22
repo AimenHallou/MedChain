@@ -1,11 +1,11 @@
-// src/components/AssetCard.tsx
+// src/components/PatientCard.tsx
 import React, { FC } from "react";
 import { useRouter } from "next/router";
-import { Asset } from "../objects/types";
+import { Patient } from "../objects/types";
 
-interface AssetCardProps extends Asset {}
+interface PatientCardProps extends Patient {}
 
-const AssetCard: FC<AssetCardProps> = ({
+const PatientCard: FC<PatientCardProps> = ({
   title,
   owner,
   ownerTitle,
@@ -15,7 +15,7 @@ const AssetCard: FC<AssetCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/assets/${id}`);
+    router.push(`/patients/${id}`);
   };
 
   return (
@@ -34,4 +34,4 @@ const AssetCard: FC<AssetCardProps> = ({
   );
 };
 
-export default AssetCard;
+export default PatientCard;

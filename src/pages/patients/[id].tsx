@@ -1,33 +1,33 @@
-// src/pages/assets/[id].tsx
+// src/pages/patients/[id].tsx
 import React, { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import {
-  updateAsset,
+  updatePatient,
   transferOwnership,
-  shareAsset,
-  unshareAsset,
+  sharePatient,
+  unsharePatient,
   acceptAccessRequest,
   rejectAccessRequest,
   requestAccess,
-} from "../../redux/slices/assetSlice";
+} from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
-import AssetEditForm from "../../pages/assets/AssetEditForm";
-import AssetOwnerActions from "../../pages/assets/AssetOwnerActions";
-import AssetHistory from "../../pages/assets/AssetHistory";
-import AssetRequestAccess from "../../pages/assets/AssetRequestAccess";
-import AssetFileSection from "../../pages/assets/AssetFileSection";
+import PatientEditForm from "./PatientEditForm";
+import PatientOwnerActions from "./PatientOwnerActions";
+import PatientHistory from "./PatientHistory";
+import PatientRequestAccess from "./PatientRequestAccess";
+import PatientFileSection from "./PatientFileSection";
 import { addNotification } from "../../redux/slices/userSlice";
 
-const AssetPage: FC = () => {
+const PatientPage: FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const assets = useSelector((state: RootState) => state.assets);
+  const patients = useSelector((state: RootState) => state.patients);
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const asset = assets.find((asset) => asset.id === id);
+  const patient = patients.find((patient) => patient.id === id);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
@@ -39,10 +39,10 @@ const AssetPage: FC = () => {
   );
 
   useEffect(() => {
-    if (asset) {
-      setEditedTitle(asset.title);
-      if (Array.isArray(asset.content)) {
-        const files = asset.content.map((fileData) => {
+    if (patient) {
+      setEditedTitle(patient.title);
+      if (Array.isArray(patient.content)) {
+        const files = patient.content.map((fileData) => {
           const base64String = fixBase64Padding(fileData.base64);
           const decodedData = atob(base64String);
           const array = new Uint8Array(decodedData.length);
@@ -56,10 +56,10 @@ const AssetPage: FC = () => {
         setEditedContent(files);
       }
     }
-  }, [asset]);
+  }, [patient]);
 
-  if (!asset) {
-    return <div>Asset not found</div>;
+  if (!patient) {
+    return <div>Patient not found</div>;
   }
 
   const handleEdit = () => {
@@ -78,8 +78,8 @@ const AssetPage: FC = () => {
     );
 
     dispatch(
-      updateAsset({
-        id: asset.id,
+      updatePatient({
+        id: patient.id,
         title: editedTitle,
         content: fileDataArray,
       })
@@ -105,32 +105,32 @@ const AssetPage: FC = () => {
   };
 
   const handleTransfer = () => {
-    dispatch(transferOwnership({ assetId: asset.id, newOwner }));
+    dispatch(transferOwnership({ patientId: patient.id, newOwner }));
     setNewOwner("");
   };
 
   const handleShare = () => {
-    dispatch(shareAsset({ assetId: asset.id, address: sharedAddress }));
+    dispatch(sharePatient({ patientId: patient.id, address: sharedAddress }));
     setSharedAddress("");
   };
 
   const handleUnshare = (address: string) => {
-    dispatch(unshareAsset({ assetId: asset.id, address }));
+    dispatch(unsharePatient({ patientId: patient.id, address }));
   };
 
   const handleRequestAccess = () => {
-    const requestPending = asset.accessRequests.includes(currentUserAddress);
+    const requestPending = patient.accessRequests.includes(currentUserAddress);
     if (!requestPending) {
       dispatch(
-        requestAccess({ assetId: asset.id, requestor: currentUserAddress })
+        requestAccess({ patientId: patient.id, requestor: currentUserAddress })
       );
       dispatch(
         addNotification({
-          address: asset.owner,
+          address: patient.owner,
           notification: {
             id: uuid(),
             read: false,
-            message: `${currentUserAddress} has requested access to asset ${asset.title}`,
+            message: `${currentUserAddress} has requested access to patient ${patient.title}`,
           },
         })
       );
@@ -138,28 +138,28 @@ const AssetPage: FC = () => {
   };
 
   const handleAcceptRequest = (requestor: string) => {
-    dispatch(acceptAccessRequest({ assetId: asset.id, requestor }));
+    dispatch(acceptAccessRequest({ patientId: patient.id, requestor }));
     dispatch(
       addNotification({
         address: requestor,
         notification: {
           id: uuid(),
           read: false,
-          message: `Your access request to asset ${asset.title} has been accepted`,
+          message: `Your access request to patient ${patient.title} has been accepted`,
         },
       })
     );
   };
 
   const handleRejectRequest = (requestor: string) => {
-    dispatch(rejectAccessRequest({ assetId: asset.id, requestor }));
+    dispatch(rejectAccessRequest({ patientId: patient.id, requestor }));
     dispatch(
       addNotification({
         address: requestor,
         notification: {
           id: uuid(),
           read: false,
-          message: `Your access request to asset ${asset.title} has been rejected`,
+          message: `Your access request to patient ${patient.title} has been rejected`,
         },
       })
     );
@@ -169,21 +169,21 @@ const AssetPage: FC = () => {
     <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-gray-600">
       <div className="px-4 py-2 flex md:flex-row flex-col">
         <div className="md:w-2/3 w-full">
-          <h1 className="text-lg font-bold text-white">{asset.title}</h1>
-          <p className="text-sm text-white">Owner: {asset.owner}</p>
-          <p className="text-sm text-white">Title: {asset.ownerTitle}</p>
+          <h1 className="text-lg font-bold text-white">{patient.title}</h1>
+          <p className="text-sm text-white">Owner: {patient.owner}</p>
+          <p className="text-sm text-white">Title: {patient.ownerTitle}</p>
           <p className="text-sm text-white">
-            Created Date: {asset.createdDate}
+            Created Date: {patient.createdDate}
           </p>
-          {(asset.sharedWith.includes(user.currentUserAddress) ||
-            user.currentUserAddress === asset.owner) && (
+          {(patient.sharedWith.includes(user.currentUserAddress) ||
+            user.currentUserAddress === patient.owner) && (
               // <p className="text-sm text-white">Data: </p>
-              <AssetFileSection assetId={id as string} />
+              <PatientFileSection patientId={id as string} />
           )}
         </div>
         <div className="md:w-1/3 w-full px-4">
-          {user.currentUserAddress === asset.owner && !isEditing && (
-            <AssetOwnerActions
+          {user.currentUserAddress === patient.owner && !isEditing && (
+            <PatientOwnerActions
               isEditing={isEditing}
               newOwner={newOwner}
               setNewOwner={setNewOwner}
@@ -191,26 +191,26 @@ const AssetPage: FC = () => {
               sharedAddress={sharedAddress}
               setSharedAddress={setSharedAddress}
               handleShare={handleShare}
-              sharedWith={asset.sharedWith}
+              sharedWith={patient.sharedWith}
               handleUnshare={handleUnshare}
             />
           )}
           <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
-          <AssetRequestAccess
-            assetId={id as string}
+          <PatientRequestAccess
+            patientId={id as string}
             handleRequestAccess={handleRequestAccess}
-            requestPending={asset.accessRequests.includes(currentUserAddress)}
-            accessRequests={asset.accessRequests}
+            requestPending={patient.accessRequests.includes(currentUserAddress)}
+            accessRequests={patient.accessRequests}
             handleAcceptRequest={handleAcceptRequest}
             handleRejectRequest={handleRejectRequest}
             currentUserAddress={currentUserAddress}
-            assetOwner={asset.owner}
+            patientOwner={patient.owner}
           />
         </div>
       </div>
-      <AssetHistory history={asset.history} />
+      <PatientHistory history={patient.history} />
       {isEditing && (
-        <AssetEditForm
+        <PatientEditForm
           editedTitle={editedTitle}
           setEditedTitle={setEditedTitle}
           editedContent={editedContent}
@@ -222,4 +222,4 @@ const AssetPage: FC = () => {
   );
 };
 
-export default AssetPage;
+export default PatientPage;

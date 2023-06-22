@@ -1,7 +1,7 @@
-// src/components/pages/AssetEditForm.tsx
+// src/components/pages/PatientEditForm.tsx
 import React, { FC } from "react";
 
-interface AssetEditFormProps {
+interface PatientEditFormProps {
   editedTitle: string;
   setEditedTitle: (value: string) => void;
   editedContent: File[];
@@ -9,7 +9,7 @@ interface AssetEditFormProps {
   handleSave: () => void;
 }
 
-const AssetEditForm: FC<AssetEditFormProps> = ({
+const PatientEditForm: FC<PatientEditFormProps> = ({
   editedTitle,
   setEditedTitle,
   editedContent,
@@ -58,4 +58,4 @@ const AssetEditForm: FC<AssetEditFormProps> = ({
   </div>
 );
 
-export default AssetEditForm;
+export default PatientEditForm;

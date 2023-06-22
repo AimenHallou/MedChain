@@ -1,7 +1,7 @@
-// src/components/pages/AssetHeader.tsx
+// src/components/pages/PatientHeader.tsx
 import React, { FC } from "react";
 
-interface AssetHeaderProps {
+interface PatientHeaderProps {
   title: string;
   owner: string;
   ownerTitle: string;
@@ -11,7 +11,7 @@ interface AssetHeaderProps {
   sharedWith: string[];
 }
 
-const AssetHeader: FC<AssetHeaderProps> = ({
+const PatientHeader: FC<PatientHeaderProps> = ({
   title,
   owner,
   ownerTitle,
@@ -31,4 +31,4 @@ const AssetHeader: FC<AssetHeaderProps> = ({
   </div>
 );
 
-export default AssetHeader;
+export default PatientHeader;

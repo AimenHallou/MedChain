@@ -1,6 +1,6 @@
 // src/components/HomePage.tsx
 import React, { FC } from "react";
-import AssetList from "./AssetList";
+import PatientList from "./PatientList";
 
 interface HomePageProps {
   searchTerm: string;
@@ -9,7 +9,7 @@ interface HomePageProps {
 const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
   return (
     <div>
-      <AssetList searchTerm={searchTerm} />
+      <PatientList searchTerm={searchTerm} />
     </div>
   );
 };

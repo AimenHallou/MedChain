@@ -3,8 +3,8 @@ import React, { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser, addUser } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
-import PublishedAssets from "../components/PublishedAssets";
-import AccessedAssets from "../components/AccessedAssets";
+import PublishedPatients from "./PublishedPatient";
+import AccessedPatients from "./AccessedPatients";
 
 const UserAccount: FC = () => {
   const dispatch = useDispatch();
@@ -84,7 +84,7 @@ const UserAccount: FC = () => {
                 : "bg-gray-700 text-white"
             }`}
           >
-            Published Assets
+            Published Patients
           </button>
           <button
             onClick={() => setShowSection("accessed")}
@@ -94,12 +94,12 @@ const UserAccount: FC = () => {
                 : "bg-gray-700 text-white"
             }`}
           >
-            Accessed Assets
+            Accessed Patients
           </button>
         </div>
   
-        {showSection === "published" && <PublishedAssets />}
-        {showSection === "accessed" && <AccessedAssets />}
+        {showSection === "published" && <PublishedPatients />}
+        {showSection === "accessed" && <AccessedPatients />}
       </div>
       
       {users.length > 0 && (

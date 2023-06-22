@@ -1,7 +1,7 @@
-// src/components/pages/AssetOwnerActions.tsx
+// src/components/pages/PatientOwnerActions.tsx
 import React, { FC } from "react";
 
-interface AssetOwnerActionsProps {
+interface PatientOwnerActionsProps {
   isEditing: boolean;
   newOwner: string;
   setNewOwner: (value: string) => void;
@@ -13,7 +13,7 @@ interface AssetOwnerActionsProps {
   handleUnshare: (address: string) => void;
 }
 
-const AssetOwnerActions: FC<AssetOwnerActionsProps> = ({
+const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   isEditing,
   newOwner,
   setNewOwner,
@@ -52,7 +52,7 @@ const AssetOwnerActions: FC<AssetOwnerActionsProps> = ({
         className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
         onClick={handleShare}
       >
-        Share Asset
+        Share Patient
       </button>
       <div className="py-2">
         {sharedWith.map((address, index) => (
@@ -71,4 +71,4 @@ const AssetOwnerActions: FC<AssetOwnerActionsProps> = ({
   );
 };
 
-export default AssetOwnerActions;
+export default PatientOwnerActions;

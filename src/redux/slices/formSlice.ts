@@ -1,8 +1,8 @@
 // src/redux/slices/formSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Asset, FileData } from "../../objects/types";
+import { Patient, FileData } from "../../objects/types";
 
-interface FormState extends Omit<Asset, "id"> {
+interface FormState extends Omit<Patient, "id"> {
   base64Content: FileData[] | null; 
 }
 
@@ -30,10 +30,10 @@ export const formSlice = createSlice({
     setCreatedDate: (state, action: PayloadAction<string>) => {
       state.createdDate = action.payload;
     },
-    setContent: (state, action: PayloadAction<FileData[] | null>) => {  // FileData used here
+    setContent: (state, action: PayloadAction<FileData[] | null>) => {
       state.content = action.payload;
     },
-    setBase64Content: (state, action: PayloadAction<FileData[] | null>) => {  // FileData used here
+    setBase64Content: (state, action: PayloadAction<FileData[] | null>) => {
       state.base64Content = action.payload;
     },
     setSharedWith: (state, action: PayloadAction<string[]>) => {

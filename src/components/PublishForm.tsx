@@ -3,7 +3,7 @@ import React, { FC, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { setTitle, resetForm } from "../redux/slices/formSlice";
-import { addAsset } from "../redux/slices/assetSlice";
+import { addPatient } from "../redux/slices/patientSlice";
 import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import { uuid } from "uuidv4";
@@ -30,13 +30,13 @@ const PublishForm: FC = () => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
     dispatch(
-      addAsset({
+      addPatient({
         ...form,
         owner: currentUser?.address,
         ownerTitle: currentUser?.address,
         createdDate,
         sharedWith: sharedUsers,
-        history: [`Asset created on ${createdDate}`],
+        history: [`Patient created on ${createdDate}`],
       })
     );
 
@@ -47,7 +47,7 @@ const PublishForm: FC = () => {
           notification: {
             id: uuid(),
             read: false,
-            message: `You have been added as a shared user to the asset titled "${form.title}".`,
+            message: `You have been added as a shared user to the patient with id "${form.title}".`,
           },
         })
       );
@@ -61,7 +61,7 @@ const PublishForm: FC = () => {
     <div className="flex flex-col md:flex-row justify-center md:justify-between bg-gray-900 p-4 md:p-8 text-white">
       <form onSubmit={handleSubmit} className="w-full md:w-4/5 mx-auto md:mx-0 mt-5 md:mt-0">
         <h1 className="text-2xl font-bold mb-4 text-center">
-          Publish Data
+          Create Patient Data
         </h1>
         <TitleSection />
         <ContentSection />

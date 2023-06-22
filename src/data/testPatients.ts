@@ -1,5 +1,5 @@
-// src/data/testAssets.ts
-const testAssets = [
+// src/data/testPatients.ts
+const testPatients = [
     {
       id: '1',
       title: 'Patient Medical Record 1',
@@ -58,5 +58,5 @@ const testAssets = [
     
   ];
   
-  export default testAssets;
+  export default testPatients;
   

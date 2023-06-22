@@ -4,7 +4,7 @@ export interface FileData {
   name: string;
 }
 
-export interface Asset {
+export interface Patient {
   id: string;
   title: string;
   owner: string;
@@ -16,8 +16,8 @@ export interface Asset {
   accessRequests?: string[];
 }
 
-export interface AssetListProps {
-  assets: Asset[];
+export interface PatientListProps {
+  patients: Patient[];
 }
 
 export interface UserNotification {
@@ -39,6 +39,6 @@ export interface UsersState {
   currentUserAddress: string | null;
 }
 
-export interface AssetsState {
-  assets: Asset[];
+export interface PatientState {
+  patients: Patient[];
 }
