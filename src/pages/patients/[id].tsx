@@ -166,58 +166,65 @@ const PatientPage: FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden md:max-w-3xl m-4 border-2 border-gray-600">
-      <div className="px-4 py-2 flex md:flex-row flex-col">
-        <div className="md:w-2/3 w-full">
-          <h1 className="text-lg font-bold text-white">{patient.patient_id}</h1>
-          <p className="text-sm text-white">Owner: {patient.owner}</p>
-          <p className="text-sm text-white">Title: {patient.ownerTitle}</p>
-          <p className="text-sm text-white">
-            Created Date: {patient.createdDate}
-          </p>
-          {(patient.sharedWith.includes(user.currentUserAddress) ||
-            user.currentUserAddress === patient.owner) && (
-            // <p className="text-sm text-white">Data: </p>
-            <PatientFileSection patientId={id as string} />
-          )}
-        </div>
-        <div className="md:w-1/3 w-full px-4">
-          {user.currentUserAddress === patient.owner && !isEditing && (
-            <PatientOwnerActions
-              isEditing={isEditing}
-              newOwner={newOwner}
-              setNewOwner={setNewOwner}
-              handleTransfer={handleTransfer}
-              sharedAddress={sharedAddress}
-              setSharedAddress={setSharedAddress}
-              handleShare={handleShare}
-              sharedWith={patient.sharedWith}
-              handleUnshare={handleUnshare}
+    <div className="flex justify-between">
+      <div className="w-full max-w-3xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        <div className="px-4 py-2 flex md:flex-row flex-col">
+          <div className="md:w-2/3 w-full">
+            <h1 className="text-lg font-bold text-white">
+              {patient.patient_id}
+            </h1>
+            <p className="text-sm text-white">Owner: {patient.owner}</p>
+            <p className="text-sm text-white">Title: {patient.ownerTitle}</p>
+            <p className="text-sm text-white">
+              Created Date: {patient.createdDate}
+            </p>
+          </div>
+          <div className="md:w-1/3 w-full px-4">
+            {user.currentUserAddress === patient.owner && !isEditing && (
+              <PatientOwnerActions
+                isEditing={isEditing}
+                newOwner={newOwner}
+                setNewOwner={setNewOwner}
+                handleTransfer={handleTransfer}
+                sharedAddress={sharedAddress}
+                setSharedAddress={setSharedAddress}
+                handleShare={handleShare}
+                sharedWith={patient.sharedWith}
+                handleUnshare={handleUnshare}
+              />
+            )}
+            <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
+            <PatientRequestAccess
+              patientId={id as string}
+              handleRequestAccess={handleRequestAccess}
+              requestPending={patient.accessRequests.includes(
+                currentUserAddress
+              )}
+              accessRequests={patient.accessRequests}
+              handleAcceptRequest={handleAcceptRequest}
+              handleRejectRequest={handleRejectRequest}
+              currentUserAddress={currentUserAddress}
+              patientOwner={patient.owner}
             />
-          )}
-          <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
-          <PatientRequestAccess
-            patientId={id as string}
-            handleRequestAccess={handleRequestAccess}
-            requestPending={patient.accessRequests.includes(currentUserAddress)}
-            accessRequests={patient.accessRequests}
-            handleAcceptRequest={handleAcceptRequest}
-            handleRejectRequest={handleRejectRequest}
-            currentUserAddress={currentUserAddress}
-            patientOwner={patient.owner}
-          />
+          </div>
         </div>
+        <PatientHistory history={patient.history} />
+        {isEditing && (
+          <PatientEditForm
+            editedPatient_id={editedPatient_id}
+            setEditedPatient_id={setEditedPatient_id}
+            editedContent={editedContent}
+            setEditedContent={setEditedContent}
+            handleSave={handleSave}
+          />
+        )}
       </div>
-      <PatientHistory history={patient.history} />
-      {isEditing && (
-        <PatientEditForm
-          editedPatient_id={editedPatient_id}
-          setEditedPatient_id={setEditedPatient_id}
-          editedContent={editedContent}
-          setEditedContent={setEditedContent}
-          handleSave={handleSave}
-        />
-      )}
+      <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        {(patient.sharedWith.includes(user.currentUserAddress) ||
+          user.currentUserAddress === patient.owner) && (
+          <PatientFileSection patientId={id as string} />
+        )}
+      </div>
     </div>
   );
 };
