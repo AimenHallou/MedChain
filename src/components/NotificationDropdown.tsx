@@ -1,10 +1,13 @@
+// src/components/NotificationDropdown.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
+import { removeNotification, markNotificationAsRead } from "../redux/slices/userSlice";
 
 const NotificationDropdown: React.FC = () => {
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const { users, currentUserAddress } = useSelector(
     (state: RootState) => state.user
   );
@@ -13,7 +16,22 @@ const NotificationDropdown: React.FC = () => {
   const unreadNotifications =
     notifications?.filter((notification) => !notification.read) || [];
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+    markAllNotificationsAsRead();
+  };
+  
+  const markAllNotificationsAsRead = () => {
+    notifications?.forEach(notification => {
+      if (!notification.read) {
+        dispatch(markNotificationAsRead({address: currentUserAddress as string, notificationId: notification.id}));
+      }
+    });
+  };
+
+  const handleCloseNotification = (id: string) => {
+    dispatch(removeNotification({address: currentUserAddress as string, notificationId: id}));
+  };
 
   const ref = useRef(null);
   const handleClickOutside = (event) => {

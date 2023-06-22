@@ -35,9 +35,18 @@ export const userSlice = createSlice({
         );
       }
     },
+    markNotificationAsRead: (state, action: PayloadAction<{ address: string, notificationId: string }>) => {
+      const user = state.users.find(user => user.address === action.payload.address);
+      if (user) {
+        const notification = user.notifications.find((notification) => notification.id === action.payload.notificationId);
+        if (notification) {
+          notification.read = true;
+        }
+      }
+    },
   },
 });
 
-export const { addUser, setCurrentUser, addNotification, removeNotification } = userSlice.actions;
+export const { addUser, setCurrentUser, addNotification, removeNotification, markNotificationAsRead } = userSlice.actions;
 
 export default userSlice.reducer;
