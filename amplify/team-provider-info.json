@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-medchain-dev-220652-authRole",
+      "UnauthRoleArn": "arn:aws:iam::370057825404:role/amplify-medchain-dev-220652-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::370057825404:role/amplify-medchain-dev-220652-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-medchain-dev-220652-deployment",
+      "UnauthRoleName": "amplify-medchain-dev-220652-unauthRole",
+      "StackName": "amplify-medchain-dev-220652",
+      "StackId": "arn:aws:cloudformation:us-east-1:370057825404:stack/amplify-medchain-dev-220652/9fd53620-116a-11ee-aa47-126b097d13bf",
+      "AmplifyAppId": "d2e2r6qqob6hv6"
+    },
+    "categories": {
+      "hosting": {
+        "S3AndCloudFront": {}
+      }
+    }
+  }
+}

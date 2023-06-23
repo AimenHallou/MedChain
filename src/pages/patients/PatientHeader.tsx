@@ -1,4 +1,3 @@
-// src/components/pages/PatientHeader.tsx
 import React, { FC } from "react";
 
 interface PatientHeaderProps {
@@ -18,7 +17,7 @@ const PatientHeader: FC<PatientHeaderProps> = ({
   createdDate,
   content,
   currentUserAddress,
-  sharedWith,
+  sharedWith = [],
 }) => (
   <div className="md:w-2/3 w-full">
     <h1 className="text-lg font-bold text-white">{Patient_id}</h1>

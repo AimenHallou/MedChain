@@ -21,7 +21,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   sharedAddress,
   setSharedAddress,
   handleShare,
-  sharedWith,
+  sharedWith = [],
   handleUnshare,
 }) => {
   if (isEditing) return null;

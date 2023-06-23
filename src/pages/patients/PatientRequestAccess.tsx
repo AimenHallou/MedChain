@@ -18,7 +18,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   handleRequestAccess,
   handleAcceptRequest,
   handleRejectRequest,
-  accessRequests,
+  accessRequests = [],
   currentUserAddress,
   patientOwner,
 }) => (
