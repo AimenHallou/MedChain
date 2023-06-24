@@ -45,13 +45,12 @@ const Header: FC<HeaderProps> = ({ onSearch }) => {
           </div>
           <Link href="/account">
             <button className="px-6 py-4 bg-blue-700 text-white rounded cursor-pointer">
-              Account
+              {currentUser ? currentUser.address : "Account"}
             </button>
           </Link>
         </div>
       </header>
     );
-    
 };
 
 export default Header;
