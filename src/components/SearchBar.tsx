@@ -14,15 +14,15 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex items-stretch">
       <input
         type="text"
         placeholder="Search"
         value={searchTerm}
         onChange={handleChange}
-        className="rounded-l px-4 py-2 text-black"  
+        className="rounded-l px-4 text-black flex-grow py-2"  
       />
-      <div className="bg-blue-700 px-4 py-2 rounded-r">
+      <div className="bg-blue-700 px-4 py-2 rounded-r flex items-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
