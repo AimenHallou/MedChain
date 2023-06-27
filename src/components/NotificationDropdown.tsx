@@ -50,7 +50,7 @@ const NotificationDropdown: React.FC = () => {
   return (
     <div className="relative" ref={ref}>
       <button onClick={toggleDropdown}>
-        <img src="/images/bell.png" alt="Notification" className="h-10 w-10" />
+        <img src="/images/bell.png" alt="Notification" className="h-12 w-12" />
         {unreadNotifications.length > 0 && (
           <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
         )}
