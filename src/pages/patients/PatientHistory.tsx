@@ -11,7 +11,7 @@ const PatientHistory: FC<PatientHistoryProps> = ({ history = [] }) => (
       <h2 className="text-xl font-bold text-white mb-4">Patient Record History</h2>
     </div>
     {history.map((entry, index) => (
-      <div key={index} className="text-sm text-gray-200 bg-gray-900 p-3 my-2 rounded-md shadow-lg">
+      <div key={index} className="text-sm text-gray-200 bg-gray-600 p-3 my-2 rounded-md shadow-lg">
         <p>{entry}</p>
       </div>
     ))}

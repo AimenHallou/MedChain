@@ -180,14 +180,14 @@ const PatientPage: FC = () => {
       <div className="w-full max-w-3xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
         <div className="px-4 py-2 flex md:flex-row flex-col">
           <div className="md:w-2/3 w-full">
-            <h1 className="text-lg font-bold text-white">
-              {patient.patient_id}
-            </h1>
-            <p className="text-sm text-white">Owner: {patient.owner}</p>
-            <p className="text-sm text-white">Title: {patient.ownerTitle}</p>
-            <p className="text-sm text-white">
-              Created Date: {patient.createdDate}
-            </p>
+            <div className="bg-gray-700 p-3 rounded-lg shadow-md mb-4">
+              <h1 className="text-lg font-bold text-white mb-2">
+                {patient.patient_id}
+              </h1>
+              <p className="text-sm text-white mb-1">Owner: {patient.owner}</p>
+              <p className="text-sm text-white mb-1">Title: {patient.ownerTitle}</p>
+              <p className="text-sm text-white mb-1">Created Date: {patient.createdDate}</p>
+            </div>
           </div>
           <div className="md:w-1/3 w-full px-4">
             {user.currentUserAddress === patient.owner && !isEditing && (
