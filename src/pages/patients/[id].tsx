@@ -11,6 +11,7 @@ import {
   acceptAccessRequest,
   rejectAccessRequest,
   requestAccess,
+  cancelRequest,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
@@ -137,6 +138,15 @@ const PatientPage: FC = () => {
     }
   };
 
+  const handleCancelRequest = () => {
+    const requestPending = patient.accessRequests.includes(currentUserAddress);
+    if (requestPending) {
+      dispatch(
+        cancelRequest({ patientId: patient.id, requestor: currentUserAddress })
+      );
+    }
+  };
+
   const handleAcceptRequest = (requestor: string) => {
     dispatch(acceptAccessRequest({ patientId: patient.id, requestor }));
     dispatch(
@@ -193,7 +203,6 @@ const PatientPage: FC = () => {
                 handleUnshare={handleUnshare}
               />
             )}
-            <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
             <PatientRequestAccess
               patientId={id as string}
               handleRequestAccess={handleRequestAccess}
@@ -201,8 +210,10 @@ const PatientPage: FC = () => {
                 currentUserAddress
               )}
               accessRequests={patient.accessRequests}
+              handleCancelRequest={handleCancelRequest}
               handleAcceptRequest={handleAcceptRequest}
               handleRejectRequest={handleRejectRequest}
+              accessList={patient.sharedWith}
               currentUserAddress={currentUserAddress}
               patientOwner={patient.owner}
             />

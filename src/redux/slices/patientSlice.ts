@@ -94,6 +94,21 @@ export const patientSlice = createSlice({
         );
       }
     },
+    cancelRequest: (
+      state,
+      action: PayloadAction<{ patientId: string; requestor: string }>
+    ) => {
+      const { patientId, requestor } = action.payload;
+      const patient = state.find((patient) => patient.id === patientId);
+      if (patient && patient.accessRequests.includes(requestor)) {
+        patient.accessRequests = patient.accessRequests.filter(
+          (request) => request !== requestor
+        );
+        patient.history.push(
+          `Patient request for access by ${requestor} was cancelled`
+        );
+      }
+    },    
     acceptAccessRequest: (
       state,
       action: PayloadAction<{ patientId: string; requestor: string }>
@@ -136,6 +151,7 @@ export const {
   sharePatient,
   unsharePatient,
   requestAccess,
+  cancelRequest,
   acceptAccessRequest,
   rejectAccessRequest,
 } = patientSlice.actions;
