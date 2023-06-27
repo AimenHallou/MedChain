@@ -30,11 +30,6 @@ const Header: FC<HeaderProps> = ({ onSearch }) => {
               MedChain
             </span>
           </Link>
-          <Link href="/publish">
-            <span className="text-lg text-white cursor-pointer">
-              Publish Data
-            </span>
-          </Link>
         </nav>
         <div className="flex gap-4">
           <SearchBar onSearch={onSearch} />

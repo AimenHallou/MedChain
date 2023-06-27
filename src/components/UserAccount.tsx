@@ -36,8 +36,8 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-between bg-gray-700 p-6 rounded lg:mx-80 mt-10 text-white">
-      <div className="md:w-3/4 ">
+    <div className="flex flex-col md:flex-row justify-between bg-gray-700 p-6 rounded lg:mx-[30rem] mt-10 text-white">
+      <div className="md:w-full ">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold">User Account</h2>
         </div>
@@ -105,7 +105,7 @@ const UserAccount: FC = () => {
       </div>
   
       {users.length > 0 && (
-        <div className="mt-4 flex-1 md:ml-8">
+        <div className="mt-4 md:w-1/4 md:ml-8">
           <h2 className="text-2xl font-bold mb-2">Switch User</h2>
           <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
             {users.map((user) => (

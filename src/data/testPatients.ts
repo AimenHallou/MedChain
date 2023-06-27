@@ -7,9 +7,9 @@ const testPatients = [
       ownerTitle: 'Dr',
       createdDate: '2023-06-01',
       content: null,
-      restricted: false,
       sharedWith: [],
       history: [],
+      accessRequests: [],
     },
     {
       id: '2',
@@ -18,9 +18,9 @@ const testPatients = [
       ownerTitle: 'Ms',
       createdDate: '2023-06-02',
       content: null,
-      restricted: false,
       sharedWith: [],
       history: [],
+      accessRequests: []
     },
     {
       id: '3',
@@ -29,9 +29,9 @@ const testPatients = [
       ownerTitle: 'Drs',
       createdDate: '2023-06-03',
       content: null,
-      restricted: true,
       sharedWith: [],
       history: [],
+      accessRequests: [],
     },
     {
       id: '4',
@@ -40,9 +40,9 @@ const testPatients = [
       ownerTitle: 'Drs',
       createdDate: '2023-06-04',
       content: null,
-      restricted: true,
       sharedWith: [],
       history: [],
+      accessRequests: [],
     },
     {
       id: '5',
@@ -51,9 +51,9 @@ const testPatients = [
       ownerTitle: 'Mr',
       createdDate: '2023-06-05',
       content: null,
-      restricted: true,
       sharedWith: [],
       history: [],
+      accessRequests: [],
     },
     
   ];

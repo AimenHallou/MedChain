@@ -29,7 +29,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
 
   return (
     <div className="flex justify-center mb-4">
-      <div className="w-3/6">
+      <div className="w-1/2">
         <label className="block text-white font-bold mb-2" htmlFor="share">
           Share
         </label>
