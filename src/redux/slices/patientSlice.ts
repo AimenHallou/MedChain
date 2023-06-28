@@ -2,7 +2,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Patient } from "../../objects/types";
 import testPatients from "../../data/testPatients";
-import { v4 as uuid } from "uuid";
 
 const initialState: Patient[] = testPatients;
 
@@ -11,7 +10,7 @@ export const patientSlice = createSlice({
   initialState,
   reducers: {
     addPatient: (state, action: PayloadAction<Omit<Patient, "id">>) => {
-      const newId = uuid();
+      const newId = action.payload.patient_id;
       state.push({
         id: newId,
         history: [`Patient created on ${new Date().toISOString()}`],
@@ -19,7 +18,7 @@ export const patientSlice = createSlice({
         ...action.payload,
         content: action.payload.content,
       });
-    },
+    },    
     fetchPublishedPatients: (state, action: PayloadAction<string>) => {
       return state.filter((patient) => patient.owner === action.payload);
     },

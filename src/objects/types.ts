@@ -24,6 +24,7 @@ export interface UserNotification {
   id: string;
   read: boolean;
   message: string;
+  patient_id: string;
   accepted?: boolean;
   rejected?: boolean;
 }

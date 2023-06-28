@@ -32,6 +32,7 @@ const PublishForm: FC = () => {
     dispatch(
       addPatient({
         ...form,
+        patient_id: form.patient_id,
         owner: currentUser?.address,
         ownerTitle: currentUser?.address,
         createdDate,
@@ -48,10 +49,11 @@ const PublishForm: FC = () => {
             id: uuid(),
             read: false,
             message: `You have been added as a shared user to the patient with id "${form.patient_id}".`,
+            patient_id: form.patient_id
           },
         })
       );
-    });
+    });    
 
     dispatch(resetForm());
     router.push("/");

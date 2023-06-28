@@ -132,6 +132,7 @@ const PatientPage: FC = () => {
             id: uuid(),
             read: false,
             message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
+            patient_id: patient.patient_id,
           },
         })
       );
@@ -156,6 +157,7 @@ const PatientPage: FC = () => {
           id: uuid(),
           read: false,
           message: `Your access request to patient ${patient.patient_id} has been accepted`,
+          patient_id: patient.patient_id,
         },
       })
     );
@@ -170,6 +172,7 @@ const PatientPage: FC = () => {
           id: uuid(),
           read: false,
           message: `Your access request to patient ${patient.patient_id} has been rejected`,
+          patient_id: patient.patient_id,
         },
       })
     );

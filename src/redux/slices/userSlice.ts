@@ -24,7 +24,10 @@ export const userSlice = createSlice({
     addNotification: (state, action: PayloadAction<{ address: string, notification: UserNotification }>) => {
       const user = state.users.find(user => user.address === action.payload.address);
       if (user) {
-        user.notifications.push(action.payload.notification);
+        user.notifications.push({
+          ...action.payload.notification,
+          patient_id: action.payload.notification.patient_id
+        });
       }
     },
     removeNotification: (state, action: PayloadAction<{ address: string, notificationId: string }>) => {
