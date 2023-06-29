@@ -40,19 +40,19 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
           </button>
         </div>
       )}
-    {currentUserAddress === patientOwner && (
+    {currentUserAddress === patientOwner && accessRequests.length > 0 && (
       <>
         <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
         {accessRequests.map((requestor) => (
           <div
             key={`${patientId}-${requestor}`}
-            className="flex justify-between items-center"
+            className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-700"
           >
-            <p>{requestor}</p>
-            <div className="flex">
+            <span className="col-span-5 text-sm text-gray-200">{requestor}</span>
+            <div className="col-span-1 flex justify-end">
               <button
                 onClick={() => handleAcceptRequest(requestor)}
-                className="w-10"
+                className="w-9 mr-2"
               >
                 <img src="/images/check.png" alt="Accept" />
               </button>
