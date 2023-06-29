@@ -3,6 +3,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setFormContent } from '../../redux/slices/formSlice';
+import {AiFillFileText} from 'react-icons/ai';
+
 
 const FileCardsSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -17,7 +19,7 @@ const FileCardsSection: React.FC = () => {
   const renderFileCards = () => {
     return filesData.map((file, index) => (
       <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-4">
-        <img src="/images/files.png" alt="File" className="file-image w-20 h-20"/>
+        <AiFillFileText className="file-image w-20 h-20"/>
         <label className="block text-white font-bold mb-2 mt-4" htmlFor={`fileName-${index}`}>
           File {index + 1} name:
         </label>

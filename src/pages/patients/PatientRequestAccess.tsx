@@ -1,5 +1,6 @@
 // src/components/pages/PatientRequestAccess.tsx
 import React, { FC } from "react";
+import {IoIosClose, IoIosCheckmark} from 'react-icons/io';
 
 interface PatientRequestAccessProps {
   patientId: string;
@@ -48,20 +49,10 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
             key={`${patientId}-${requestor}`}
             className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-700"
           >
-            <span className="col-span-5 text-sm text-gray-200">{requestor}</span>
-            <div className="col-span-1 flex justify-end">
-              <button
-                onClick={() => handleAcceptRequest(requestor)}
-                className="w-9 mr-2"
-              >
-                <img src="/images/check.png" alt="Accept" />
-              </button>
-              <button
-                onClick={() => handleRejectRequest(requestor)}
-                className="w-7"
-              >
-                <img src="/images/close.png" alt="Reject" />
-              </button>
+            <span className="col-span-4 text-sm text-gray-200">{requestor}</span>
+            <div className="col-span-2 flex justify-end">
+              <IoIosCheckmark onClick={() => handleAcceptRequest(requestor)} className="w-10 h-10"/>
+              <IoIosClose onClick={() => handleRejectRequest(requestor)} className="w-10 h-10"/>
             </div>
           </div>
         ))}

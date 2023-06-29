@@ -1,5 +1,6 @@
 // src/components/pages/PatientOwnerActions.tsx
 import React, { FC } from "react";
+import {IoIosClose} from 'react-icons/io';
 
 interface PatientOwnerActionsProps {
   isEditing: boolean;
@@ -61,12 +62,10 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
             className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-700"
           >
             <span className="col-span-5 text-sm text-gray-200">{address}</span>
-            <button
-              className="col-span-1 text-sm bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+            <IoIosClose
+              className="col-span-1 h-10 w-10 centered"
               onClick={() => handleUnshare(address)}
-            >
-              X
-            </button>
+            />
           </div>
         ))}
       </div>

@@ -3,6 +3,7 @@ import React from 'react';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import { FileData } from '../../objects/types';
+import {AiFillFileText} from 'react-icons/ai';
 
 type PatientFileSectionProps = {
   patientId: string;
@@ -17,7 +18,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({ patientId }) =>
   const renderFileCards = (patientFiles: FileData[]) => {
     return patientFiles.map((file, index) => (
       <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-4">
-        <img src="/images/files.png" alt="File" className="file-image w-20 h-20"/>
+        <AiFillFileText className="file-image w-20 h-20"/>
         <div className="text-white font-bold mt-4 text-center">
           {file.name}
         </div>
