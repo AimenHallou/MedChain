@@ -18,7 +18,6 @@ const AccessedPatients: FC = () => {
 
   return (
     <div>
-      <h2>Accessed Patient</h2>
       {accessedPatients.map((patient) => (
         <PatientCard key={patient.id} {...patient} />
       ))}

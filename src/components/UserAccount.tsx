@@ -43,13 +43,7 @@ const UserAccount: FC = () => {
         </div>
         
         <div className="mb-4">
-          {currentUser && (
-            <>
-              <h3 className="text-xl mb-2">{currentUser.address}</h3>
-              <h3 className="text-xl mb-2">{currentUser.title}</h3>
-            </>
-          )}
-    
+
           <div className="mb-4">
             <h2 className="text-2xl font-bold mb-2">Add User</h2>
             <input
@@ -57,14 +51,14 @@ const UserAccount: FC = () => {
               value={newUserAddress}
               placeholder="Address"
               onChange={handleNewUserAddressChange}
-              className="block bg-gray-700 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
+              className="block bg-white placeholder-gray-400 text-black border border-gray-600 rounded p-2 w-full mb-4"
             />
             <input
               type="text"
               value={newUserTitle}
               placeholder="Title"
               onChange={handleNewUserTitleChange}
-              className="block bg-gray-700 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
+              className="block bg-white placeholder-gray-400 text-black border border-gray-600 rounded p-2 w-full mb-4"
             />
             <button
               onClick={handleAddUser}
@@ -74,7 +68,7 @@ const UserAccount: FC = () => {
             </button>
           </div>
         </div>
-        
+        <div className="border-t-2 border-dashed border-white py-2"/>
         <div className="mb-4">
           <div className="flex justify-between mb-4">
             <button

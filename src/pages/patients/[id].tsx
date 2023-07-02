@@ -38,6 +38,7 @@ const PatientPage: FC = () => {
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
+  const [showOwnerControls, setShowOwnerControls] = useState(false);
 
   useEffect(() => {
     if (patient) {

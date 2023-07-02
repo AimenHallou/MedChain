@@ -23,10 +23,10 @@ const Header: FC<HeaderProps> = ({ onSearch }) => {
     notifications?.filter((notification) => !notification.read) || [];
 
   return (
-    <header className="flex justify-between px-4 py-2 bg-blue-900 text-white items-center">
+    <header className="flex justify-between px-4 py-2 bg-blue-900 text-white items-center ">
       <nav className="flex gap-4">
         <Link href="/">
-          <img src="/images/logo.png" alt="Logo" className="h-16 mr-3" />
+          <img src="/images/logo.png" alt="Logo" className="h-12 mr-3" />
         </Link>
       </nav>
       <div className="flex gap-4">
@@ -37,7 +37,7 @@ const Header: FC<HeaderProps> = ({ onSearch }) => {
           </span>
         </div>
         <Link href="/account">
-          <button className="px-6 py-4 bg-blue-700 text-white rounded cursor-pointer">
+          <button className="px-6 py-3 bg-blue-700 text-white rounded cursor-pointer">
             {currentUser ? currentUser.address : "Account"}
           </button>
         </Link>

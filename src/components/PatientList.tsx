@@ -19,7 +19,6 @@ const PatientList: FC<PatientListProps> = ({ searchTerm }) => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-center my-8">Patient</h1>
       <div className= "text-center">
       <Link href="/publish">
       <button className="px-6 py-4 bg-blue-700 text-white rounded cursor-pointer mb-8">

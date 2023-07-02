@@ -1,3 +1,4 @@
+// src/components/PatientHeader.tsx
 import React, { FC } from "react";
 
 interface PatientHeaderProps {

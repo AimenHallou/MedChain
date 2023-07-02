@@ -21,10 +21,10 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         placeholder="Search"
         value={searchTerm}
         onChange={handleChange}
-        className="rounded-l px-4 text-black flex-grow py-2"  
+        className="rounded-l px-6 text-black flex-grow py-2"  
       />
       <div className="bg-blue-700 px-4 py-2 rounded-r flex items-center">
-      <BsSearch className="h-6 w-6"/>
+      <BsSearch className="h-4 w-4"/>
       </div>
     </div>
   );
