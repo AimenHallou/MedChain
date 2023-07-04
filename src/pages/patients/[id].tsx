@@ -234,12 +234,12 @@ const PatientPage: FC = () => {
           />
         )}
       </div>
+      {(patient.sharedWith.includes(user.currentUserAddress) ||
+        user.currentUserAddress === patient.owner) && (
       <div className="w-full lg:w-[30rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        {(patient.sharedWith.includes(user.currentUserAddress) ||
-          user.currentUserAddress === patient.owner) && (
-          <PatientFileSection patientId={id as string} />
-        )}
+        <PatientFileSection patientId={id as string} />
       </div>
+      )}
     </div>
   );
 };

@@ -18,23 +18,20 @@ const FileCardsSection: React.FC = () => {
 
   const renderFileCards = () => {
     return filesData.map((file, index) => (
-      <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-4">
-        <AiFillFileText className="file-image w-20 h-20"/>
-        <label className="block text-white font-bold mb-2 mt-4" htmlFor={`fileName-${index}`}>
-          File {index + 1} name:
-        </label>
+      <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-4 bg-gray-700">
+        <AiFillFileText className="file-image w-20 h-20 text-blue-500 mb-2"/>
         <input
           id={`fileName-${index}`}
           name={`fileName-${index}`}
           type="text"
           value={file.name}
           onChange={(e) => handleFileNameChange(index, e.target.value)}
-          className="file-name-input w-3/4 px-3 py-2 text-white bg-gray-800 rounded outline-none focus:bg-gray-600"
+          className="file-name-input w-full h-10 px-3 py-4 text-white placeholder-gray-400 bg-gray-800 rounded outline-none focus:bg-gray-900"
         />
       </div>
     ));
   };
-
+  
   return (
     <div className="file-cards-section">
       <h2 className="text-center text-2xl font-bold text-white mb-4">
@@ -45,6 +42,7 @@ const FileCardsSection: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default FileCardsSection;

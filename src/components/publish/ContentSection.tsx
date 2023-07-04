@@ -50,7 +50,7 @@ const ContentSection: React.FC = () => {
           name="content"
           type="file"
           onChange={handleFileChange}
-          className="w-full px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded outline-none"
+          className="w-full px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded outline-none focus:bg-gray-900" 
           multiple
         />
       </div>

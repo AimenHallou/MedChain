@@ -39,7 +39,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
             placeholder="Enter address to share with"
             value={shareWith}
             onChange={handleShareWithChange}
-            className="w-4/6 px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded-l outline-none"
+            className="w-4/6 px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded-l outline-none focus:bg-gray-900"
           />
           <button
             type="button"
