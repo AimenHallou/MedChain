@@ -36,12 +36,12 @@ const UserAccount: FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-between bg-gray-700 p-6 rounded lg:mx-[30rem] mt-10 text-white">
-      <div className="md:w-full ">
+    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
+  
+      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[40rem]">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold">User Account</h2>
         </div>
-        
         <div className="mb-4">
 
           <div className="mb-4">
@@ -97,21 +97,21 @@ const UserAccount: FC = () => {
           {showSection === "accessed" && <AccessedPatients />}
         </div>
       </div>
+        {users.length > 0 && (
+      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[20rem]">
+      <h2 className="text-2xl font-bold mb-2">Switch User</h2>
+            <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
+              {users.map((user) => (
+                <option key={user.address} value={user.address}>
+                  {user.title} ({user.address})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        
+      </div>
+    );  
+  };
   
-      {users.length > 0 && (
-        <div className="mt-4 md:w-1/4 md:ml-8">
-          <h2 className="text-2xl font-bold mb-2">Switch User</h2>
-          <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
-            {users.map((user) => (
-              <option key={user.address} value={user.address}>
-                {user.title} ({user.address})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-    </div>
-  );  
-};
-
-export default UserAccount;
+  export default UserAccount;
