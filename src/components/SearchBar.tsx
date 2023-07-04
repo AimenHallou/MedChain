@@ -1,6 +1,6 @@
 // src/components/SearchBar.tsx
 import React, { FC, useState } from "react";
-import { BsSearch } from 'react-icons/Bs';
+import { BiSearch } from 'react-icons/Bi';
 
 interface SearchBarProps {
   onSearch: (term: string) => void;
@@ -24,7 +24,7 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         className="rounded-l px-6 text-black flex-grow py-2"  
       />
       <div className="bg-blue-700 px-4 py-2 rounded-r flex items-center">
-      <BsSearch className="h-4 w-4"/>
+      <BiSearch className="h-6 w-6 "/>
       </div>
     </div>
   );

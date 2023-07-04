@@ -180,9 +180,9 @@ const PatientPage: FC = () => {
   };
 
   return (
-    <div className="flex justify-between">
-      <div className="w-full max-w-3xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        <div className="px-4 py-2 flex md:flex-row flex-col">
+    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
+    <div className="w-full lg:w-[40rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+      <div className="px-4 py-2 flex md:flex-row flex-col">
           <div className="md:w-2/3 w-full">
             <div className="bg-gray-700 p-3 rounded-lg shadow-md mb-4">
               <h1 className="text-lg font-bold text-white mb-2">
@@ -234,7 +234,7 @@ const PatientPage: FC = () => {
           />
         )}
       </div>
-      <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+      <div className="w-full lg:w-[40rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
         {(patient.sharedWith.includes(user.currentUserAddress) ||
           user.currentUserAddress === patient.owner) && (
           <PatientFileSection patientId={id as string} />
