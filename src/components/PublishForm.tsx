@@ -78,10 +78,7 @@ const PublishForm: FC = () => {
           </button>
         </div>
       </form>
-  
-      <div className="w-full lg:w-[35rem] bg-gray-700 p-6 rounded mt-10 text-white">
         <FileCardsSection />
-      </div>
     </div>
   );  
 };
