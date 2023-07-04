@@ -181,9 +181,9 @@ const PatientPage: FC = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
-    <div className="w-full lg:w-[40rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-      <div className="px-4 py-2 flex md:flex-row flex-col">
-          <div className="md:w-2/3 w-full">
+      <div className="w-full lg:w-[25rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        <div className="px-4 py-2">
+          <div className="w-full">
             <div className="bg-gray-700 p-3 rounded-lg shadow-md mb-4">
               <h1 className="text-lg font-bold text-white mb-2">
                 {patient.patient_id}
@@ -193,35 +193,35 @@ const PatientPage: FC = () => {
               <p className="text-sm text-white mb-1">Created Date: {patient.createdDate}</p>
             </div>
           </div>
-          <div className="md:w-1/3 w-full px-4">
-            {user.currentUserAddress === patient.owner && !isEditing && (
-              <PatientOwnerActions
-                isEditing={isEditing}
-                newOwner={newOwner}
-                setNewOwner={setNewOwner}
-                handleTransfer={handleTransfer}
-                sharedAddress={sharedAddress}
-                setSharedAddress={setSharedAddress}
-                handleShare={handleShare}
-                sharedWith={patient.sharedWith}
-                handleUnshare={handleUnshare}
-              />
-            )}
-            <PatientRequestAccess
-              patientId={id as string}
-              handleRequestAccess={handleRequestAccess}
-              requestPending={patient.accessRequests.includes(
-                currentUserAddress
-              )}
-              accessRequests={patient.accessRequests}
-              handleCancelRequest={handleCancelRequest}
-              handleAcceptRequest={handleAcceptRequest}
-              handleRejectRequest={handleRejectRequest}
-              accessList={patient.sharedWith}
-              currentUserAddress={currentUserAddress}
-              patientOwner={patient.owner}
+        </div>
+        <div className="flex justify-center px-4 py-2 w-2/3 ">
+          {user.currentUserAddress === patient.owner && !isEditing && (
+            <PatientOwnerActions
+              isEditing={isEditing}
+              newOwner={newOwner}
+              setNewOwner={setNewOwner}
+              handleTransfer={handleTransfer}
+              sharedAddress={sharedAddress}
+              setSharedAddress={setSharedAddress}
+              handleShare={handleShare}
+              sharedWith={patient.sharedWith}
+              handleUnshare={handleUnshare}
             />
-          </div>
+          )}
+          <PatientRequestAccess
+            patientId={id as string}
+            handleRequestAccess={handleRequestAccess}
+            requestPending={patient.accessRequests.includes(
+              currentUserAddress
+            )}
+            accessRequests={patient.accessRequests}
+            handleCancelRequest={handleCancelRequest}
+            handleAcceptRequest={handleAcceptRequest}
+            handleRejectRequest={handleRejectRequest}
+            accessList={patient.sharedWith}
+            currentUserAddress={currentUserAddress}
+            patientOwner={patient.owner}
+          />
         </div>
         <PatientHistory history={patient.history} />
         {isEditing && (
@@ -234,7 +234,7 @@ const PatientPage: FC = () => {
           />
         )}
       </div>
-      <div className="w-full lg:w-[40rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+      <div className="w-full lg:w-[30rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
         {(patient.sharedWith.includes(user.currentUserAddress) ||
           user.currentUserAddress === patient.owner) && (
           <PatientFileSection patientId={id as string} />

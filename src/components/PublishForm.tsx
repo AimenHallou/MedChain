@@ -60,15 +60,15 @@ const PublishForm: FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center md:justify-between bg-gray-900 p-4 md:p-8 text-white">
-      <form onSubmit={handleSubmit} className="w-full md:w-5/5 mx-auto md:mx-0 mt-5 md:mt-0">
+    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white">
+      <form onSubmit={handleSubmit} className="w-full lg:w-[30rem] bg-gray-700 p-6 rounded mt-10 text-white">
         <h1 className="text-2xl font-bold mb-4 text-center">
           Create Patient Data
         </h1>
         <Patient_idSection />
         <ContentSection />
         <ShareSection sharedUsers={sharedUsers} setSharedUsers={setSharedUsers} />
-
+  
         <div className="flex items-center justify-center mt-5">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -78,12 +78,12 @@ const PublishForm: FC = () => {
           </button>
         </div>
       </form>
-
-      <div className="w-full md:w-3/5 mt-8 md:mt-0">
+  
+      <div className="w-full lg:w-[35rem] bg-gray-700 p-6 rounded mt-10 text-white">
         <FileCardsSection />
       </div>
     </div>
-  );
+  );  
 };
 
 export default PublishForm;

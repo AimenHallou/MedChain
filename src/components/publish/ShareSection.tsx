@@ -28,8 +28,8 @@ const ShareSection: React.FC<ShareSectionProps> = ({
   };
 
   return (
-    <div className="flex justify-center mb-4">
-      <div className="w-1/2">
+    <div className="mb-4">
+      <div className="">
         <label className="block text-white font-bold mb-2" htmlFor="share">
           Share
         </label>
@@ -39,7 +39,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
             placeholder="Enter address to share with"
             value={shareWith}
             onChange={handleShareWithChange}
-            className="w-4/6 px-3 py-2 text-white placeholder-white bg-gray-700 rounded-l outline-none focus:bg-gray-600"
+            className="w-4/6 px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded-l outline-none"
           />
           <button
             type="button"
@@ -53,7 +53,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
           {sharedUsers.map((address, index) => (
             <div
               key={index}
-              className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mt-2"
+              className="flex items-center justify-between bg-gray-800 px-3 py-2 rounded mt-2"
             >
               <span className="text-white">{address}</span>
               <button

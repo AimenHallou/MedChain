@@ -28,7 +28,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   if (isEditing) return null;
 
   return (
-    <div className=" w-full">
+    <div className="justify-center">
       <input
         className="shadow appearance-none border rounded-t-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
         type="text"

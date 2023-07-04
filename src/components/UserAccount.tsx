@@ -37,8 +37,7 @@ const UserAccount: FC = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
-  
-      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[40rem]">
+      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem]">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold">User Account</h2>
         </div>
@@ -51,14 +50,14 @@ const UserAccount: FC = () => {
               value={newUserAddress}
               placeholder="Address"
               onChange={handleNewUserAddressChange}
-              className="block bg-white placeholder-gray-400 text-black border border-gray-600 rounded p-2 w-full mb-4"
+              className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
             />
             <input
               type="text"
               value={newUserTitle}
               placeholder="Title"
               onChange={handleNewUserTitleChange}
-              className="block bg-white placeholder-gray-400 text-black border border-gray-600 rounded p-2 w-full mb-4"
+              className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full mb-4"
             />
             <button
               onClick={handleAddUser}

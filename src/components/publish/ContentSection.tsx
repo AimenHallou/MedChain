@@ -40,8 +40,8 @@ const ContentSection: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center mb-4">
-      <div className="w-1/2">
+    <div className="mb-4">
+      <div className="">
         <label className="block text-white font-bold mb-2" htmlFor="content">
           Content
         </label>
@@ -50,7 +50,7 @@ const ContentSection: React.FC = () => {
           name="content"
           type="file"
           onChange={handleFileChange}
-          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+          className="w-full px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded outline-none"
           multiple
         />
       </div>

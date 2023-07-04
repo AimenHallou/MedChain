@@ -29,7 +29,7 @@ const FileCardsSection: React.FC = () => {
           type="text"
           value={file.name}
           onChange={(e) => handleFileNameChange(index, e.target.value)}
-          className="file-name-input w-3/4 px-3 py-2 text-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+          className="file-name-input w-3/4 px-3 py-2 text-white bg-gray-800 rounded outline-none focus:bg-gray-600"
         />
       </div>
     ));
