@@ -33,7 +33,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
         <label className="block text-white font-bold mb-2" htmlFor="share">
           Share
         </label>
-        <div className="mb-4 flex items-center">
+        <div className="mb-6 flex items-center">
           <input
             type="text"
             placeholder="Enter address to share with"
