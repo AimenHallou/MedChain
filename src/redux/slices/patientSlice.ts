@@ -139,6 +139,22 @@ export const patientSlice = createSlice({
         );
       }
     },
+    removeFile: (
+      state,
+      action: PayloadAction<{ patientId: string; fileName: string }>
+    ) => {
+      const { patientId, fileName } = action.payload;
+      const patient = state.find((patient) => patient.id === patientId);
+      if (patient) {
+        const fileIndex = patient.content.findIndex((file) => file.name === fileName);
+        if (fileIndex !== -1) {
+          patient.content.splice(fileIndex, 1);
+          patient.history.push(
+            `File ${fileName} removed on ${new Date().toISOString()}`
+          );
+        }
+      }
+    },    
   },
 });
 
@@ -153,6 +169,7 @@ export const {
   cancelRequest,
   acceptAccessRequest,
   rejectAccessRequest,
+  removeFile,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

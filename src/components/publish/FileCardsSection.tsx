@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setFormContent } from '../../redux/slices/formSlice';
 import {AiFillFileText} from 'react-icons/ai';
-import { TiDelete } from 'react-icons/ti';  // Import MdDelete from react-icons
+import { TiDelete } from 'react-icons/ti';
 
 const FileCardsSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -16,7 +16,6 @@ const FileCardsSection: React.FC = () => {
     dispatch(setFormContent(newFilesData));
   };
 
-  // Function to remove file
   const handleFileRemove = (index: number) => {
     const newFilesData = filesData.filter((_, i) => i !== index);
     dispatch(setFormContent(newFilesData));
@@ -31,8 +30,8 @@ const FileCardsSection: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {filesData.map((file, index) => (
-              <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-3 bg-gray-700 relative">  {/* Add relative to position delete icon correctly */}
-                <TiDelete className="absolute right-2 top-2 h-8 w-8 cursor-pointer text-red-500" onClick={() => handleFileRemove(index)}/>  {/* Add delete icon */}
+              <div key={index} className="file-card mt-2 flex flex-col items-center rounded p-3 bg-gray-700 relative">
+                <TiDelete className="absolute right-2 top-2 h-8 w-8 cursor-pointer text-red-500" onClick={() => handleFileRemove(index)}/>
                 <AiFillFileText className="file-image w-20 h-20 text-blue-500 mb-2"/>
                 <input
                   id={`fileName-${index}`}

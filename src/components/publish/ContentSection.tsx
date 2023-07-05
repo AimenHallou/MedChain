@@ -26,8 +26,9 @@ const ContentSection: React.FC = () => {
               const base64String = reader.result.split(",")[1];
               fileContents.push({ base64: base64String, name: file.name });
               if (fileContents.length === files.length) {
-                setFilesData(fileContents);
-                dispatch(setFormContent(fileContents));
+                const newFilesData = [...filesData, ...fileContents];
+                setFilesData(newFilesData);
+                dispatch(setFormContent(newFilesData));
               }
             } else {
               console.error("Unexpected result type from FileReader");

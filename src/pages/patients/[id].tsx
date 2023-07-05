@@ -182,12 +182,12 @@ const PatientPage: FC = () => {
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
       <div className="w-full lg:w-[25rem] bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        <div className="px-4 py-2">
+        <div className="px-4 ">
           <div className="w-full">
-            <div className="bg-gray-700 p-3 rounded-lg shadow-md mb-4">
-              <h1 className="text-lg font-bold text-white mb-2">
-                {patient.patient_id}
-              </h1>
+          <h2 className="text-center text-2xl font-bold text-white my-4">
+          {patient.patient_id}
+          </h2>
+            <div className="flex-col text-center">
               <p className="text-sm text-white mb-1">Owner: {patient.owner}</p>
               <p className="text-sm text-white mb-1">Title: {patient.ownerTitle}</p>
               <p className="text-sm text-white mb-1">Created Date: {patient.createdDate}</p>
