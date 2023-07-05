@@ -27,7 +27,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   patientOwner,
   accessList = [],
 }) => (
-  <div className="mt-4">
+  <div className="flex justify-center">
     {currentUserAddress !== patientOwner &&
       !accessList.includes(currentUserAddress || "") && (
         <div>
@@ -43,11 +43,11 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
       )}
     {currentUserAddress === patientOwner && accessRequests.length > 0 && (
       <>
-        <h3 className="text-lg font-bold text-white mt-4">Request List:</h3>
+        <h3 className="text-lg font-bold text-white mt-4 mr-2">Requests:</h3>
         {accessRequests.map((requestor) => (
           <div
             key={`${patientId}-${requestor}`}
-            className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-700"
+            className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-800"
           >
             <span className="col-span-4 text-sm text-gray-200">{requestor}</span>
             <div className="col-span-2 flex justify-end">

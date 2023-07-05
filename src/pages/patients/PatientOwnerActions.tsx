@@ -30,7 +30,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   return (
     <div className="justify-center">
       <input
-        className="shadow appearance-none border rounded-t-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
+        className="shadow appearance-none rounded-t-lg w-full py-2 px-3 bg-gray-800 text-gray-700 leading-tight mt-2"
         type="text"
         placeholder="Enter new owner's address"
         value={newOwner}
@@ -43,7 +43,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
         Transfer Ownership
       </button>
       <input
-        className="shadow appearance-none border rounded-t-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2"
+        className="shadow appearance-none rounded-t-lg w-full py-2 px-3 bg-gray-800 text-gray-700 leading-tight mt-2"
         type="text"
         placeholder="Enter address to share with"
         value={sharedAddress}

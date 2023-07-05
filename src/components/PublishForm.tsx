@@ -22,10 +22,6 @@ const PublishForm: FC = () => {
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setPatient_id(event.target.value));
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
@@ -34,7 +30,7 @@ const PublishForm: FC = () => {
         ...form,
         patient_id: form.patient_id,
         owner: currentUser?.address,
-        ownerTitle: currentUser?.address,
+        ownerTitle: currentUser?.title,
         createdDate,
         sharedWith: sharedUsers,
         history: [`Patient created on ${createdDate}`],

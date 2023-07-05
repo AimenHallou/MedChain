@@ -27,7 +27,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({ patientId }) =>
   if (!currentPatient) return null;
 
   return (
-    <div className="patient-file-section">
+    <div className="">
       <h2 className="text-center text-2xl font-bold text-white my-4">
         Attached Files
       </h2>
