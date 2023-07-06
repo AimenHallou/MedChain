@@ -91,7 +91,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                         : "text-white"
                     }`}
                   />
-                  <div className="text-white font-bold text-center">{file.name}</div>
+                  <div className="text-white font-bold text-center truncate w-full">{file.name}</div>
                   {isOwner && editing && (
                     <TiDelete
                       className="absolute right-2 top-2 h-6 w-6 cursor-pointer text-red-500"
