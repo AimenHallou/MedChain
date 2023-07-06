@@ -12,6 +12,7 @@ import {
   rejectAccessRequest,
   requestAccess,
   cancelRequest,
+  updateSharedFiles,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
@@ -38,12 +39,11 @@ const PatientPage: FC = () => {
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
-  const [showOwnerControls, setShowOwnerControls] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [selectedRequestor, setSelectedRequestor] = useState<string | null>(
     null
   );
-
+  const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
   useEffect(() => {
     if (patient) {
       setEditedPatient_id(patient.patient_id);
@@ -189,6 +189,10 @@ const PatientPage: FC = () => {
     );
   };
 
+  const handleUpdateSharedFiles = (address: string, files: string[]) => {
+    dispatch(updateSharedFiles({ patientId: patient.id, address, files }));
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
       <div className="w-full lg:w-[25rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-700">
@@ -219,6 +223,13 @@ const PatientPage: FC = () => {
               handleShare={handleShare}
               sharedWith={Object.keys(patient.sharedWith)}
               handleUnshare={handleUnshare}
+              selectedFiles={selectedFiles}
+              setSelectedFiles={setSelectedFiles}
+              selectedUser={selectedUsers}
+              setSelectedUser={setSelectedUsers}
+              handleUpdateSharedFiles={() =>
+                handleUpdateSharedFiles(selectedUsers, selectedFiles)
+              }
             />
           )}
           <PatientRequestAccess
@@ -257,7 +268,8 @@ const PatientPage: FC = () => {
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
             selectedRequestor={selectedRequestor}
-            />
+            selectedUsers={selectedUsers}
+          />
         </div>
       )}
     </div>

@@ -76,7 +76,7 @@ export const patientSlice = createSlice({
           `Patient shared with ${address} on ${new Date().toISOString()}`
         );
       }
-    },    
+    },
     unsharePatient: (
       state,
       action: PayloadAction<{ patientId: string; address: string }>
@@ -167,7 +167,20 @@ export const patientSlice = createSlice({
           }
         }
       }
-    },         
+    },   
+    updateSharedFiles: (
+      state,
+      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
+    ) => {
+      const { patientId, address, files } = action.payload;
+      const patient = state.find((patient) => patient.id === patientId);
+      if (patient && patient.sharedWith[address]) {
+        patient.sharedWith[address] = files;
+        patient.history.push(
+          `Files updated for ${address} on ${new Date().toISOString()}`
+        );
+      }
+    },          
   },
 });
 
@@ -183,6 +196,7 @@ export const {
   acceptAccessRequest,
   rejectAccessRequest,
   removeFile,
+  updateSharedFiles,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

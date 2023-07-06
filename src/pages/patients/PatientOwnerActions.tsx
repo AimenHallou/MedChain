@@ -1,6 +1,7 @@
 // src/components/pages/PatientOwnerActions.tsx
 import React, { FC } from "react";
-import {IoIosClose} from 'react-icons/io';
+import { IoIosClose } from "react-icons/io";
+import { MdUpdate } from "react-icons/md";
 
 interface PatientOwnerActionsProps {
   isEditing: boolean;
@@ -9,9 +10,14 @@ interface PatientOwnerActionsProps {
   handleTransfer: () => void;
   sharedAddress: string;
   setSharedAddress: (value: string) => void;
-  handleShare: () => void;
+  handleShare: (user: string) => void;
   sharedWith: string[];
   handleUnshare: (address: string) => void;
+  selectedFiles: string[];
+  setSelectedFiles: (files: string[]) => void;
+  selectedUser: string | null;
+  setSelectedUser: (user: string | null) => void;
+  handleUpdateSharedFiles: (address: string, files: string[]) => void;
 }
 
 const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
@@ -24,6 +30,11 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   handleShare,
   sharedWith = [],
   handleUnshare,
+  selectedFiles,
+  setSelectedFiles,
+  selectedUser,
+  setSelectedUser,
+  handleUpdateSharedFiles
 }) => {
   if (isEditing) return null;
 
@@ -51,7 +62,12 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
       />
       <button
         className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-b-lg focus:outline-none focus:shadow-outline w-full"
-        onClick={handleShare}
+        onClick={() => {
+          if (selectedUser) {
+            handleShare(selectedUser);
+            setSelectedUser(null);
+          }
+        }}
       >
         Share Patient
       </button>
@@ -59,9 +75,28 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
         {sharedWith.map((address, index) => (
           <div
             key={index}
-            className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-700"
+            className={`grid grid-cols-8 gap-2 items-center p-2 mb-1 rounded-md ${
+              selectedUser === address ? "bg-blue-700" : "bg-gray-800"
+            }`}
           >
-            <span className="col-span-5 text-sm text-gray-200">{address}</span>
+            <span
+              className="col-span-6 text-sm text-gray-200 cursor-pointer"
+              onClick={() => {
+                if (selectedUser === address) {
+                  setSelectedUser(null);
+                } else {
+                  setSelectedUser(address);
+                }
+              }}
+            >
+              {address}
+            </span>
+            <MdUpdate
+              className="col-span-1 h-6 w-6 centered cursor-pointer"
+              onClick={() =>
+                handleUpdateSharedFiles(address, selectedFiles)
+              }
+            />
             <IoIosClose
               className="col-span-1 h-10 w-10 centered"
               onClick={() => handleUnshare(address)}

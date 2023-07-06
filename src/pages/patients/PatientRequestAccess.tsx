@@ -35,7 +35,6 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   setSelectedRequestor,
   selectedRequestor,
 }) => {
-
   return (
     <div className="flex justify-center">
       {currentUserAddress !== patientOwner &&
@@ -64,22 +63,26 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
               className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-800"
             >
               <span
-                className="col-span-4 text-sm text-gray-200"
+                className="col-span-4 text-sm text-gray-200 cursor-pointer"
                 onClick={() => {
-                  setSelectedFiles([]);
-                  setSelectedRequestor(requestor);
+                  if (selectedRequestor === requestor) {
+                    setSelectedFiles([]);
+                    setSelectedRequestor(null);
+                  } else {
+                    setSelectedFiles([]);
+                    setSelectedRequestor(requestor);
+                  }
                 }}
               >
                 {requestor}
               </span>
               <div className="col-span-2 flex justify-end">
-                {selectedRequestor === requestor && (
+                {selectedRequestor === requestor ? (
                   <>
                     <IoIosCheckmark
                       onClick={() => {
                         handleAcceptRequest(requestor, selectedFiles);
                         setSelectedFiles([]);
-                        console.log(selectedFiles)
                       }}
                       className="w-10 h-10"
                     />
@@ -87,6 +90,11 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
                       onClick={() => handleRejectRequest(requestor)}
                       className="w-10 h-10"
                     />
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10" />
+                    <div className="w-10 h-10" />
                   </>
                 )}
               </div>
