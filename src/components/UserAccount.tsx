@@ -37,7 +37,7 @@ const UserAccount: FC = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
-      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem]">
+      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold">User Account</h2>
         </div>
@@ -96,7 +96,7 @@ const UserAccount: FC = () => {
         </div>
       </div>
         {users.length > 0 && (
-      <div className="bg-gray-700 p-4 rounded mt-10 text-white lg:w-[20rem]">
+      <div className="bg-gray-700 p-4 rounded mt-10 text-white lg:w-[20rem] border-2 border-gray-600">
       <h2 className="flex text-2xl justify-center font-bold mb-2">Switch User</h2>
             <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
               {users.map((user) => (

@@ -65,8 +65,8 @@ const PublishForm: FC = () => {
   
 
   return (
-    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white">
-      <form onSubmit={handleSubmit} className="w-full lg:w-[30rem] bg-gray-700 p-6 rounded mt-10 text-white">
+    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white ">
+      <form onSubmit={handleSubmit} className="w-full lg:w-[30rem] bg-gray-700 p-6 rounded mt-10 text-white border-2 border-gray-600">
         <h1 className="text-2xl font-bold mb-4 text-center">
           Create Patient Data
         </h1>

@@ -23,7 +23,7 @@ const FileCardsSection: React.FC = () => {
 
   return (
     filesData && filesData.length > 0 && (
-      <div className="w-full lg:w-[35rem] bg-gray-700 p-6 rounded mt-10 text-white">
+      <div className="w-full lg:w-[35rem] bg-gray-700 p-6 rounded mt-10 text-white border-2 border-gray-600">
         <div className="file-cards-section">
           <h2 className="text-center text-2xl font-bold text-white mb-1.5">
             Uploaded Files

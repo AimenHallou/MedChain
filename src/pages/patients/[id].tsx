@@ -44,6 +44,7 @@ const PatientPage: FC = () => {
     null
   );
   const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
+
   useEffect(() => {
     if (patient) {
       setEditedPatient_id(patient.patient_id);
@@ -195,7 +196,7 @@ const PatientPage: FC = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
-      <div className="w-full lg:w-[25rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-700">
+      <div className="w-full lg:w-[25rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
         <div className="px-6 py-4">
           <h2 className="text-center text-3xl font-bold text-white mb-6">
             {patient.patient_id}
@@ -211,7 +212,7 @@ const PatientPage: FC = () => {
             </p>
           </div>
         </div>
-        <div className="px-6 py-4 space-y-4 border-t border-gray-700">
+        <div className="px-6 py-2 space-y-4 border-t border-gray-700">
           {user.currentUserAddress === patient.owner && !isEditing && (
             <PatientOwnerActions
               isEditing={isEditing}
@@ -262,7 +263,7 @@ const PatientPage: FC = () => {
       </div>
       {(Object.keys(patient.sharedWith).includes(user.currentUserAddress) ||
         user.currentUserAddress === patient.owner) && (
-        <div className="w-full lg:w-[30rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        <div className="w-full lg:w-[30rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
           <PatientFileSection
             patientId={id as string}
             selectedFiles={selectedFiles}
