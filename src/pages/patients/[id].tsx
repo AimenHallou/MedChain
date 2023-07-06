@@ -39,6 +39,10 @@ const PatientPage: FC = () => {
     (state: RootState) => state.user.currentUserAddress
   );
   const [showOwnerControls, setShowOwnerControls] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [selectedRequestor, setSelectedRequestor] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (patient) {
@@ -112,7 +116,13 @@ const PatientPage: FC = () => {
   };
 
   const handleShare = () => {
-    dispatch(sharePatient({ patientId: patient.id, address: sharedAddress }));
+    dispatch(
+      sharePatient({
+        patientId: patient.id,
+        address: sharedAddress,
+        files: patient.content.map((fileData) => fileData.name),
+      })
+    );
     setSharedAddress("");
   };
 
@@ -149,8 +159,8 @@ const PatientPage: FC = () => {
     }
   };
 
-  const handleAcceptRequest = (requestor: string) => {
-    dispatch(acceptAccessRequest({ patientId: patient.id, requestor }));
+  const handleAcceptRequest = (requestor: string, files: string[]) => {
+    dispatch(acceptAccessRequest({ patientId: patient.id, requestor, files }));
     dispatch(
       addNotification({
         address: requestor,
@@ -183,10 +193,18 @@ const PatientPage: FC = () => {
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
       <div className="w-full lg:w-[25rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-700">
         <div className="px-6 py-4">
-          <h2 className="text-center text-3xl font-bold text-white mb-6">{patient.patient_id}</h2>
+          <h2 className="text-center text-3xl font-bold text-white mb-6">
+            {patient.patient_id}
+          </h2>
           <div className="space-y-4 text-center">
-            <p className="text-lg text-gray-300"><span className="font-semibold">{patient.ownerTitle} {patient.owner}</span></p>
-            <p className="text-lg text-gray-300"><span className="font-semibold">{patient.createdDate}</span></p>
+            <p className="text-lg text-gray-300">
+              <span className="font-semibold">
+                {patient.ownerTitle} {patient.owner}
+              </span>
+            </p>
+            <p className="text-lg text-gray-300">
+              <span className="font-semibold">{patient.createdDate}</span>
+            </p>
           </div>
         </div>
         <div className="px-6 py-4 space-y-4 border-t border-gray-700">
@@ -199,23 +217,25 @@ const PatientPage: FC = () => {
               sharedAddress={sharedAddress}
               setSharedAddress={setSharedAddress}
               handleShare={handleShare}
-              sharedWith={patient.sharedWith}
+              sharedWith={Object.keys(patient.sharedWith)}
               handleUnshare={handleUnshare}
             />
           )}
           <PatientRequestAccess
             patientId={id as string}
             handleRequestAccess={handleRequestAccess}
-            requestPending={patient.accessRequests.includes(
-              currentUserAddress
-            )}
+            requestPending={patient.accessRequests.includes(currentUserAddress)}
             accessRequests={patient.accessRequests}
             handleCancelRequest={handleCancelRequest}
             handleAcceptRequest={handleAcceptRequest}
             handleRejectRequest={handleRejectRequest}
-            accessList={patient.sharedWith}
+            accessList={Object.keys(patient.sharedWith)}
             currentUserAddress={currentUserAddress}
             patientOwner={patient.owner}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            selectedRequestor={selectedRequestor}
+            setSelectedRequestor={setSelectedRequestor}
           />
         </div>
         <PatientHistory history={patient.history} />
@@ -229,11 +249,16 @@ const PatientPage: FC = () => {
           />
         )}
       </div>
-      {(patient.sharedWith.includes(user.currentUserAddress) ||
+      {(Object.keys(patient.sharedWith).includes(user.currentUserAddress) ||
         user.currentUserAddress === patient.owner) && (
-      <div className="w-full lg:w-[30rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        <PatientFileSection patientId={id as string} />
-      </div>
+        <div className="w-full lg:w-[30rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+          <PatientFileSection
+            patientId={id as string}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            selectedRequestor={selectedRequestor}
+            />
+        </div>
       )}
     </div>
   );

@@ -20,8 +20,21 @@ export const patientSlice = createSlice({
       });
     },    
     fetchPublishedPatients: (state, action: PayloadAction<string>) => {
-      return state.filter((patient) => patient.owner === action.payload);
-    },
+      const ownerAddress = action.payload;
+      return state
+        .filter((patient) => patient.owner === ownerAddress)
+        .map((patient) => {
+          const { id, patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests } = patient;
+    
+          let allowedContent = null;
+          if (content && sharedWith[ownerAddress]) {
+            const allowedFileNames = sharedWith[ownerAddress];
+            allowedContent = content.filter(file => allowedFileNames.includes(file.name));
+          }
+    
+          return { id, patient_id, owner, ownerTitle, createdDate, content: allowedContent, sharedWith, history, accessRequests };
+        });
+    },    
     updatePatient: (
       state,
       action: PayloadAction<
@@ -53,31 +66,28 @@ export const patientSlice = createSlice({
     },
     sharePatient: (
       state,
-      action: PayloadAction<{ patientId: string; address: string }>
+      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
     ) => {
-      const { patientId, address } = action.payload;
+      const { patientId, address, files } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
       if (patient) {
-        patient.sharedWith.push(address);
+        patient.sharedWith[address] = files;
         patient.history.push(
           `Patient shared with ${address} on ${new Date().toISOString()}`
         );
       }
-    },
+    },    
     unsharePatient: (
       state,
       action: PayloadAction<{ patientId: string; address: string }>
     ) => {
       const { patientId, address } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
-      if (patient) {
-        const index = patient.sharedWith.indexOf(address);
-        if (index !== -1) {
-          patient.sharedWith.splice(index, 1);
-          patient.history.push(
-            `Patient unshared with ${address} on ${new Date().toISOString()}`
-          );
-        }
+      if (patient && patient.sharedWith[address]) {
+        delete patient.sharedWith[address];
+        patient.history.push(
+          `Patient unshared with ${address} on ${new Date().toISOString()}`
+        );
       }
     },
     requestAccess: (
@@ -110,20 +120,20 @@ export const patientSlice = createSlice({
     },    
     acceptAccessRequest: (
       state,
-      action: PayloadAction<{ patientId: string; requestor: string }>
+      action: PayloadAction<{ patientId: string; requestor: string; files: string[] }>
     ) => {
-      const { patientId, requestor } = action.payload;
+      const { patientId, requestor, files } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
       if (patient && patient.accessRequests.includes(requestor)) {
         patient.accessRequests = patient.accessRequests.filter(
           (request) => request !== requestor
         );
-        patient.sharedWith.push(requestor);
+        patient.sharedWith[requestor] = files;
         patient.history.push(
           `Access request accepted for ${requestor} on ${new Date().toISOString()}`
         );
       }
-    },
+    },      
     rejectAccessRequest: (
       state,
       action: PayloadAction<{ patientId: string; requestor: string }>
@@ -152,9 +162,12 @@ export const patientSlice = createSlice({
           patient.history.push(
             `File ${fileName} removed on ${new Date().toISOString()}`
           );
+          for (let address in patient.sharedWith) {
+            patient.sharedWith[address] = patient.sharedWith[address].filter(file => file !== fileName);
+          }
         }
       }
-    },    
+    },         
   },
 });
 

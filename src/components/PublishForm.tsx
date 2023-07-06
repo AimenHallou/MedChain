@@ -22,9 +22,17 @@ const PublishForm: FC = () => {
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
+  const sharedData: { [address: string]: string[]; } = {};
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
+  
+    const sharedWith: { [address: string]: string[]; } = {};
+    sharedUsers.forEach((sharedUser) => {
+      sharedWith[sharedUser] = [];
+    });
+  
     dispatch(
       addPatient({
         ...form,
@@ -32,11 +40,11 @@ const PublishForm: FC = () => {
         owner: currentUser?.address,
         ownerTitle: currentUser?.title,
         createdDate,
-        sharedWith: sharedUsers,
+        sharedWith,
         history: [`Patient created on ${createdDate}`],
       })
     );
-
+  
     sharedUsers.forEach((sharedUser) => {
       dispatch(
         addNotification({
@@ -50,10 +58,11 @@ const PublishForm: FC = () => {
         })
       );
     });    
-
+  
     dispatch(resetForm());
     router.push("/");
   };
+  
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white">
