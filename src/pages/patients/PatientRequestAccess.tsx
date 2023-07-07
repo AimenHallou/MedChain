@@ -60,7 +60,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
           {accessRequests.map((requestor) => (
             <div
               key={`${patientId}-${requestor}`}
-              className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-md bg-gray-800"
+              className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-lg bg-gray-800"
             >
               <span
                 className="col-span-4 text-sm text-gray-200 cursor-pointer"

@@ -1,6 +1,6 @@
 // src/redux/slices/patientSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Patient } from "../../objects/types";
+import { Patient,FileData } from "../../objects/types";
 import testPatients from "../../data/testPatients";
 
 const initialState: Patient[] = testPatients;
@@ -180,7 +180,25 @@ export const patientSlice = createSlice({
           `Files updated for ${address} on ${new Date().toISOString()}`
         );
       }
-    },          
+    },  
+    addFile: (
+      state,
+      action: PayloadAction<{ patientId: string; file: FileData }>
+    ) => {
+      const { patientId, file } = action.payload;
+      const patientIndex = state.findIndex((patient) => patient.id === patientId);
+      if (patientIndex !== -1) {
+        const patient = state[patientIndex];
+        state[patientIndex] = {
+          ...patient,
+          content: [...patient.content, file],
+          history: [
+            ...patient.history,
+            `New files added on ${new Date().toISOString()}`
+          ],
+        };
+      }
+    },         
   },
 });
 
@@ -197,6 +215,7 @@ export const {
   rejectAccessRequest,
   removeFile,
   updateSharedFiles,
+  addFile,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

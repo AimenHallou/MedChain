@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setBase64Content } from '../../redux/slices/formSlice';
 import { setFormContent } from '../../redux/slices/formSlice';
-
-interface FileData {
-  base64: string;
-  name: string;
-}
+import { FileData } from "../../objects/types";
 
 const ContentSection: React.FC = () => {
   const dispatch = useDispatch();
