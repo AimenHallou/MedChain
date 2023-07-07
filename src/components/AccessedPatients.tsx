@@ -13,12 +13,11 @@ const AccessedPatients: FC = () => {
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const accessedPatients = patients.filter((patient) =>
-    patient.sharedWith.includes(currentUser?.address || "")
-  );
+  patient.sharedWith.hasOwnProperty(currentUser?.address || "")
+);
 
   return (
     <div>
-      <h2>Accessed Patient</h2>
       {accessedPatients.map((patient) => (
         <PatientCard key={patient.id} {...patient} />
       ))}

@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setBase64Content } from '../../redux/slices/formSlice';
 import { setFormContent } from '../../redux/slices/formSlice';
-
-interface FileData {
-  base64: string;
-  name: string;
-}
+import { FileData } from "../../objects/types";
 
 const ContentSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -26,8 +22,9 @@ const ContentSection: React.FC = () => {
               const base64String = reader.result.split(",")[1];
               fileContents.push({ base64: base64String, name: file.name });
               if (fileContents.length === files.length) {
-                setFilesData(fileContents);
-                dispatch(setFormContent(fileContents));
+                const newFilesData = [...filesData, ...fileContents];
+                setFilesData(newFilesData);
+                dispatch(setFormContent(newFilesData));
               }
             } else {
               console.error("Unexpected result type from FileReader");
@@ -40,8 +37,8 @@ const ContentSection: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center mb-4">
-      <div className="w-1/2">
+    <div className="mb-4">
+      <div className="">
         <label className="block text-white font-bold mb-2" htmlFor="content">
           Content
         </label>
@@ -50,7 +47,7 @@ const ContentSection: React.FC = () => {
           name="content"
           type="file"
           onChange={handleFileChange}
-          className="w-full px-3 py-2 text-white placeholder-white bg-gray-700 rounded outline-none focus:bg-gray-600"
+          className="w-full px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded outline-none focus:bg-gray-900" 
           multiple
         />
       </div>

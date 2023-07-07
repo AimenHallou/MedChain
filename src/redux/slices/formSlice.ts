@@ -13,7 +13,7 @@ const initialState: FormState = {
   createdDate: "",
   content: null,
   base64Content: null,
-  sharedWith: [],
+  sharedWith: {},
   history: [],
 };
 
@@ -36,9 +36,9 @@ export const formSlice = createSlice({
     setBase64Content: (state, action: PayloadAction<FileData[] | null>) => {
       state.base64Content = action.payload;
     },
-    setSharedWith: (state, action: PayloadAction<string[]>) => {
+    setSharedWith: (state, action: PayloadAction<{ [address: string]: string[] }>) => {
       state.sharedWith = action.payload;
-    },
+    },       
     setFormContent: (state, action: PayloadAction<FileData[]>) => {
       state.content = action.payload;
     },

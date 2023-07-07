@@ -12,6 +12,7 @@ import {
   rejectAccessRequest,
   requestAccess,
   cancelRequest,
+  updateSharedFiles,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
@@ -20,6 +21,7 @@ import PatientOwnerActions from "./PatientOwnerActions";
 import PatientHistory from "./PatientHistory";
 import PatientRequestAccess from "./PatientRequestAccess";
 import PatientFileSection from "./PatientFileSection";
+import PatientHeader from "./PatientHeader";
 import { addNotification } from "../../redux/slices/userSlice";
 
 const PatientPage: FC = () => {
@@ -38,6 +40,11 @@ const PatientPage: FC = () => {
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [selectedRequestor, setSelectedRequestor] = useState<string | null>(
+    null
+  );
+  const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
 
   useEffect(() => {
     if (patient) {
@@ -111,7 +118,13 @@ const PatientPage: FC = () => {
   };
 
   const handleShare = () => {
-    dispatch(sharePatient({ patientId: patient.id, address: sharedAddress }));
+    dispatch(
+      sharePatient({
+        patientId: patient.id,
+        address: sharedAddress,
+        files: patient.content.map((fileData) => fileData.name),
+      })
+    );
     setSharedAddress("");
   };
 
@@ -132,6 +145,7 @@ const PatientPage: FC = () => {
             id: uuid(),
             read: false,
             message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
+            patient_id: patient.patient_id,
           },
         })
       );
@@ -147,8 +161,8 @@ const PatientPage: FC = () => {
     }
   };
 
-  const handleAcceptRequest = (requestor: string) => {
-    dispatch(acceptAccessRequest({ patientId: patient.id, requestor }));
+  const handleAcceptRequest = (requestor: string, files: string[]) => {
+    dispatch(acceptAccessRequest({ patientId: patient.id, requestor, files }));
     dispatch(
       addNotification({
         address: requestor,
@@ -156,6 +170,7 @@ const PatientPage: FC = () => {
           id: uuid(),
           read: false,
           message: `Your access request to patient ${patient.patient_id} has been accepted`,
+          patient_id: patient.patient_id,
         },
       })
     );
@@ -170,54 +185,63 @@ const PatientPage: FC = () => {
           id: uuid(),
           read: false,
           message: `Your access request to patient ${patient.patient_id} has been rejected`,
+          patient_id: patient.patient_id,
         },
       })
     );
   };
 
+  const handleUpdateSharedFiles = (address: string, files: string[]) => {
+    dispatch(updateSharedFiles({ patientId: patient.id, address, files }));
+  };
+
   return (
-    <div className="flex justify-between">
-      <div className="w-full max-w-3xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        <div className="px-4 py-2 flex md:flex-row flex-col">
-          <div className="md:w-2/3 w-full">
-            <div className="bg-gray-700 p-3 rounded-lg shadow-md mb-4">
-              <h1 className="text-lg font-bold text-white mb-2">
-                {patient.patient_id}
-              </h1>
-              <p className="text-sm text-white mb-1">Owner: {patient.owner}</p>
-              <p className="text-sm text-white mb-1">Title: {patient.ownerTitle}</p>
-              <p className="text-sm text-white mb-1">Created Date: {patient.createdDate}</p>
-            </div>
-          </div>
-          <div className="md:w-1/3 w-full px-4">
-            {user.currentUserAddress === patient.owner && !isEditing && (
-              <PatientOwnerActions
-                isEditing={isEditing}
-                newOwner={newOwner}
-                setNewOwner={setNewOwner}
-                handleTransfer={handleTransfer}
-                sharedAddress={sharedAddress}
-                setSharedAddress={setSharedAddress}
-                handleShare={handleShare}
-                sharedWith={patient.sharedWith}
-                handleUnshare={handleUnshare}
-              />
-            )}
-            <PatientRequestAccess
-              patientId={id as string}
-              handleRequestAccess={handleRequestAccess}
-              requestPending={patient.accessRequests.includes(
-                currentUserAddress
-              )}
-              accessRequests={patient.accessRequests}
-              handleCancelRequest={handleCancelRequest}
-              handleAcceptRequest={handleAcceptRequest}
-              handleRejectRequest={handleRejectRequest}
-              accessList={patient.sharedWith}
-              currentUserAddress={currentUserAddress}
-              patientOwner={patient.owner}
+    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
+      <div className="w-full lg:w-[20rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        <PatientHeader
+          Patient_id={patient.patient_id}
+          owner={patient.owner}
+          ownerTitle={patient.ownerTitle}
+          createdDate={patient.createdDate}
+        />
+        <div className="px-6 py-2 space-y-4 border-t border-gray-700">
+          {user.currentUserAddress === patient.owner && !isEditing && (
+            <PatientOwnerActions
+              isEditing={isEditing}
+              newOwner={newOwner}
+              setNewOwner={setNewOwner}
+              handleTransfer={handleTransfer}
+              sharedAddress={sharedAddress}
+              setSharedAddress={setSharedAddress}
+              handleShare={handleShare}
+              sharedWith={Object.keys(patient.sharedWith)}
+              handleUnshare={handleUnshare}
+              selectedFiles={selectedFiles}
+              setSelectedFiles={setSelectedFiles}
+              selectedUser={selectedUsers}
+              setSelectedUser={setSelectedUsers}
+              handleUpdateSharedFiles={() =>
+                handleUpdateSharedFiles(selectedUsers, selectedFiles)
+              }
+              patient={patient}
             />
-          </div>
+          )}
+          <PatientRequestAccess
+            patientId={id as string}
+            handleRequestAccess={handleRequestAccess}
+            requestPending={patient.accessRequests.includes(currentUserAddress)}
+            accessRequests={patient.accessRequests}
+            handleCancelRequest={handleCancelRequest}
+            handleAcceptRequest={handleAcceptRequest}
+            handleRejectRequest={handleRejectRequest}
+            accessList={Object.keys(patient.sharedWith)}
+            currentUserAddress={currentUserAddress}
+            patientOwner={patient.owner}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            selectedRequestor={selectedRequestor}
+            setSelectedRequestor={setSelectedRequestor}
+          />
         </div>
         <PatientHistory history={patient.history} />
         {isEditing && (
@@ -230,12 +254,18 @@ const PatientPage: FC = () => {
           />
         )}
       </div>
-      <div className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        {(patient.sharedWith.includes(user.currentUserAddress) ||
-          user.currentUserAddress === patient.owner) && (
-          <PatientFileSection patientId={id as string} />
-        )}
-      </div>
+      {(Object.keys(patient.sharedWith).includes(user.currentUserAddress) ||
+        user.currentUserAddress === patient.owner) && (
+        <div className="w-full lg:w-[30rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
+          <PatientFileSection
+            patientId={id as string}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            selectedRequestor={selectedRequestor}
+            selectedUsers={selectedUsers}
+          />
+        </div>
+      )}
     </div>
   );
 };

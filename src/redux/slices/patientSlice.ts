@@ -1,8 +1,7 @@
 // src/redux/slices/patientSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Patient } from "../../objects/types";
+import { Patient,FileData } from "../../objects/types";
 import testPatients from "../../data/testPatients";
-import { v4 as uuid } from "uuid";
 
 const initialState: Patient[] = testPatients;
 
@@ -11,7 +10,7 @@ export const patientSlice = createSlice({
   initialState,
   reducers: {
     addPatient: (state, action: PayloadAction<Omit<Patient, "id">>) => {
-      const newId = uuid();
+      const newId = action.payload.patient_id;
       state.push({
         id: newId,
         history: [`Patient created on ${new Date().toISOString()}`],
@@ -19,10 +18,23 @@ export const patientSlice = createSlice({
         ...action.payload,
         content: action.payload.content,
       });
-    },
+    },    
     fetchPublishedPatients: (state, action: PayloadAction<string>) => {
-      return state.filter((patient) => patient.owner === action.payload);
-    },
+      const ownerAddress = action.payload;
+      return state
+        .filter((patient) => patient.owner === ownerAddress)
+        .map((patient) => {
+          const { id, patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests } = patient;
+    
+          let allowedContent = null;
+          if (content && sharedWith[ownerAddress]) {
+            const allowedFileNames = sharedWith[ownerAddress];
+            allowedContent = content.filter(file => allowedFileNames.includes(file.name));
+          }
+    
+          return { id, patient_id, owner, ownerTitle, createdDate, content: allowedContent, sharedWith, history, accessRequests };
+        });
+    },    
     updatePatient: (
       state,
       action: PayloadAction<
@@ -54,12 +66,12 @@ export const patientSlice = createSlice({
     },
     sharePatient: (
       state,
-      action: PayloadAction<{ patientId: string; address: string }>
+      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
     ) => {
-      const { patientId, address } = action.payload;
+      const { patientId, address, files } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
       if (patient) {
-        patient.sharedWith.push(address);
+        patient.sharedWith[address] = files;
         patient.history.push(
           `Patient shared with ${address} on ${new Date().toISOString()}`
         );
@@ -71,14 +83,11 @@ export const patientSlice = createSlice({
     ) => {
       const { patientId, address } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
-      if (patient) {
-        const index = patient.sharedWith.indexOf(address);
-        if (index !== -1) {
-          patient.sharedWith.splice(index, 1);
-          patient.history.push(
-            `Patient unshared with ${address} on ${new Date().toISOString()}`
-          );
-        }
+      if (patient && patient.sharedWith[address]) {
+        delete patient.sharedWith[address];
+        patient.history.push(
+          `Patient unshared with ${address} on ${new Date().toISOString()}`
+        );
       }
     },
     requestAccess: (
@@ -111,20 +120,20 @@ export const patientSlice = createSlice({
     },    
     acceptAccessRequest: (
       state,
-      action: PayloadAction<{ patientId: string; requestor: string }>
+      action: PayloadAction<{ patientId: string; requestor: string; files: string[] }>
     ) => {
-      const { patientId, requestor } = action.payload;
+      const { patientId, requestor, files } = action.payload;
       const patient = state.find((patient) => patient.id === patientId);
       if (patient && patient.accessRequests.includes(requestor)) {
         patient.accessRequests = patient.accessRequests.filter(
           (request) => request !== requestor
         );
-        patient.sharedWith.push(requestor);
+        patient.sharedWith[requestor] = files;
         patient.history.push(
           `Access request accepted for ${requestor} on ${new Date().toISOString()}`
         );
       }
-    },
+    },      
     rejectAccessRequest: (
       state,
       action: PayloadAction<{ patientId: string; requestor: string }>
@@ -140,6 +149,56 @@ export const patientSlice = createSlice({
         );
       }
     },
+    removeFile: (
+      state,
+      action: PayloadAction<{ patientId: string; fileName: string }>
+    ) => {
+      const { patientId, fileName } = action.payload;
+      const patient = state.find((patient) => patient.id === patientId);
+      if (patient) {
+        const fileIndex = patient.content.findIndex((file) => file.name === fileName);
+        if (fileIndex !== -1) {
+          patient.content.splice(fileIndex, 1);
+          patient.history.push(
+            `File ${fileName} removed on ${new Date().toISOString()}`
+          );
+          for (let address in patient.sharedWith) {
+            patient.sharedWith[address] = patient.sharedWith[address].filter(file => file !== fileName);
+          }
+        }
+      }
+    },   
+    updateSharedFiles: (
+      state,
+      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
+    ) => {
+      const { patientId, address, files } = action.payload;
+      const patient = state.find((patient) => patient.id === patientId);
+      if (patient && patient.sharedWith[address]) {
+        patient.sharedWith[address] = files;
+        patient.history.push(
+          `Files updated for ${address} on ${new Date().toISOString()}`
+        );
+      }
+    },  
+    addFile: (
+      state,
+      action: PayloadAction<{ patientId: string; file: FileData }>
+    ) => {
+      const { patientId, file } = action.payload;
+      const patientIndex = state.findIndex((patient) => patient.id === patientId);
+      if (patientIndex !== -1) {
+        const patient = state[patientIndex];
+        state[patientIndex] = {
+          ...patient,
+          content: [...patient.content, file],
+          history: [
+            ...patient.history,
+            `New files added on ${new Date().toISOString()}`
+          ],
+        };
+      }
+    },         
   },
 });
 
@@ -154,6 +213,9 @@ export const {
   cancelRequest,
   acceptAccessRequest,
   rejectAccessRequest,
+  removeFile,
+  updateSharedFiles,
+  addFile,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;
