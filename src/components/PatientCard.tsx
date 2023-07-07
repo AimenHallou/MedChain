@@ -2,6 +2,7 @@
 import React, { FC } from "react";
 import { useRouter } from "next/router";
 import { Patient } from "../objects/types";
+import { BsFillFilePersonFill } from "react-icons/bs";
 
 interface PatientCardProps extends Patient {}
 
@@ -21,17 +22,19 @@ const PatientCard: FC<PatientCardProps> = ({
   return (
     <div
       onClick={handleClick}
-      className="cursor-pointer w-full bg-gray-800 text-white shadow-md rounded-md overflow-hidden border-2 border-gray-600 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-100"
+      className="cursor-pointer w-full bg-gray-800 text-white rounded-lg border-2 border-blue-900 transition 
+      duration-200 ease-in-out transform hover:scale-105 shadow-lg overflow-hidden flex items-center space-x-4 p-4"
     >
-      <div className="px-4 py-2">
-        <h2 className="text-lg font-bold text-white">{patient_id}</h2>
+      <div className="flex-grow space-y-2 flex flex-col justify-between">
+        <div>
+          <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">{patient_id}</h2>
+          <p className="text-sm font-light">{ownerTitle} {owner}</p>
+        </div>
+        <p className="text-xs text-gray-400">Created: {createdDate}</p>
       </div>
-      <div className="px-4 py-2 bg-gray-900">
-        <p className="text-sm text-white">Owner: {owner}</p>
-        <p className="text-sm text-white">Created Date: {createdDate}</p>
-      </div>
+      <BsFillFilePersonFill className="text-blue-500 h-12 w-12 flex-shrink-0"/>
     </div>
-  );
+  );  
 };
 
 export default PatientCard;

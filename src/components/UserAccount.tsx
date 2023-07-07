@@ -98,7 +98,7 @@ const UserAccount: FC = () => {
         {users.length > 0 && (
       <div className="bg-gray-700 p-4 rounded mt-10 text-white lg:w-[20rem] border-2 border-gray-600">
       <h2 className="flex text-2xl justify-center font-bold mb-2">Switch User</h2>
-            <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-700 text-white border border-gray-600 rounded p-2 w-full mb-4">
+            <select value={currentUserAddress || ''} onChange={handleSwitchUser} className="block bg-gray-800 text-white border border-gray-600 rounded p-2 w-full mb-4">
               {users.map((user) => (
                 <option key={user.address} value={user.address}>
                   {user.title} ({user.address})
