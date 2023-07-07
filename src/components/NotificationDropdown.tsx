@@ -66,10 +66,10 @@ const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className='absolute right-0 w-64 mt-2 py-2 bg-white border rounded shadow-xl z-50'>
+        <div className='absolute right-0 w-64 mt-2 py-2 bg-gray-800 border border-gray-700 rounded shadow-xl z-50'>
           {notifications?.map((notification) => (
             <div
-              className='px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white'
+              className='px-4 py-2 text-white hover:bg-gray-700'
               key={notification.id}
               onClick={() => handleNotificationClick(notification.patient_id)}
             >

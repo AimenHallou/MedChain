@@ -23,7 +23,7 @@ const PatientCard: FC<PatientCardProps> = ({
     <div
       onClick={handleClick}
       className="cursor-pointer w-full bg-gray-800 text-white rounded-lg border-2 border-blue-900 transition 
-      duration-200 ease-in-out transform hover:scale-105 shadow-lg overflow-hidden flex items-center space-x-4 p-4"
+      duration-200 hover:bg-blue-900 ease-in-out transform hover:scale-105 shadow-lg overflow-hidden flex items-center space-x-4 p-4"
     >
       <div className="flex-grow space-y-2 flex flex-col justify-between">
         <div>

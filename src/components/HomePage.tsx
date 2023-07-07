@@ -13,7 +13,7 @@ const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
     <div className="bg-gray-900 text-white min-h-screen py-8 px-6">
       <div className="text-center max-w-2xl mx-auto">
         <h1 className="text-4xl py-2 text-white">Welcome to MedChain</h1>
-        <p className="text-lg">
+        <p className="text-sm">
             We're revolutionizing healthcare by providing a secure, efficient platform for sharing patient data among medical professionals. 
             Focus on care while we handle the complexity of data management and security. 
             MedChain - transforming patient care through seamless collaboration.
