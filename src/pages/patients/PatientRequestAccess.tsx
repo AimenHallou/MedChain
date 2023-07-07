@@ -1,7 +1,7 @@
 // src/components/pages/PatientRequestAccess.tsx
 import React, { FC, useState } from "react";
 import { IoIosClose, IoIosCheckmark } from "react-icons/io"; 
-import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/Bi";
+import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 
 interface PatientRequestAccessProps {
   patientId: string;

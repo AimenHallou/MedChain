@@ -5,7 +5,7 @@ import { RootState } from "../../redux/store";
 import { AiFillFileText } from "react-icons/ai";
 import { removeFile } from "../../redux/slices/patientSlice";
 import { TiDelete } from "react-icons/ti";
-import { BiSolidEditAlt } from "react-icons/Bi";
+import { BiSolidEditAlt } from "react-icons/bi";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FileData } from "../../objects/types";
 import { addFile } from "../../redux/slices/patientSlice";
