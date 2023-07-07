@@ -56,14 +56,14 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
         )}
       {currentUserAddress === patientOwner && accessRequests.length > 0 && (
         <>
-          <h3 className="text-lg font-bold text-white mt-4 mr-2">Requests:</h3>
+          <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
           {accessRequests.map((requestor) => (
             <div
               key={`${patientId}-${requestor}`}
-              className="grid grid-cols-6 gap-2 items-center p-2 mb-1 rounded-lg bg-gray-800"
+              className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
             >
               <span
-                className="col-span-4 text-sm text-gray-200 cursor-pointer"
+                className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg"
                 onClick={() => {
                   if (selectedRequestor === requestor) {
                     setSelectedFiles([]);
@@ -84,17 +84,17 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
                         handleAcceptRequest(requestor, selectedFiles);
                         setSelectedFiles([]);
                       }}
-                      className="w-10 h-10"
+                      className="w-6 h-6"
                     />
                     <IoIosClose
                       onClick={() => handleRejectRequest(requestor)}
-                      className="w-10 h-10"
+                      className="w-6 h-6"
                     />
                   </>
                 ) : (
                   <>
-                    <div className="w-10 h-10" />
-                    <div className="w-10 h-10" />
+                    <div className="w-6 h-6" />
+                    <div className="w-6 h-6" />
                   </>
                 )}
               </div>
