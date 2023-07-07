@@ -36,7 +36,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   selectedRequestor,
 }) => {
   return (
-    <div className="flex justify-center">
+    <div className="flex">
       {currentUserAddress !== patientOwner &&
         !accessList.includes(currentUserAddress || "") && (
           <div>

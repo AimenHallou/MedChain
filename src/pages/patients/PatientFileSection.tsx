@@ -103,13 +103,13 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         {isOwner && (
           <div className="flex">
             <button
-              className="flex items-center gap-2 text-white  px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
+              className="flex items-center gap-2 text-blue-500  px-4 py-2 rounded hover:bg-blue-900 transition duration-200"
               onClick={() => setEditing(!editing)}
             >
               <BiSolidEditAlt className="h-8 w-8" />
             </button>
             <button
-              className="flex items-center gap-2 text-white  px-4 py-2 rounded hover:bg-green-700 transition duration-200"
+              className="flex items-center gap-2 text-blue-500  px-4 py-2 rounded hover:bg-blue-900 transition duration-200"
               onClick={() => fileInputRef.current?.click()}
             >
               <AiFillFileAdd className="h-8 w-8" />

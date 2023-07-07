@@ -2,6 +2,7 @@
 import React, { FC } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
+import { Patient } from "../../objects/types";
 
 interface PatientOwnerActionsProps {
   isEditing: boolean;
@@ -18,6 +19,7 @@ interface PatientOwnerActionsProps {
   selectedUser: string | null;
   setSelectedUser: (user: string | null) => void;
   handleUpdateSharedFiles: (address: string, files: string[]) => void;
+  patient: Patient;
 }
 
 const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
@@ -34,7 +36,8 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   setSelectedFiles,
   selectedUser,
   setSelectedUser,
-  handleUpdateSharedFiles
+  handleUpdateSharedFiles,
+  patient,
 }) => {
   if (isEditing) return null;
 
@@ -72,37 +75,43 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
         Share Patient
       </button>
       <div className="py-2">
-        {sharedWith.map((address, index) => (
-          <div
-            key={index}
-            className={`grid grid-cols-8 gap-2 items-center p-2 mb-1 rounded-md ${
-              selectedUser === address ? "bg-blue-700" : "bg-gray-800"
-            }`}
-          >
-            <span
-              className="col-span-6 text-sm text-gray-200 cursor-pointer"
-              onClick={() => {
-                if (selectedUser === address) {
-                  setSelectedUser(null);
-                } else {
-                  setSelectedUser(address);
-                }
-              }}
+        {sharedWith.map((address, index) => {
+          const currentFiles = patient.sharedWith[address] || [];
+          const hasChanges = JSON.stringify([...currentFiles].sort()) !== JSON.stringify([...selectedFiles].sort());
+
+          return (
+            <div
+              key={index}
+              className={`grid grid-cols-10 gap-2 items-center p-2 mb-1 rounded-md ${
+                selectedUser === address ? "bg-gray-900" : "bg-gray-800"
+              }`}
             >
-              {address}
-            </span>
-            <MdUpdate
-              className="col-span-1 h-6 w-6 centered cursor-pointer"
-              onClick={() =>
-                handleUpdateSharedFiles(address, selectedFiles)
-              }
-            />
-            <IoIosClose
-              className="col-span-1 h-10 w-10 centered"
-              onClick={() => handleUnshare(address)}
-            />
-          </div>
-        ))}
+              <span
+                className="col-span-7 text-sm text-gray-200 cursor-pointer"
+                onClick={() => {
+                  if (selectedUser === address) {
+                    setSelectedUser(null);
+                    setSelectedFiles([]);
+                  } else {
+                    setSelectedUser(address);
+                    const userFiles = patient.sharedWith[address];
+                    setSelectedFiles(userFiles || []);
+                  }
+                }}
+              >
+                {address}
+              </span>
+              <MdUpdate
+                className={`col-span-1 h-6 w-6 centered cursor-pointer ${selectedUser === address && hasChanges ? 'text-white' : 'text-white opacity-0'}`}
+                onClick={() => handleUpdateSharedFiles(address, selectedFiles)}
+              />
+              <IoIosClose
+                className={`col-span-2 h-10 w-10 centered cursor-pointer ${selectedUser === address ? 'text-white' : 'text-white opacity-0'}`}
+                onClick={() => handleUnshare(address)}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

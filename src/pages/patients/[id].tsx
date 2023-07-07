@@ -223,6 +223,7 @@ const PatientPage: FC = () => {
               handleUpdateSharedFiles={() =>
                 handleUpdateSharedFiles(selectedUsers, selectedFiles)
               }
+              patient={patient}
             />
           )}
           <PatientRequestAccess
