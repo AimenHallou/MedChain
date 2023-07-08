@@ -5,7 +5,6 @@ import { MdUpdate } from "react-icons/md";
 import { Patient } from "../../objects/types";
 
 interface PatientOwnerActionsProps {
-  isEditing: boolean;
   newOwner: string;
   setNewOwner: (value: string) => void;
   handleTransfer: () => void;
@@ -23,7 +22,6 @@ interface PatientOwnerActionsProps {
 }
 
 const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
-  isEditing,
   newOwner,
   setNewOwner,
   handleTransfer,
@@ -39,7 +37,6 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   handleUpdateSharedFiles,
   patient,
 }) => {
-  if (isEditing) return null;
 
   return (
     <div className="justify-center">

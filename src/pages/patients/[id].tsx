@@ -16,7 +16,6 @@ import {
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
-import PatientEditForm from "./PatientEditForm";
 import PatientOwnerActions from "./PatientOwnerActions";
 import PatientHistory from "./PatientHistory";
 import PatientRequestAccess from "./PatientRequestAccess";
@@ -32,9 +31,6 @@ const PatientPage: FC = () => {
   const dispatch = useDispatch();
   const patient = patients.find((patient) => patient.id === id);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedPatient_id, setEditedPatient_id] = useState("");
-  const [editedContent, setEditedContent] = useState<File[]>([]);
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
   const currentUserAddress = useSelector(
@@ -46,71 +42,9 @@ const PatientPage: FC = () => {
   );
   const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (patient) {
-      setEditedPatient_id(patient.patient_id);
-      if (Array.isArray(patient.content)) {
-        const files = patient.content.map((fileData) => {
-          const base64String = fixBase64Padding(fileData.base64);
-          const decodedData = atob(base64String);
-          const array = new Uint8Array(decodedData.length);
-          for (let i = 0; i < decodedData.length; i++) {
-            array[i] = decodedData.charCodeAt(i);
-          }
-          const blob = new Blob([array.buffer]);
-          const file = new File([blob], fileData.name);
-          return file;
-        });
-        setEditedContent(files);
-      }
-    }
-  }, [patient]);
-
   if (!patient) {
     return <div>Patient not found</div>;
   }
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = async () => {
-    const fileDataArray = await Promise.all(
-      editedContent.map(async (file) => {
-        const base64 = await toBase64(file);
-        return {
-          base64: base64.split(",")[1],
-          name: file.name,
-        };
-      })
-    );
-
-    dispatch(
-      updatePatient({
-        id: patient.id,
-        patient_id: editedPatient_id,
-        content: fileDataArray,
-      })
-    );
-
-    setIsEditing(false);
-  };
-
-  const toBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-  const fixBase64Padding = (base64String: string): string => {
-    let paddedBase64 = base64String;
-    while (paddedBase64.length % 4 !== 0) {
-      paddedBase64 += "=";
-    }
-    return paddedBase64;
-  };
 
   const handleTransfer = () => {
     dispatch(transferOwnership({ patientId: patient.id, newOwner }));
@@ -205,9 +139,8 @@ const PatientPage: FC = () => {
           createdDate={patient.createdDate}
         />
         <div className="px-6 py-2 space-y-4 border-t border-gray-700">
-          {user.currentUserAddress === patient.owner && !isEditing && (
+          {user.currentUserAddress === patient.owner && (
             <PatientOwnerActions
-              isEditing={isEditing}
               newOwner={newOwner}
               setNewOwner={setNewOwner}
               handleTransfer={handleTransfer}
@@ -244,15 +177,6 @@ const PatientPage: FC = () => {
           />
         </div>
         <PatientHistory history={patient.history} />
-        {isEditing && (
-          <PatientEditForm
-            editedPatient_id={editedPatient_id}
-            setEditedPatient_id={setEditedPatient_id}
-            editedContent={editedContent}
-            setEditedContent={setEditedContent}
-            handleSave={handleSave}
-          />
-        )}
       </div>
       {(Object.keys(patient.sharedWith).includes(user.currentUserAddress) ||
         user.currentUserAddress === patient.owner) && (

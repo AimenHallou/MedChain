@@ -11,7 +11,6 @@ import { FileData } from "../../objects/types";
 import { addFile } from "../../redux/slices/patientSlice";
 import { setFormContent } from '../../redux/slices/formSlice';
 
-
 type PatientFileSectionProps = {
   patientId: string;
   selectedFiles: string[];
