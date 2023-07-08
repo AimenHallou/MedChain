@@ -25,7 +25,7 @@ const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
           <RecentPatientData />
         </div>
         <div className="col-span-6">
-          <PatientList searchTerm={searchTerm} />
+          <PatientList/>
         </div>
       </div>
     </div>

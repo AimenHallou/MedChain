@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <Provider store={store}>
-      <Header onSearch={handleSearch} />
+      <Header/>
       <main className="bg-dark text-light">
         <Component {...pagePropsWithSearch} />
       </main>
