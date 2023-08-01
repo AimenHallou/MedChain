@@ -1,28 +1,38 @@
 // src/components/PatientList.tsx
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import PatientCard from "./PatientCard";
-import { RootState } from "../redux/store";
+import { RootState, AppDispatch } from "../redux/store";
+import { fetchPatients } from "../redux/slices/patientSlice";
 import { Patient } from "../objects/types";
 import Link from "next/link";
 import SearchBar from "./SearchBar";
 
 const PatientList: FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const patients = useSelector((state: RootState) => state.patients);
-  
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredPatients = patients.filter(patient =>
-    patient.patient_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.owner.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    dispatch(fetchPatients());
+  }, [dispatch]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredPatients = Array.isArray(patients)
+  ? patients.filter(
+      (patient) => 
+        (patient.patient_id && patient.patient_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (patient.owner && patient.owner.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+  : [];
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
   };
 
   return (
-    <div className="bg-gray-700 text-white rounded-lg p-4 shadow  border-2 border-gray-600">
+    <div className="bg-gray-700 text-white rounded-lg p-4 shadow border-2 border-gray-600">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">Patients</h2>
         <SearchBar onSearch={handleSearch} />
@@ -34,7 +44,9 @@ const PatientList: FC = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPatients &&
-          filteredPatients.map((patient: Patient) => <PatientCard key={patient.id} {...patient} />)}
+          filteredPatients.map((patient, index) => (
+            <PatientCard key={patient.patient_id || `fallback-${index}`} {...patient} />
+          ))}
       </div>
     </div>
   );

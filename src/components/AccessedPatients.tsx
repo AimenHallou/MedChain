@@ -19,7 +19,7 @@ const AccessedPatients: FC = () => {
   return (
     <div>
       {accessedPatients.map((patient) => (
-        <PatientCard key={patient.id} {...patient} />
+        <PatientCard key={patient.patient_id} {...patient} />
       ))}
     </div>
   );

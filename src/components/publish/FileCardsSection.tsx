@@ -11,12 +11,14 @@ const FileCardsSection: React.FC = () => {
   const filesData = useSelector((state: RootState) => state.form.content);
 
   const handleFileNameChange = (index: number, name: string) => {
+    if (!filesData) return;
     const newFilesData = [...filesData];
     newFilesData[index] = {...newFilesData[index], name: name};
     dispatch(setFormContent(newFilesData));
   };
 
   const handleFileRemove = (index: number) => {
+    if (!filesData) return;
     const newFilesData = filesData.filter((_, i) => i !== index);
     dispatch(setFormContent(newFilesData));
   };

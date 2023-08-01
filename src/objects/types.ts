@@ -5,7 +5,6 @@ export interface FileData {
 }
 
 export interface Patient {
-  id: string;
   patient_id: string;
   owner: string;
   ownerTitle: string;

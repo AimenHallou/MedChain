@@ -11,12 +11,12 @@ const PatientCard: FC<PatientCardProps> = ({
   owner,
   ownerTitle,
   createdDate,
-  id,
 }) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/patients/${id}`);
+    console.log("handle click patient id: ", patient_id)
+    router.push(`/patients/${patient_id}`);
   };
 
   return (

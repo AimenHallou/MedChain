@@ -1,4 +1,5 @@
 node_modules
+medchain.db
 .next
 
 #amplify-do-not-edit-begin

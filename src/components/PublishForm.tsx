@@ -1,9 +1,10 @@
 // src/components/PublishForm.tsx
 import React, { FC, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from '../redux/store';
 import { useRouter } from "next/router";
-import { setPatient_id, resetForm } from "../redux/slices/formSlice";
-import { addPatient } from "../redux/slices/patientSlice";
+import { resetForm } from "../redux/slices/formSlice";
+import { createPatient } from "../redux/slices/patientSlice";
 import { addNotification } from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import { uuid } from "uuidv4";
@@ -13,7 +14,7 @@ import Patient_idSection from "./publish/Patient_idSection";
 import FileCardsSection from "./publish/FileCardsSection";
 
 const PublishForm: FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const form = useSelector((state: RootState) => state.form);
   const [sharedUsers, setSharedUsers] = useState<string[]>([]);
@@ -32,13 +33,15 @@ const PublishForm: FC = () => {
     sharedUsers.forEach((sharedUser) => {
       sharedWith[sharedUser] = [];
     });
-  
+    const ownerAddress = currentUser?.address || "";
+    const ownerTitle = currentUser?.title || "";
+
     dispatch(
-      addPatient({
+      createPatient({
         ...form,
         patient_id: form.patient_id,
-        owner: currentUser?.address,
-        ownerTitle: currentUser?.title,
+        owner: ownerAddress,
+        ownerTitle: ownerTitle,
         createdDate,
         sharedWith,
         history: [`Patient created on ${createdDate}`],
@@ -63,7 +66,6 @@ const PublishForm: FC = () => {
     router.push("/");
   };
   
-
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white ">
       <form onSubmit={handleSubmit} className="w-full lg:w-[30rem] bg-gray-700 p-6 rounded mt-10 text-white border-2 border-gray-600">

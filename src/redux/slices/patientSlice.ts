@@ -1,221 +1,435 @@
 // src/redux/slices/patientSlice.ts
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Patient,FileData } from "../../objects/types";
-import testPatients from "../../data/testPatients";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { Patient, FileData } from "../../objects/types";
 
-const initialState: Patient[] = testPatients;
+const initialState: Patient[] = [];
+
+export const fetchPatients = createAsyncThunk(
+  "patients/fetchPatients",
+  async () => {
+    const response = await fetch("/api/patients");
+    const patients = await response.json();
+    return patients;
+  }
+);
+
+export const createPatient = createAsyncThunk(
+  "patients/createPatient",
+  async (patient: Patient) => {
+    console.log(patient,"here is data")
+    const response = await fetch("/api/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(patient),
+    });
+    const patientData = await response.json();
+    return patientData;
+  }
+);
+
+export const deletePatient = createAsyncThunk(
+  "patients/deletePatient",
+  async (patientId: string) => {
+    const response = await fetch(`/api/patients/${patientId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete patient");
+    }
+    return patientId;
+  }
+);
+
+export const fetchSinglePatient = createAsyncThunk(
+  "patients/fetchSinglePatient",
+  async (patient_id: string) => {
+    const response = await fetch(`/api/patients/${patient_id}`);
+    const patient = await response.json();
+    return patient;
+  }
+);
+
+export const transferOwnership = createAsyncThunk(
+  "patients/transferOwnership",
+  async (payload: { patientId: string; newOwner: string }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/transfer`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newOwner: payload.newOwner }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to transfer ownership");
+    }
+    return payload;
+  }
+);
+
+export const sharePatient = createAsyncThunk(
+  "patients/sharePatient",
+  async (payload: { patientId: string; address: string; files: string[] }) => {
+    const response = await fetch(`/api/patients/${payload.patientId}/share`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: payload.address,
+        files: payload.files,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to share patient");
+    }
+    return payload;
+  }
+);
+
+export const unsharePatient = createAsyncThunk(
+  "patients/unsharePatient",
+  async (payload: { patientId: string; address: string }) => {
+    const response = await fetch(`/api/patients/${payload.patientId}/unshare`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: payload.address,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to unshare patient");
+    }
+    return payload;
+  }
+);
+
+export const requestAccess = createAsyncThunk(
+  "patients/requestAccess",
+  async (payload: { patient_id: string; requestor: string }) => {
+    console.log("Redux Action: requestAccess dispatched with payload:", payload);
+    const response = await fetch(`/api/patients/${payload.patient_id}/request`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requestor: payload.requestor,
+      }),
+    });
+    console.log("Redux Action: requestAccess received response:", response.status, await response.json());
+    if (!response.ok) {
+      throw new Error("Failed to request access");
+    }
+    return payload;
+  }
+);
+
+export const removeFile = createAsyncThunk(
+  "patients/removeFile",
+  async (payload: { patientId: string; fileName: string }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/remove-file`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: payload.fileName,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to remove file");
+    }
+    return payload;
+  }
+);
+
+export const updateSharedFiles = createAsyncThunk(
+  "patients/updateSharedFiles",
+  async (payload: { patientId: string; address: string; files: string[] }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/update-shared`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: payload.address,
+          files: payload.files,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update shared files");
+    }
+    return payload;
+  }
+);
+
+export const addFile = createAsyncThunk(
+  "patients/addFile",
+  async (payload: { patientId: string; file: FileData }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/add-file`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file: payload.file,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to add file");
+    }
+    return payload;
+  }
+);
+
+export const acceptAccessRequest = createAsyncThunk(
+  "patients/acceptAccessRequest",
+  async (payload: {
+    patientId: string;
+    requestor: string;
+    files: string[];
+  }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/accept-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to accept access request");
+    }
+    return payload;
+  }
+);
+
+export const rejectAccessRequest = createAsyncThunk(
+  "patients/rejectAccessRequest",
+  async (payload: { patientId: string; requestor: string }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/reject-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to reject access request");
+    }
+    return payload;
+  }
+);
+
+export const cancelRequest = createAsyncThunk(
+  "patients/cancelRequest",
+  async (payload: { patientId: string; requestor: string }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/cancel-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to cancel request");
+    }
+    return payload;
+  }
+);
+
 
 export const patientSlice = createSlice({
   name: "patients",
   initialState,
-  reducers: {
-    addPatient: (state, action: PayloadAction<Omit<Patient, "id">>) => {
-      const newId = action.payload.patient_id;
-      state.push({
-        id: newId,
-        history: [`Patient created on ${new Date().toISOString()}`],
-        accessRequests: [],
-        ...action.payload,
-        content: action.payload.content,
-      });
-    },    
-    fetchPublishedPatients: (state, action: PayloadAction<string>) => {
-      const ownerAddress = action.payload;
-      return state
-        .filter((patient) => patient.owner === ownerAddress)
-        .map((patient) => {
-          const { id, patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests } = patient;
-    
-          let allowedContent = null;
-          if (content && sharedWith[ownerAddress]) {
-            const allowedFileNames = sharedWith[ownerAddress];
-            allowedContent = content.filter(file => allowedFileNames.includes(file.name));
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPatients.fulfilled, (state, action) => {
+        return action.payload;
+      })
+      .addCase(createPatient.fulfilled, (state, action) => {
+        state.push(action.payload);
+      })
+      .addCase(fetchSinglePatient.fulfilled, (state, action) => {
+        const patientIndex = state.findIndex(
+          (patient) => patient.patient_id === action.payload.patient_id
+        );
+        if (patientIndex !== -1) {
+          state[patientIndex] = action.payload;
+        } else {
+          state.push(action.payload);
+        }
+      })
+      .addCase(deletePatient.fulfilled, (state, action) => {
+        return state.filter((patient) => patient.patient_id !== action.payload);
+      })
+      .addCase(transferOwnership.fulfilled, (state, action) => {
+        const { patientId, newOwner } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          patient.owner = newOwner;
+          patient.history.push(
+            `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(sharePatient.fulfilled, (state, action) => {
+        const { patientId, address, files } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          if (!patient.sharedWith) {
+            patient.sharedWith = {};
           }
-    
-          return { id, patient_id, owner, ownerTitle, createdDate, content: allowedContent, sharedWith, history, accessRequests };
-        });
-    },    
-    updatePatient: (
-      state,
-      action: PayloadAction<
-        Pick<Patient, "id" | "patient_id" | "content">
-      >
-    ) => {
-      const { id, patient_id, content } = action.payload;
-      const patientIndex = state.findIndex((patient) => patient.id === id);
-      if (patientIndex !== -1) {
-        state[patientIndex].patient_id = patient_id;
-        state[patientIndex].content = content;
-        state[patientIndex].history.push(
-          `Patient updated on ${new Date().toISOString()}`
+          patient.sharedWith[address] = files;
+          patient.history.push(
+            `Shared with ${address} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(unsharePatient.fulfilled, (state, action) => {
+        const { patientId, address } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
         );
-      }
-    },
-    transferOwnership: (
-      state,
-      action: PayloadAction<{ patientId: string; newOwner: string }>
-    ) => {
-      const { patientId, newOwner } = action.payload;
-      const patientIndex = state.findIndex((patient) => patient.id === patientId);
-      if (patientIndex !== -1) {
-        state[patientIndex].owner = newOwner;
-        state[patientIndex].history.push(
-          `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`
+        if (patient && patient.sharedWith && patient.sharedWith[address]) {
+          delete patient.sharedWith[address];
+          patient.history.push(
+            `Unshared with ${address} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(requestAccess.fulfilled, (state, action) => {
+        const { patient_id, requestor } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patient_id
         );
-      }
-    },
-    sharePatient: (
-      state,
-      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
-    ) => {
-      const { patientId, address, files } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient) {
-        patient.sharedWith[address] = files;
-        patient.history.push(
-          `Patient shared with ${address} on ${new Date().toISOString()}`
+        if (patient) {
+          if (!patient.accessRequests) {
+            patient.accessRequests = [];
+          }
+          if (!patient.accessRequests.includes(requestor)) {
+            patient.accessRequests.push(requestor);
+          }
+          patient.history.push(
+            `Access requested by ${requestor} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(removeFile.fulfilled, (state, action) => {
+        const { patientId, fileName } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
         );
-      }
-    },
-    unsharePatient: (
-      state,
-      action: PayloadAction<{ patientId: string; address: string }>
-    ) => {
-      const { patientId, address } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && patient.sharedWith[address]) {
-        delete patient.sharedWith[address];
-        patient.history.push(
-          `Patient unshared with ${address} on ${new Date().toISOString()}`
-        );
-      }
-    },
-    requestAccess: (
-      state,
-      action: PayloadAction<{ patientId: string; requestor: string }>
-    ) => {
-      const { patientId, requestor } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && !patient.accessRequests.includes(requestor)) {
-        patient.accessRequests.push(requestor);
-        patient.history.push(
-          `Access requested by ${requestor} on ${new Date().toISOString()}`
-        );
-      }
-    },
-    cancelRequest: (
-      state,
-      action: PayloadAction<{ patientId: string; requestor: string }>
-    ) => {
-      const { patientId, requestor } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && patient.accessRequests.includes(requestor)) {
-        patient.accessRequests = patient.accessRequests.filter(
-          (request) => request !== requestor
-        );
-        patient.history.push(
-          `Patient request for access by ${requestor} was cancelled`
-        );
-      }
-    },    
-    acceptAccessRequest: (
-      state,
-      action: PayloadAction<{ patientId: string; requestor: string; files: string[] }>
-    ) => {
-      const { patientId, requestor, files } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && patient.accessRequests.includes(requestor)) {
-        patient.accessRequests = patient.accessRequests.filter(
-          (request) => request !== requestor
-        );
-        patient.sharedWith[requestor] = files;
-        patient.history.push(
-          `Access request accepted for ${requestor} on ${new Date().toISOString()}`
-        );
-      }
-    },      
-    rejectAccessRequest: (
-      state,
-      action: PayloadAction<{ patientId: string; requestor: string }>
-    ) => {
-      const { patientId, requestor } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && patient.accessRequests.includes(requestor)) {
-        patient.accessRequests = patient.accessRequests.filter(
-          (request) => request !== requestor
-        );
-        patient.history.push(
-          `Patient request rejected for ${requestor} on ${new Date().toISOString()}`
-        );
-      }
-    },
-    removeFile: (
-      state,
-      action: PayloadAction<{ patientId: string; fileName: string }>
-    ) => {
-      const { patientId, fileName } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient) {
-        const fileIndex = patient.content.findIndex((file) => file.name === fileName);
-        if (fileIndex !== -1) {
-          patient.content.splice(fileIndex, 1);
+        if (patient && patient.content) {
+          patient.content = patient.content.filter(
+            (file) => file.name !== fileName
+          );
           patient.history.push(
             `File ${fileName} removed on ${new Date().toISOString()}`
           );
-          for (let address in patient.sharedWith) {
-            patient.sharedWith[address] = patient.sharedWith[address].filter(file => file !== fileName);
-          }
         }
-      }
-    },   
-    updateSharedFiles: (
-      state,
-      action: PayloadAction<{ patientId: string; address: string; files: string[] }>
-    ) => {
-      const { patientId, address, files } = action.payload;
-      const patient = state.find((patient) => patient.id === patientId);
-      if (patient && patient.sharedWith[address]) {
-        patient.sharedWith[address] = files;
-        patient.history.push(
-          `Files updated for ${address} on ${new Date().toISOString()}`
+      })
+      .addCase(updateSharedFiles.fulfilled, (state, action) => {
+        const { patientId, address, files } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
         );
-      }
-    },  
-    addFile: (
-      state,
-      action: PayloadAction<{ patientId: string; file: FileData }>
-    ) => {
-      const { patientId, file } = action.payload;
-      const patientIndex = state.findIndex((patient) => patient.id === patientId);
-      if (patientIndex !== -1) {
-        const patient = state[patientIndex];
-        state[patientIndex] = {
-          ...patient,
-          content: [...patient.content, file],
-          history: [
-            ...patient.history,
-            `New files added on ${new Date().toISOString()}`
-          ],
-        };
-      }
-    },         
+        if (patient && patient.sharedWith) {
+          patient.sharedWith[address] = files;
+          patient.history.push(
+            `Shared files updated for ${address} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(addFile.fulfilled, (state, action) => {
+        const { patientId, file } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          if (!patient.content) {
+            patient.content = [];
+          }
+          patient.content.push(file);
+          patient.history.push(`File added on ${new Date().toISOString()}`);
+        }
+      })
+      .addCase(acceptAccessRequest.fulfilled, (state, action) => {
+        const { patientId, requestor, files } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          patient.accessRequests = patient.accessRequests || [];
+          patient.accessRequests = patient.accessRequests.filter(
+            (request) => request !== requestor
+          );
+          patient.sharedWith[requestor] = files;
+          patient.history.push(
+            `Access request accepted for ${requestor} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(rejectAccessRequest.fulfilled, (state, action) => {
+        const { patientId, requestor } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          patient.accessRequests = patient.accessRequests || [];
+          patient.accessRequests = patient.accessRequests.filter(
+            (request) => request !== requestor
+          );
+          patient.history.push(
+            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(cancelRequest.fulfilled, (state, action) => {
+        const { patientId, requestor } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patientId
+        );
+        if (patient) {
+          patient.accessRequests = patient.accessRequests || [];
+          patient.accessRequests = patient.accessRequests.filter(
+            (request) => request !== requestor
+          );
+          patient.history.push(
+            `Access request cancelled by ${requestor} on ${new Date().toISOString()}`
+          );
+        }
+      });
   },
 });
-
-export const {
-  addPatient,
-  fetchPublishedPatients,
-  updatePatient,
-  transferOwnership,
-  sharePatient,
-  unsharePatient,
-  requestAccess,
-  cancelRequest,
-  acceptAccessRequest,
-  rejectAccessRequest,
-  removeFile,
-  updateSharedFiles,
-  addFile,
-} = patientSlice.actions;
 
 export default patientSlice.reducer;

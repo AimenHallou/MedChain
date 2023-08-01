@@ -2,9 +2,8 @@
 import React, { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../redux/store";
+import { RootState, AppDispatch } from "../../redux/store";
 import {
-  updatePatient,
   transferOwnership,
   sharePatient,
   unsharePatient,
@@ -13,6 +12,7 @@ import {
   requestAccess,
   cancelRequest,
   updateSharedFiles,
+  fetchSinglePatient,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 
@@ -28,8 +28,8 @@ const PatientPage: FC = () => {
   const { id } = router.query;
   const patients = useSelector((state: RootState) => state.patients);
   const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
-  const patient = patients.find((patient) => patient.id === id);
+  const dispatch = useDispatch<AppDispatch>();
+  const [patientData, setPatientData] = useState<any | null>(null);
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -42,61 +42,91 @@ const PatientPage: FC = () => {
   );
   const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
 
-  if (!patient) {
-    return <div>Patient not found</div>;
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchSinglePatient(id as string))
+        .unwrap()
+        .then((patient) => setPatientData(patient))
+        .catch((error) => console.error("Failed to fetch patient:", error));
+    }
+  }, [id, dispatch]);
+
+  if (!patientData) {
+    return <div>Loading...</div>;
   }
 
+  const patient = patientData;
   const handleTransfer = () => {
-    dispatch(transferOwnership({ patientId: patient.id, newOwner }));
-    setNewOwner("");
+    if (newOwner) {
+      dispatch(transferOwnership({ patientId: patient.patient_id, newOwner }));
+      setNewOwner("");
+    }
   };
 
   const handleShare = () => {
-    dispatch(
-      sharePatient({
-        patientId: patient.id,
-        address: sharedAddress,
-        files: patient.content.map((fileData) => fileData.name),
-      })
-    );
-    setSharedAddress("");
+    if (sharedAddress) {
+      dispatch(
+        sharePatient({
+          patientId: patient.patient_id,
+          address: sharedAddress,
+          files: patient.content
+            ? patient.content.map((fileData) => fileData.name)
+            : [],
+        })
+      );
+      setSharedAddress("");
+    }
   };
 
   const handleUnshare = (address: string) => {
-    dispatch(unsharePatient({ patientId: patient.id, address }));
+    dispatch(unsharePatient({ patientId: patient.patient_id, address }));
   };
 
   const handleRequestAccess = () => {
-    const requestPending = patient.accessRequests.includes(currentUserAddress);
-    if (!requestPending) {
-      dispatch(
-        requestAccess({ patientId: patient.id, requestor: currentUserAddress })
-      );
-      dispatch(
-        addNotification({
-          address: patient.owner,
-          notification: {
-            id: uuid(),
-            read: false,
-            message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
+    if (currentUserAddress) {
+      const requestPending = patient.accessRequests
+        ? patient.accessRequests.includes(currentUserAddress)
+        : false;
+      if (!requestPending) {
+        dispatch(
+          requestAccess({
             patient_id: patient.patient_id,
-          },
-        })
-      );
+            requestor: currentUserAddress,
+          })
+        );
+        dispatch(
+          addNotification({
+            address: patient.owner,
+            notification: {
+              id: uuid(),
+              read: false,
+              message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
+              patient_id: patient.patient_id,
+            },
+          })
+        );
+      }
     }
   };
 
   const handleCancelRequest = () => {
-    const requestPending = patient.accessRequests.includes(currentUserAddress);
-    if (requestPending) {
-      dispatch(
-        cancelRequest({ patientId: patient.id, requestor: currentUserAddress })
-      );
+    if (currentUserAddress) {
+      const requestPending = patient.accessRequests
+        ? patient.accessRequests.includes(currentUserAddress)
+        : false;
+      if (requestPending && currentUserAddress) {
+        dispatch(
+          cancelRequest({
+            patientId: patient.id,
+            requestor: currentUserAddress,
+          })
+        );
+      }
     }
   };
 
   const handleAcceptRequest = (requestor: string, files: string[]) => {
-    dispatch(acceptAccessRequest({ patientId: patient.id, requestor, files }));
+    dispatch(acceptAccessRequest({ patientId: patient.patient_id, requestor, files }));
     dispatch(
       addNotification({
         address: requestor,
@@ -111,7 +141,7 @@ const PatientPage: FC = () => {
   };
 
   const handleRejectRequest = (requestor: string) => {
-    dispatch(rejectAccessRequest({ patientId: patient.id, requestor }));
+    dispatch(rejectAccessRequest({ patientId: patient.patient_id, requestor }));
     dispatch(
       addNotification({
         address: requestor,
@@ -126,7 +156,15 @@ const PatientPage: FC = () => {
   };
 
   const handleUpdateSharedFiles = (address: string, files: string[]) => {
-    dispatch(updateSharedFiles({ patientId: patient.id, address, files }));
+    if (selectedUsers) {
+      dispatch(
+        updateSharedFiles({
+          patientId: patient.patient_id,
+          address: selectedUsers,
+          files,
+        })
+      );
+    }
   };
 
   return (
@@ -147,28 +185,34 @@ const PatientPage: FC = () => {
               sharedAddress={sharedAddress}
               setSharedAddress={setSharedAddress}
               handleShare={handleShare}
-              sharedWith={Object.keys(patient.sharedWith)}
+              sharedWith={patient.sharedWith}
               handleUnshare={handleUnshare}
               selectedFiles={selectedFiles}
               setSelectedFiles={setSelectedFiles}
               selectedUser={selectedUsers}
               setSelectedUser={setSelectedUsers}
-              handleUpdateSharedFiles={() =>
-                handleUpdateSharedFiles(selectedUsers, selectedFiles)
-              }
+              handleUpdateSharedFiles={handleUpdateSharedFiles}
               patient={patient}
             />
           )}
           <PatientRequestAccess
             patientId={id as string}
             handleRequestAccess={handleRequestAccess}
-            requestPending={patient.accessRequests.includes(currentUserAddress)}
-            accessRequests={patient.accessRequests}
+            requestPending={
+              patient.accessRequests
+                ? patient.accessRequests.includes(currentUserAddress || "")
+                : false
+            }
+            accessRequests={patient.accessRequests || []}
             handleCancelRequest={handleCancelRequest}
             handleAcceptRequest={handleAcceptRequest}
             handleRejectRequest={handleRejectRequest}
-            accessList={Object.keys(patient.sharedWith)}
-            currentUserAddress={currentUserAddress}
+            accessList={
+              patient.sharedWith && typeof patient.sharedWith === "object"
+                ? Object.keys(patient.sharedWith)
+                : []
+            }
+            currentUserAddress={currentUserAddress || ""}
             patientOwner={patient.owner}
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
@@ -178,7 +222,9 @@ const PatientPage: FC = () => {
         </div>
         <PatientHistory history={patient.history} />
       </div>
-      {(Object.keys(patient.sharedWith).includes(user.currentUserAddress) ||
+      {(Object.keys(patient.sharedWith || {}).includes(
+        user.currentUserAddress || ""
+      ) ||
         user.currentUserAddress === patient.owner) && (
         <div className="w-full lg:w-[30rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
           <PatientFileSection

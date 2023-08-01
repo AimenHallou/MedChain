@@ -1,7 +1,7 @@
 // src/components/PatientFileSection.tsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { RootState, AppDispatch } from "../../redux/store";
 import { AiFillFileText } from "react-icons/ai";
 import { removeFile } from "../../redux/slices/patientSlice";
 import { TiDelete } from "react-icons/ti";
@@ -9,7 +9,7 @@ import { BiSolidEditAlt } from "react-icons/bi";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FileData } from "../../objects/types";
 import { addFile } from "../../redux/slices/patientSlice";
-import { setFormContent } from '../../redux/slices/formSlice';
+import { setFormContent } from "../../redux/slices/formSlice";
 
 type PatientFileSectionProps = {
   patientId: string;
@@ -26,12 +26,13 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   selectedRequestor,
   selectedUsers,
 }) => {
-  const dispatch = useDispatch();
+  console.log(selectedFiles, typeof(selectedFiles), "HERE")
+  const dispatch: AppDispatch = useDispatch();
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
   const patient = useSelector((state: RootState) => state.patients);
-  const currentPatient = patient.find((patient) => patient.id === patientId);
+  const currentPatient = patient.find((patient) => patient.patient_id === patientId);
   const [filesData, setFilesData] = useState<FileData[]>([]);
 
   const handleRemoveFile = (fileName: string) => {
@@ -46,24 +47,24 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     if (event.target.files) {
       const files = Array.from(event.target.files);
       let fileContents: FileData[] = [];
-  
+
       files.forEach((file, index) => {
         const reader = new FileReader();
-  
+
         reader.onloadend = () => {
           if (typeof reader.result === "string") {
             const base64String = reader.result.split(",")[1];
             fileContents.push({ base64: base64String, name: file.name });
-  
+
             if (fileContents.length === files.length) {
               const newFilesData = [...filesData, ...fileContents];
               setFilesData(newFilesData);
               dispatch(setFormContent(newFilesData));
-  
+
               fileContents.forEach((file) => {
                 dispatch(
                   addFile({
-                    patientId: patientId, // use your patientId variable
+                    patientId: patientId,
                     file: { name: file.name, base64: file.base64 },
                   })
                 );
@@ -73,20 +74,56 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             console.error("Unexpected result type from FileReader");
           }
         };
-  
+
         reader.readAsDataURL(file);
       });
     }
-  };  
-  
+  };
+
   const [editing, setEditing] = useState(false);
 
   if (!currentPatient) return null;
 
   const isOwner = currentUser === currentPatient.owner;
-  const accessibleFiles = isOwner
-    ? currentPatient.content?.map((file) => file.name)
-    : currentPatient.sharedWith[currentUser] || [];
+
+  let accessibleFiles: string[] = [];
+  
+  let content = currentPatient.content;
+
+  if (typeof content === "string") {
+      try {
+          content = JSON.parse(content);
+      } catch (error) {
+          console.error("Failed to parse currentPatient.content:", error);
+      }
+  }
+  
+  if (isOwner) {
+      if (Array.isArray(content)) {
+          accessibleFiles = content.map((file) => file.name);
+      }
+  } else if (currentUser) {
+      accessibleFiles = currentPatient.sharedWith[currentUser] || [];
+  }
+
+  console.log(currentPatient.content,"HRLP", typeof(currentPatient.content))
+
+  let contentArray: any[] = [];
+
+  if (typeof currentPatient.content === "string") {
+    try {
+      const parsedContent = JSON.parse(currentPatient.content);
+      if (Array.isArray(parsedContent)) {
+        contentArray = parsedContent;
+      }
+    } catch (error) {
+      console.error("Failed to parse currentPatient.content:", error);
+    }
+  } else if (Array.isArray(currentPatient.content)) {
+    contentArray = currentPatient.content;
+  }
+  console.log(contentArray,"HRLP", typeof(contentArray))
+
 
   return (
     <div className="bg-gray-700 p-6 rounded-lg shadow-md">
@@ -124,8 +161,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currentPatient.content &&
-          currentPatient.content
+      {contentArray
             .filter((file) => accessibleFiles.includes(file.name))
             .map((file, index) => (
               <div

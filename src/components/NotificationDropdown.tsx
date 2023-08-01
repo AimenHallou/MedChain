@@ -33,7 +33,7 @@ const NotificationDropdown: React.FC = () => {
     dispatch(removeNotification({ address: currentUserAddress as string, notificationId: id }));
   };
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const handleClickOutside = (event) => {
     if (ref.current && !ref.current.contains(event.target)) {
       closeDropdown();
