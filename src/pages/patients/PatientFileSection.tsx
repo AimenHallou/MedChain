@@ -106,8 +106,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
       accessibleFiles = currentPatient.sharedWith[currentUser] || [];
   }
 
-  console.log(currentPatient.content,"HRLP", typeof(currentPatient.content))
-
   let contentArray: any[] = [];
 
   if (typeof currentPatient.content === "string") {

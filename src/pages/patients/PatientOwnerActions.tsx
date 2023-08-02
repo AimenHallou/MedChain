@@ -11,7 +11,7 @@ interface PatientOwnerActionsProps {
   sharedAddress: string;
   setSharedAddress: (value: string) => void;
   handleShare: (user: string) => void;
-  sharedWith: string;
+  sharedWith: { [address: string]: string[] };
   handleUnshare: (address: string) => void;
   selectedFiles: string[];
   setSelectedFiles: (files: string[]) => void;
@@ -39,18 +39,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
 }) => {
   let parsedSharedWith: string[] = [];
   try {
-    const potentialParsed = JSON.parse(sharedWith);
-    if (
-      Array.isArray(potentialParsed) &&
-      potentialParsed.every((item) => typeof item === "string")
-    ) {
-      parsedSharedWith = potentialParsed;
-    } else {
-      console.error(
-        "sharedWith doesn't contain an array of strings:",
-        sharedWith
-      );
-    }
+    const parsedSharedWith = Object.keys(sharedWith);
   } catch (error) {
     console.error("Failed to parse sharedWith:", error);
   }

@@ -58,7 +58,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
       {currentUserAddress === patientOwner && accessRequests.length > 0 && (
         <>
           <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
-          {accessRequests.map((requestor) => (
+          {Array.isArray(accessRequests) && accessRequests.map((requestor) => (
             <div
               key={`${patientId}-${requestor}`}
               className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"

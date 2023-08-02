@@ -46,10 +46,21 @@ const PatientPage: FC = () => {
     if (id) {
       dispatch(fetchSinglePatient(id as string))
         .unwrap()
-        .then((patient) => setPatientData(patient))
+        .then((patient) => {
+          const patientCopy = { ...patient };
+          
+          if (typeof patientCopy.accessRequests === "string") {
+            patientCopy.accessRequests = JSON.parse(patientCopy.accessRequests);
+          }
+          
+          setPatientData(patientCopy);
+        })
         .catch((error) => console.error("Failed to fetch patient:", error));
     }
   }, [id, dispatch]);
+
+
+  console.log(patientData);
 
   if (!patientData) {
     return <div>Loading...</div>;
@@ -93,12 +104,13 @@ const PatientPage: FC = () => {
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        ).then(() => {
-          return dispatch(fetchSinglePatient(id as string)).unwrap();
-        })
-        .then((updatedPatient) => {
-          setPatientData(updatedPatient);
-        });
+        )
+          .then(() => {
+            return dispatch(fetchSinglePatient(id as string)).unwrap();
+          })
+          .then((updatedPatient) => {
+            setPatientData(updatedPatient);
+          });
         dispatch(
           addNotification({
             address: patient.owner,
@@ -125,12 +137,13 @@ const PatientPage: FC = () => {
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        ).then(() => {
-          return dispatch(fetchSinglePatient(id as string)).unwrap();
-        })
-        .then((updatedPatient) => {
-          setPatientData(updatedPatient);
-        });
+        )
+          .then(() => {
+            return dispatch(fetchSinglePatient(id as string)).unwrap();
+          })
+          .then((updatedPatient) => {
+            setPatientData(updatedPatient);
+          });
       }
     }
   };
