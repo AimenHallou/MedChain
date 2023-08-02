@@ -93,7 +93,12 @@ const PatientPage: FC = () => {
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        );
+        ).then(() => {
+          return dispatch(fetchSinglePatient(id as string)).unwrap();
+        })
+        .then((updatedPatient) => {
+          setPatientData(updatedPatient);
+        });
         dispatch(
           addNotification({
             address: patient.owner,
@@ -120,13 +125,20 @@ const PatientPage: FC = () => {
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        );
+        ).then(() => {
+          return dispatch(fetchSinglePatient(id as string)).unwrap();
+        })
+        .then((updatedPatient) => {
+          setPatientData(updatedPatient);
+        });
       }
     }
   };
 
   const handleAcceptRequest = (requestor: string, files: string[]) => {
-    dispatch(acceptAccessRequest({ patientId: patient.patient_id, requestor, files }));
+    dispatch(
+      acceptAccessRequest({ patientId: patient.patient_id, requestor, files })
+    );
     dispatch(
       addNotification({
         address: requestor,
