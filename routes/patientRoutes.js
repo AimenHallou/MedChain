@@ -5,54 +5,76 @@ const db = require("../db/database");
 
 //Request Access
 router.put("/:patient_id/request", (req, res) => {
-  console.log("Inside PUT /:id/request");
-  const patient_id = req.params.patient_id;
-  const requestor = req.body.requestor;
-
-  db.run(
-    `UPDATE patients SET accessRequests = json_insert(ifnull(accessRequests, '[]'), '$[0]', ?), history = json_insert(history, "$[0]", ?) WHERE patient_id = ?`,
-    [
-      requestor,
-      `Access requested by ${requestor} on ${new Date().toISOString()}`,
-      patient_id,
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({
-          error: "An error occurred while requesting access in the database.",
-        });
-      } else {
-        res.json({
-          message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
-        });
-      }
-    }
-  );
-});
-
-//Cancel Access Request
-router.put("/:patient_id/cancel-request", (req, res) => {
-  console.log("Inside PUT /:patient_id/cancel-request");
   const patient_id = req.params.patient_id;
   const requestor = req.body.requestor;
 
   db.get(
-    `SELECT accessRequests FROM patients WHERE patient_id = ?`,
+    `SELECT history FROM patients WHERE patient_id = ?`,
     [patient_id],
     (err, row) => {
       if (err) {
         return res.status(500).json({ error: "Database query error", details: err.message });
       }
 
-      let accessRequests = JSON.parse(row.accessRequests || '[]');
+      if (!row) {
+        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+      }
 
-      accessRequests = accessRequests.filter(item => item !== requestor);
+      let history = JSON.parse(row.history || '[]');
+      history.unshift(`Access requested by ${requestor} on ${new Date().toISOString()}`);
 
       db.run(
-        `UPDATE patients SET accessRequests = ?, history = json_insert(history, "$[0]", ?) WHERE patient_id = ?`,
+        `UPDATE patients SET accessRequests = json_insert(ifnull(accessRequests, '[]'), '$[0]', ?), history = ? WHERE patient_id = ?`,
+        [
+          requestor,
+          JSON.stringify(history),
+          patient_id,
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "An error occurred while requesting access in the database.",
+              details: err.message
+            });
+          }
+          console.log(`${requestor} just requested ${patient_id}`);
+          res.json({
+            message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
+          });
+        }
+      );
+    }
+  );
+});
+
+//Cancel Request Access
+router.put("/:patient_id/cancel-request", (req, res) => {
+  const patient_id = req.params.patient_id;
+  const requestor = req.body.requestor;
+
+  db.get(
+    `SELECT history, accessRequests FROM patients WHERE patient_id = ?`,
+    [patient_id],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: "Database query error", details: err.message });
+      }
+
+      if (!row) {
+        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+      }
+
+      let accessRequests = JSON.parse(row.accessRequests || '[]');
+      accessRequests = accessRequests.filter(item => item !== requestor);
+
+      let history = JSON.parse(row.history || '[]');
+      history.unshift(`Access request by ${requestor} cancelled on ${new Date().toISOString()}`);
+
+      db.run(
+        `UPDATE patients SET accessRequests = ?, history = ? WHERE patient_id = ?`,
         [
           JSON.stringify(accessRequests),
-          `Access request by ${requestor} cancelled on ${new Date().toISOString()}`,
+          JSON.stringify(history),
           patient_id
         ],
         function (err) {
@@ -62,6 +84,7 @@ router.put("/:patient_id/cancel-request", (req, res) => {
               details: err.message
             });
           }
+          console.log(`${requestor} just unrequested ${patient_id}`);
           res.json({
             message: `Access request by ${requestor} for patient with id: ${patient_id} cancelled`,
           });
@@ -89,7 +112,6 @@ router.get("/", (req, res) => {
 
 // Get a single patient by patient_id
 router.get("/:patient_id", (req, res) => {
-  console.log("WE ARE IN THE SINGLE PATIETN");
   const patient_id = req.params.patient_id;
   db.get(
     "SELECT * FROM patients WHERE patient_id = ?",
@@ -100,6 +122,7 @@ router.get("/:patient_id", (req, res) => {
           .status(500)
           .json({ error: "An error occurred while querying the database." });
       } else {
+        console.log(`Successfully fetched ${patient_id}`);
         res.json(row);
       }
     }

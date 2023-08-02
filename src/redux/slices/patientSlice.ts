@@ -3,6 +3,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Patient, FileData } from "../../objects/types";
 
 const initialState: Patient[] = [];
+const API_ENDPOINT = "http://localhost:3001";
 
 export const fetchPatients = createAsyncThunk(
   "patients/fetchPatients",
@@ -16,7 +17,7 @@ export const fetchPatients = createAsyncThunk(
 export const createPatient = createAsyncThunk(
   "patients/createPatient",
   async (patient: Patient) => {
-    console.log(patient,"here is data")
+    console.log(patient, "here is data");
     const response = await fetch("/api/patients", {
       method: "POST",
       headers: {
@@ -45,7 +46,7 @@ export const deletePatient = createAsyncThunk(
 export const fetchSinglePatient = createAsyncThunk(
   "patients/fetchSinglePatient",
   async (patient_id: string) => {
-    const response = await fetch(`/api/patients/${patient_id}`);
+    const response = await fetch(`${API_ENDPOINT}/api/patients/${patient_id}`);
     const patient = await response.json();
     return patient;
   }
@@ -113,17 +114,27 @@ export const unsharePatient = createAsyncThunk(
 export const requestAccess = createAsyncThunk(
   "patients/requestAccess",
   async (payload: { patient_id: string; requestor: string }) => {
-    console.log("Redux Action: requestAccess dispatched with payload:", payload);
-    const response = await fetch(`/api/patients/${payload.patient_id}/request`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        requestor: payload.requestor,
-      }),
-    });
-    console.log("Redux Action: requestAccess received response:", response.status, await response.json());
+    console.log(
+      "Redux Action: requestAccess dispatched with payload:",
+      payload
+    );
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patient_id}/request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestor: payload.requestor,
+        }),
+      }
+    );
+    console.log(
+      "Redux Action: requestAccess received response:",
+      response.status,
+      await response.json()
+    );
     if (!response.ok) {
       throw new Error("Failed to request access");
     }
@@ -244,9 +255,10 @@ export const rejectAccessRequest = createAsyncThunk(
 
 export const cancelRequest = createAsyncThunk(
   "patients/cancelRequest",
-  async (payload: { patientId: string; requestor: string }) => {
+  async (payload: { patient_id: string; requestor: string }) => {
+    console.log(payload);
     const response = await fetch(
-      `/api/patients/${payload.patientId}/cancel-request`,
+      `${API_ENDPOINT}/api/patients/${payload.patient_id}/cancel-request`,
       {
         method: "PUT",
         headers: {
@@ -261,7 +273,6 @@ export const cancelRequest = createAsyncThunk(
     return payload;
   }
 );
-
 
 export const patientSlice = createSlice({
   name: "patients",
@@ -327,23 +338,6 @@ export const patientSlice = createSlice({
           );
         }
       })
-      .addCase(requestAccess.fulfilled, (state, action) => {
-        const { patient_id, requestor } = action.payload;
-        const patient = state.find(
-          (patient) => patient.patient_id === patient_id
-        );
-        if (patient) {
-          if (!patient.accessRequests) {
-            patient.accessRequests = [];
-          }
-          if (!patient.accessRequests.includes(requestor)) {
-            patient.accessRequests.push(requestor);
-          }
-          patient.history.push(
-            `Access requested by ${requestor} on ${new Date().toISOString()}`
-          );
-        }
-      })
       .addCase(removeFile.fulfilled, (state, action) => {
         const { patientId, fileName } = action.payload;
         const patient = state.find(
@@ -383,19 +377,79 @@ export const patientSlice = createSlice({
           patient.history.push(`File added on ${new Date().toISOString()}`);
         }
       })
+      .addCase(requestAccess.fulfilled, (state, action) => {
+        const { patient_id, requestor } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patient_id
+        );
+        if (patient) {
+          if (!Array.isArray(patient.accessRequests)) {
+            patient.accessRequests = [];
+          }
+          if (!patient.accessRequests.includes(requestor)) {
+            patient.accessRequests.push(requestor);
+          }
+
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
+
+          patient.history.push(
+            `Access requested by ${requestor} on ${new Date().toISOString()}`
+          );
+          console.log(patient);
+        }
+      })
+      .addCase(cancelRequest.fulfilled, (state, action) => {
+        const { patient_id, requestor } = action.payload;
+        const patient = state.find(
+          (patient) => patient.patient_id === patient_id
+        );
+        if (patient) {
+          if (typeof patient.accessRequests === 'string') {
+            patient.accessRequests = JSON.parse(patient.accessRequests);
+          }
+      
+          if (!Array.isArray(patient.accessRequests)) {
+            console.error(
+              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. After parsing, it's currently: `,
+              patient.accessRequests
+            );
+            patient.accessRequests = [];
+          }
+          patient.accessRequests = patient.accessRequests.filter(
+            (req) => req !== requestor
+          );
+      
+          // Ensure patient.history is an array before using push
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
+          patient.history.push(
+            `Access request cancelled by ${requestor} on ${new Date().toISOString()}`
+          );
+        }
+      })
+         
       .addCase(acceptAccessRequest.fulfilled, (state, action) => {
         const { patientId, requestor, files } = action.payload;
         const patient = state.find(
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
-          patient.accessRequests = patient.accessRequests || [];
+          if (!Array.isArray(patient.accessRequests)) {
+            console.error(
+              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
+              patient.accessRequests
+            );
+            patient.accessRequests = [];
+          }
+
           patient.accessRequests = patient.accessRequests.filter(
-            (request) => request !== requestor
+            (req) => req !== requestor
           );
-          patient.sharedWith[requestor] = files;
           patient.history.push(
-            `Access request accepted for ${requestor} on ${new Date().toISOString()}`
+            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
           );
         }
       })
@@ -405,27 +459,20 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
-          patient.accessRequests = patient.accessRequests || [];
+          console.log(`[rejectAccessRequest] Before:`, patient.accessRequests);
+          if (!Array.isArray(patient.accessRequests)) {
+            console.error(
+              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
+              patient.accessRequests
+            );
+            patient.accessRequests = [];
+          }
           patient.accessRequests = patient.accessRequests.filter(
-            (request) => request !== requestor
+            (req) => req !== requestor
           );
+          console.log(`[rejectAccessRequest] After:`, patient.accessRequests);
           patient.history.push(
             `Access request rejected for ${requestor} on ${new Date().toISOString()}`
-          );
-        }
-      })
-      .addCase(cancelRequest.fulfilled, (state, action) => {
-        const { patientId, requestor } = action.payload;
-        const patient = state.find(
-          (patient) => patient.patient_id === patientId
-        );
-        if (patient) {
-          patient.accessRequests = patient.accessRequests || [];
-          patient.accessRequests = patient.accessRequests.filter(
-            (request) => request !== requestor
-          );
-          patient.history.push(
-            `Access request cancelled by ${requestor} on ${new Date().toISOString()}`
           );
         }
       });

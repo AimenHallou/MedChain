@@ -6,24 +6,22 @@ console.log("HELLO")
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const apiUrl = 'http://localhost:3001' + req.url;
-    console.log("Next.js API: Received a request with method:", req.method);
+    const API_ENDPOINT = "http://localhost:3001";
+    const apiUrl = `${API_ENDPOINT}${req.url}`;
+        console.log("Next.js API: Received a request with method:", req.method);
 
     if (req.method === 'GET') {
       console.log("Inside Next.js GET method");
-      console.log("Constructed apiUrl:", apiUrl);
       const response = await axios.get(apiUrl);
       res.status(200).json(response.data);
 
     } else if (req.method === 'POST') {
       console.log("Inside Next.js POST method");
-      console.log("Constructed apiUrl:", apiUrl);
       const response = await axios.post(apiUrl, req.body);
       res.status(200).json(response.data);
 
     } else if (req.method === 'PUT') {
       console.log("Inside Next.js PUT method");
-      console.log("Constructed apiUrl:", apiUrl);
       const response = await axios.put(apiUrl, req.body);
       res.status(200).json(response.data);
 

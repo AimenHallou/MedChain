@@ -117,7 +117,7 @@ const PatientPage: FC = () => {
       if (requestPending && currentUserAddress) {
         dispatch(
           cancelRequest({
-            patientId: patient.id,
+            patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
         );
