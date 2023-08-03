@@ -75,7 +75,8 @@ export const transferOwnership = createAsyncThunk(
 export const sharePatient = createAsyncThunk(
   "patients/sharePatient",
   async (payload: { patientId: string; address: string; files: string[] }) => {
-    const response = await fetch(`/api/patients/${payload.patientId}/share`, {
+    console.log("HERE, ", payload)
+    const response = await fetch(`${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +96,7 @@ export const sharePatient = createAsyncThunk(
 export const unsharePatient = createAsyncThunk(
   "patients/unsharePatient",
   async (payload: { patientId: string; address: string }) => {
-    const response = await fetch(`/api/patients/${payload.patientId}/unshare`, {
+    const response = await fetch(`${API_ENDPOINT}/api/patients/${payload.patientId}/unshare`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

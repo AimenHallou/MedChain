@@ -157,25 +157,53 @@ router.put("/:id/transfer", (req, res) => {
 });
 
 //Share a patient
-router.put("/:id/share", (req, res) => {
-  const id = req.params.id;
-  const { address, files } = req.body;
+router.put("/:patient_id/accept-request", (req, res) => {
+  const patient_id = req.params.patient_id;
+  const address = req.body.address;
+  const files = req.body.files;
 
-  db.run(
-    `UPDATE patients SET sharedWith = json_set(ifnull(sharedWith, '{}'), '$.${address}', json(?)), history = json_insert(history, "$[0]", ?) WHERE patient_id = ?`,
-    [
-      JSON.stringify(files),
-      `Patient shared with ${address} on ${new Date().toISOString()}`,
-      id,
-    ],
-    function (err) {
+  db.get(
+    `SELECT history, accessRequests, sharedWith FROM patients WHERE patient_id = ?`,
+    [patient_id],
+    (err, row) => {
       if (err) {
-        res.status(500).json({
-          error: "An error occurred while sharing the patient in the database.",
-        });
-      } else {
-        res.json({ message: `Patient with id: ${id} shared with ${address}` });
+        return res.status(500).json({ error: "Database query error", details: err.message });
       }
+
+      if (!row) {
+        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+      }
+
+      let accessRequests = JSON.parse(row.accessRequests || '[]');
+      accessRequests = accessRequests.filter(item => item !== address);
+
+      let sharedWith = JSON.parse(row.sharedWith || '{}');
+      sharedWith[address] = files;
+
+      let history = JSON.parse(row.history || '[]');
+      history.unshift(`Access request by ${address} accepted on ${new Date().toISOString()}`);
+
+      db.run(
+        `UPDATE patients SET accessRequests = ?, sharedWith = ?, history = ? WHERE patient_id = ?`,
+        [
+          JSON.stringify(accessRequests),
+          JSON.stringify(sharedWith),
+          JSON.stringify(history),
+          patient_id
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "An error occurred while accepting the access request in the database.",
+              details: err.message
+            });
+          }
+          console.log(`${address} has been accepted for ${patient_id}`);
+          res.json({
+            message: `Access request by ${address} for patient with id: ${patient_id} accepted`,
+          });
+        }
+      );
     }
   );
 });
@@ -185,23 +213,48 @@ router.put("/:id/unshare", (req, res) => {
   const id = req.params.id;
   const address = req.body.address;
 
-  db.run(
-    `UPDATE patients SET sharedWith = json_remove(sharedWith, '$.${address}'), history = json_insert(history, "$[0]", ?) WHERE patient_id = ?`,
-    [`Patient unshared with ${address} on ${new Date().toISOString()}`, id],
-    function (err) {
+  db.get(
+    `SELECT history, accessRequests FROM patients WHERE patient_id = ?`,
+    [id],
+    (err, row) => {
       if (err) {
-        res.status(500).json({
-          error:
-            "An error occurred while unsharing the patient in the database.",
-        });
-      } else {
-        res.json({
-          message: `Patient with id: ${id} unshared with ${address}`,
-        });
+        return res.status(500).json({ error: "Database query error", details: err.message });
       }
+
+      if (!row) {
+        return res.status(404).json({ error: `No patient found with ID: ${id}` });
+      }
+
+      let accessRequests = JSON.parse(row.accessRequests || '[]');
+      accessRequests = accessRequests.filter(item => item !== address);
+
+      let history = JSON.parse(row.history || '[]');
+      history.unshift(`Patient unshared with ${address} on ${new Date().toISOString()}`);
+
+      db.run(
+        `UPDATE patients SET accessRequests = ?, sharedWith = json_remove(sharedWith, '$.${address}'), history = ? WHERE patient_id = ?`,
+        [
+          JSON.stringify(accessRequests),
+          JSON.stringify(history),
+          id
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "An error occurred while unsharing the patient in the database.",
+              details: err.message
+            });
+          }
+          console.log(`Patient with id: ${id} unshared with ${address}`);
+          res.json({
+            message: `Patient with id: ${id} unshared with ${address}`,
+          });
+        }
+      );
     }
   );
 });
+
 
 //Remove file
 router.put("/:id/remove-file", (req, res) => {

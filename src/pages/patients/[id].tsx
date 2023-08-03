@@ -52,6 +52,9 @@ const PatientPage: FC = () => {
           if (typeof patientCopy.accessRequests === "string") {
             patientCopy.accessRequests = JSON.parse(patientCopy.accessRequests);
           }
+          if (typeof patientCopy.sharedWith === "string") {
+            patientCopy.sharedWith = JSON.parse(patientCopy.sharedWith);
+          }
           
           setPatientData(patientCopy);
         })

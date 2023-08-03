@@ -2,8 +2,6 @@
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-console.log("HELLO")
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const API_ENDPOINT = "http://localhost:3001";

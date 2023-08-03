@@ -26,13 +26,15 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   selectedRequestor,
   selectedUsers,
 }) => {
-  console.log(selectedFiles, typeof(selectedFiles), "HERE")
+  console.log(selectedFiles, typeof selectedFiles, "HERE");
   const dispatch: AppDispatch = useDispatch();
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
   const patient = useSelector((state: RootState) => state.patients);
-  const currentPatient = patient.find((patient) => patient.patient_id === patientId);
+  const currentPatient = patient.find(
+    (patient) => patient.patient_id === patientId
+  );
   const [filesData, setFilesData] = useState<FileData[]>([]);
 
   const handleRemoveFile = (fileName: string) => {
@@ -87,23 +89,37 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   const isOwner = currentUser === currentPatient.owner;
 
   let accessibleFiles: string[] = [];
-  
+
   let content = currentPatient.content;
 
   if (typeof content === "string") {
-      try {
-          content = JSON.parse(content);
-      } catch (error) {
-          console.error("Failed to parse currentPatient.content:", error);
-      }
+    try {
+      content = JSON.parse(content);
+    } catch (error) {
+      console.error("Failed to parse currentPatient.content:", error);
+    }
   }
-  
+
+  let sharedWith = currentPatient.sharedWith;
+
+  if (typeof sharedWith === "string") {
+    try {
+      sharedWith = JSON.parse(sharedWith);
+    } catch (error) {
+      console.error("Failed to parse currentPatient.sharedWith:", error);
+      sharedWith = {};
+    }
+  }
+
   if (isOwner) {
-      if (Array.isArray(content)) {
-          accessibleFiles = content.map((file) => file.name);
-      }
+    if (Array.isArray(content)) {
+      accessibleFiles = content.map((file) => file.name);
+    }
   } else if (currentUser) {
-      accessibleFiles = currentPatient.sharedWith[currentUser] || [];
+    console.log("Current user:", currentUser);
+    console.log("Shared with:", sharedWith);
+    accessibleFiles = sharedWith[currentUser] || [];
+    console.log("Files for current user:", accessibleFiles);
   }
 
   let contentArray: any[] = [];
@@ -120,8 +136,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   } else if (Array.isArray(currentPatient.content)) {
     contentArray = currentPatient.content;
   }
-  console.log(contentArray,"HRLP", typeof(contentArray))
-
+  console.log(contentArray, "HRLP", typeof contentArray);
 
   return (
     <div className="bg-gray-700 p-6 rounded-lg shadow-md">
@@ -159,59 +174,59 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {contentArray
-            .filter((file) => accessibleFiles.includes(file.name))
-            .map((file, index) => (
-              <div
-                key={index}
-                className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent ${
-                  (selectedRequestor || selectedUsers) &&
-                  "hover:border-blue-600 hover:shadow-lg"
+        {contentArray
+          .filter((file) => accessibleFiles.includes(file.name))
+          .map((file, index) => (
+            <div
+              key={index}
+              className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent ${
+                (selectedRequestor || selectedUsers) &&
+                "hover:border-blue-600 hover:shadow-lg"
+              }`}
+              onClick={() => {
+                if (
+                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                    selectedRequestor) &&
+                  selectedFiles.includes(file.name)
+                ) {
+                  setSelectedFiles(
+                    selectedFiles.filter(
+                      (selectedFile) => selectedFile !== file.name
+                    )
+                  );
+                } else if (
+                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                    selectedRequestor) &&
+                  !selectedFiles.includes(file.name)
+                ) {
+                  setSelectedFiles([...selectedFiles, file.name]);
+                }
+              }}
+            >
+              <AiFillFileText
+                className={`file-image w-16 h-16 mb-2 ${
+                  selectedFiles.includes(file.name) &&
+                  (selectedRequestor || selectedUsers)
+                    ? "text-blue-600"
+                    : "text-gray-400"
                 }`}
-                onClick={() => {
-                  if (
-                    ((currentUser === currentPatient.owner && selectedUsers) ||
-                      selectedRequestor) &&
-                    selectedFiles.includes(file.name)
-                  ) {
-                    setSelectedFiles(
-                      selectedFiles.filter(
-                        (selectedFile) => selectedFile !== file.name
-                      )
-                    );
-                  } else if (
-                    ((currentUser === currentPatient.owner && selectedUsers) ||
-                      selectedRequestor) &&
-                    !selectedFiles.includes(file.name)
-                  ) {
-                    setSelectedFiles([...selectedFiles, file.name]);
-                  }
-                }}
-              >
-                <AiFillFileText
-                  className={`file-image w-16 h-16 mb-2 ${
-                    selectedFiles.includes(file.name) &&
-                    (selectedRequestor || selectedUsers)
-                      ? "text-blue-600"
-                      : "text-gray-400"
-                  }`}
-                />
-                <div className="text-gray-100 font-bold text-center truncate w-full">
-                  {file.name}
-                </div>
-                {isOwner && editing && (
-                  <button
-                    className="absolute right-2 top-2 p-2 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFile(file.name);
-                    }}
-                  >
-                    <TiDelete className="h-8 w-8 text-red-700" />
-                  </button>
-                )}
+              />
+              <div className="text-gray-100 font-bold text-center truncate w-full">
+                {file.name}
               </div>
-            ))}
+              {isOwner && editing && (
+                <button
+                  className="absolute right-2 top-2 p-2 rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveFile(file.name);
+                  }}
+                >
+                  <TiDelete className="h-8 w-8 text-red-700" />
+                </button>
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );
