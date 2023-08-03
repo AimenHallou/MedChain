@@ -180,7 +180,13 @@ const PatientPage: FC = () => {
   };
 
   const handleRejectRequest = (requestor: string) => {
-    dispatch(rejectAccessRequest({ patientId: patient.patient_id, requestor }));
+    dispatch(rejectAccessRequest({ patientId: patient.patient_id, requestor }))
+      .then(() => {
+        return dispatch(fetchSinglePatient(id as string)).unwrap();
+      })
+      .then((updatedPatient) => {
+        setPatientData(updatedPatient);
+      });
     dispatch(
       addNotification({
         address: requestor,

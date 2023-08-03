@@ -15,7 +15,7 @@ const PublishedPatient: FC = () => {
   return (
     <div>
       {publishedPatient.map((patient) => (
-        <PatientCard key={patient.id} {...patient} />
+        <PatientCard key={patient.patient_id} {...patient} />
       ))}
     </div>
   );

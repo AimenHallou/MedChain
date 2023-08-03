@@ -245,7 +245,7 @@ export const rejectAccessRequest = createAsyncThunk(
   "patients/rejectAccessRequest",
   async (payload: { patientId: string; requestor: string }) => {
     const response = await fetch(
-      `/api/patients/${payload.patientId}/reject-request`,
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/cancel-request`,
       {
         method: "PUT",
         headers: {
@@ -482,22 +482,33 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
-          console.log(`[rejectAccessRequest] Before:`, patient.accessRequests);
+          if (typeof patient.accessRequests === "string") {
+            try {
+              patient.accessRequests = JSON.parse(patient.accessRequests);
+            } catch (error) {
+              console.error("Failed to parse accessRequests:", error);
+              patient.accessRequests = [];
+            }
+          }
           if (!Array.isArray(patient.accessRequests)) {
-            console.error(
-              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
-              patient.accessRequests
-            );
-            patient.accessRequests = [];
+              console.error(
+                  `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
+                  patient.accessRequests
+              );
+              patient.accessRequests = [];
           }
           patient.accessRequests = patient.accessRequests.filter(
-            (req) => req !== requestor
+              (req) => req !== requestor
           );
           console.log(`[rejectAccessRequest] After:`, patient.accessRequests);
+      
+          if (!Array.isArray(patient.history)) {
+              patient.history = [];
+          }
           patient.history.push(
-            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+              `Access request rejected for ${requestor} on ${new Date().toISOString()}`
           );
-        }
+      }
       });
   },
 });

@@ -11,10 +11,12 @@ const AccessedPatients: FC = () => {
   const patients = useSelector((state: RootState) => state.patients);
 
   const currentUser = users.find((user) => user.address === currentUserAddress);
+  console.log("Current User Address:", currentUser?.address);
+  const accessedPatients = patients.filter((patient) => {
+    return Object.keys(patient.sharedWith).includes(currentUser?.address || "");
+  });
 
-  const accessedPatients = patients.filter((patient) =>
-  patient.sharedWith.hasOwnProperty(currentUser?.address || "")
-);
+  console.log("Accessed Patients:", accessedPatients);
 
   return (
     <div>
