@@ -48,22 +48,19 @@ const PatientPage: FC = () => {
         .unwrap()
         .then((patient) => {
           const patientCopy = { ...patient };
-          
           if (typeof patientCopy.accessRequests === "string") {
             patientCopy.accessRequests = JSON.parse(patientCopy.accessRequests);
           }
           if (typeof patientCopy.sharedWith === "string") {
             patientCopy.sharedWith = JSON.parse(patientCopy.sharedWith);
           }
-          
+          console.log(patientCopy);
+
           setPatientData(patientCopy);
         })
         .catch((error) => console.error("Failed to fetch patient:", error));
     }
   }, [id, dispatch]);
-
-
-  console.log(patientData);
 
   if (!patientData) {
     return <div>Loading...</div>;
@@ -78,17 +75,25 @@ const PatientPage: FC = () => {
   };
 
   const handleShare = () => {
+    console.log("Inside handleShare function");
+
     if (sharedAddress) {
-      dispatch(
-        sharePatient({
-          patientId: patient.patient_id,
-          address: sharedAddress,
-          files: patient.content
-            ? patient.content.map((fileData) => fileData.name)
-            : [],
-        })
-      );
+      console.log("Shared address is present:", sharedAddress);
+
+      const payload = {
+        patientId: patient.patient_id,
+        address: sharedAddress,
+        files: patient.content
+          ? patient.content.map((fileData) => fileData.name)
+          : [],
+      };
+      console.log("Payload being dispatched:", payload);
+
+      dispatch(sharePatient(payload));
+
       setSharedAddress("");
+    } else {
+      console.log("Shared address is missing or empty.");
     }
   };
 
@@ -154,7 +159,13 @@ const PatientPage: FC = () => {
   const handleAcceptRequest = (requestor: string, files: string[]) => {
     dispatch(
       acceptAccessRequest({ patientId: patient.patient_id, requestor, files })
-    );
+    )
+      .then(() => {
+        return dispatch(fetchSinglePatient(id as string)).unwrap();
+      })
+      .then((updatedPatient) => {
+        setPatientData(updatedPatient);
+      });
     dispatch(
       addNotification({
         address: requestor,

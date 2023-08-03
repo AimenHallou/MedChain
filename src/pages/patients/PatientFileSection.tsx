@@ -26,7 +26,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   selectedRequestor,
   selectedUsers,
 }) => {
-  console.log(selectedFiles, typeof selectedFiles, "HERE");
   const dispatch: AppDispatch = useDispatch();
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
@@ -116,10 +115,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
       accessibleFiles = content.map((file) => file.name);
     }
   } else if (currentUser) {
-    console.log("Current user:", currentUser);
-    console.log("Shared with:", sharedWith);
     accessibleFiles = sharedWith[currentUser] || [];
-    console.log("Files for current user:", accessibleFiles);
   }
 
   let contentArray: any[] = [];
@@ -136,7 +132,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   } else if (Array.isArray(currentPatient.content)) {
     contentArray = currentPatient.content;
   }
-  console.log(contentArray, "HRLP", typeof contentArray);
 
   return (
     <div className="bg-gray-700 p-6 rounded-lg shadow-md">

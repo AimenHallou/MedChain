@@ -40,6 +40,8 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   let parsedSharedWith: string[] = [];
   try {
     const parsedSharedWith = Object.keys(sharedWith);
+    console.log(parsedSharedWith)
+
   } catch (error) {
     console.error("Failed to parse sharedWith:", error);
   }

@@ -13,28 +13,31 @@ router.put("/:patient_id/request", (req, res) => {
     [patient_id],
     (err, row) => {
       if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
 
       if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
-      let history = JSON.parse(row.history || '[]');
-      history.unshift(`Access requested by ${requestor} on ${new Date().toISOString()}`);
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `Access requested by ${requestor} on ${new Date().toISOString()}`
+      );
 
       db.run(
         `UPDATE patients SET accessRequests = json_insert(ifnull(accessRequests, '[]'), '$[0]', ?), history = ? WHERE patient_id = ?`,
-        [
-          requestor,
-          JSON.stringify(history),
-          patient_id,
-        ],
+        [requestor, JSON.stringify(history), patient_id],
         function (err) {
           if (err) {
             return res.status(500).json({
-              error: "An error occurred while requesting access in the database.",
-              details: err.message
+              error:
+                "An error occurred while requesting access in the database.",
+              details: err.message,
             });
           }
           console.log(`${requestor} just requested ${patient_id}`);
@@ -57,31 +60,34 @@ router.put("/:patient_id/cancel-request", (req, res) => {
     [patient_id],
     (err, row) => {
       if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
 
       if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
-      let accessRequests = JSON.parse(row.accessRequests || '[]');
-      accessRequests = accessRequests.filter(item => item !== requestor);
+      let accessRequests = JSON.parse(row.accessRequests || "[]");
+      accessRequests = accessRequests.filter((item) => item !== requestor);
 
-      let history = JSON.parse(row.history || '[]');
-      history.unshift(`Access request by ${requestor} cancelled on ${new Date().toISOString()}`);
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `Access request by ${requestor} cancelled on ${new Date().toISOString()}`
+      );
 
       db.run(
         `UPDATE patients SET accessRequests = ?, history = ? WHERE patient_id = ?`,
-        [
-          JSON.stringify(accessRequests),
-          JSON.stringify(history),
-          patient_id
-        ],
+        [JSON.stringify(accessRequests), JSON.stringify(history), patient_id],
         function (err) {
           if (err) {
             return res.status(500).json({
-              error: "An error occurred while cancelling the access request in the database.",
-              details: err.message
+              error:
+                "An error occurred while cancelling the access request in the database.",
+              details: err.message,
             });
           }
           console.log(`${requestor} just unrequested ${patient_id}`);
@@ -159,7 +165,7 @@ router.put("/:id/transfer", (req, res) => {
 //Share a patient
 router.put("/:patient_id/accept-request", (req, res) => {
   const patient_id = req.params.patient_id;
-  const address = req.body.address;
+  const address = req.body.requestor;
   const files = req.body.files;
 
   db.get(
@@ -167,21 +173,27 @@ router.put("/:patient_id/accept-request", (req, res) => {
     [patient_id],
     (err, row) => {
       if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
 
       if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
-      let accessRequests = JSON.parse(row.accessRequests || '[]');
-      accessRequests = accessRequests.filter(item => item !== address);
+      let accessRequests = JSON.parse(row.accessRequests || "[]");
+      accessRequests = accessRequests.filter((item) => item !== address);
 
-      let sharedWith = JSON.parse(row.sharedWith || '{}');
+      let sharedWith = JSON.parse(row.sharedWith || "{}");
       sharedWith[address] = files;
 
-      let history = JSON.parse(row.history || '[]');
-      history.unshift(`Access request by ${address} accepted on ${new Date().toISOString()}`);
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `Access request by ${address} accepted on ${new Date().toISOString()}`
+      );
 
       db.run(
         `UPDATE patients SET accessRequests = ?, sharedWith = ?, history = ? WHERE patient_id = ?`,
@@ -189,13 +201,14 @@ router.put("/:patient_id/accept-request", (req, res) => {
           JSON.stringify(accessRequests),
           JSON.stringify(sharedWith),
           JSON.stringify(history),
-          patient_id
+          patient_id,
         ],
         function (err) {
           if (err) {
             return res.status(500).json({
-              error: "An error occurred while accepting the access request in the database.",
-              details: err.message
+              error:
+                "An error occurred while accepting the access request in the database.",
+              details: err.message,
             });
           }
           console.log(`${address} has been accepted for ${patient_id}`);
@@ -218,31 +231,34 @@ router.put("/:id/unshare", (req, res) => {
     [id],
     (err, row) => {
       if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
 
       if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${id}` });
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${id}` });
       }
 
-      let accessRequests = JSON.parse(row.accessRequests || '[]');
-      accessRequests = accessRequests.filter(item => item !== address);
+      let accessRequests = JSON.parse(row.accessRequests || "[]");
+      accessRequests = accessRequests.filter((item) => item !== address);
 
-      let history = JSON.parse(row.history || '[]');
-      history.unshift(`Patient unshared with ${address} on ${new Date().toISOString()}`);
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `Patient unshared with ${address} on ${new Date().toISOString()}`
+      );
 
       db.run(
         `UPDATE patients SET accessRequests = ?, sharedWith = json_remove(sharedWith, '$.${address}'), history = ? WHERE patient_id = ?`,
-        [
-          JSON.stringify(accessRequests),
-          JSON.stringify(history),
-          id
-        ],
+        [JSON.stringify(accessRequests), JSON.stringify(history), id],
         function (err) {
           if (err) {
             return res.status(500).json({
-              error: "An error occurred while unsharing the patient in the database.",
-              details: err.message
+              error:
+                "An error occurred while unsharing the patient in the database.",
+              details: err.message,
             });
           }
           console.log(`Patient with id: ${id} unshared with ${address}`);
@@ -254,7 +270,6 @@ router.put("/:id/unshare", (req, res) => {
     }
   );
 });
-
 
 //Remove file
 router.put("/:id/remove-file", (req, res) => {
@@ -311,12 +326,10 @@ router.put("/:id/update-shared", (req, res) => {
     ],
     function (err) {
       if (err) {
-        res
-          .status(500)
-          .json({
-            error:
-              "An error occurred while updating shared files for the patient.",
-          });
+        res.status(500).json({
+          error:
+            "An error occurred while updating shared files for the patient.",
+        });
       } else {
         res.json({
           message: `Shared files updated for address: ${address} on patient with id: ${id}`,
@@ -345,12 +358,10 @@ router.put("/:id/add-file", (req, res) => {
     ],
     function (err) {
       if (err) {
-        res
-          .status(500)
-          .json({
-            error:
-              "An error occurred while adding the file to the patient record.",
-          });
+        res.status(500).json({
+          error:
+            "An error occurred while adding the file to the patient record.",
+        });
       } else {
         res.json({ message: `File added to patient with id: ${id}` });
       }

@@ -75,17 +75,20 @@ export const transferOwnership = createAsyncThunk(
 export const sharePatient = createAsyncThunk(
   "patients/sharePatient",
   async (payload: { patientId: string; address: string; files: string[] }) => {
-    console.log("HERE, ", payload)
-    const response = await fetch(`${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: payload.address,
-        files: payload.files,
-      }),
-    });
+    console.log("HERE, ", payload);
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: payload.address,
+          files: payload.files,
+        }),
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to share patient");
     }
@@ -96,15 +99,18 @@ export const sharePatient = createAsyncThunk(
 export const unsharePatient = createAsyncThunk(
   "patients/unsharePatient",
   async (payload: { patientId: string; address: string }) => {
-    const response = await fetch(`${API_ENDPOINT}/api/patients/${payload.patientId}/unshare`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: payload.address,
-      }),
-    });
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/unshare`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: payload.address,
+        }),
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to unshare patient");
     }
@@ -217,8 +223,9 @@ export const acceptAccessRequest = createAsyncThunk(
     requestor: string;
     files: string[];
   }) => {
+    console.log("detail", payload);
     const response = await fetch(
-      `/api/patients/${payload.patientId}/accept-request`,
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
       {
         method: "PUT",
         headers: {
@@ -407,10 +414,10 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patient_id
         );
         if (patient) {
-          if (typeof patient.accessRequests === 'string') {
+          if (typeof patient.accessRequests === "string") {
             patient.accessRequests = JSON.parse(patient.accessRequests);
           }
-      
+
           if (!Array.isArray(patient.accessRequests)) {
             console.error(
               `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. After parsing, it's currently: `,
@@ -421,8 +428,7 @@ export const patientSlice = createSlice({
           patient.accessRequests = patient.accessRequests.filter(
             (req) => req !== requestor
           );
-      
-          // Ensure patient.history is an array before using push
+
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
@@ -431,13 +437,24 @@ export const patientSlice = createSlice({
           );
         }
       })
-         
       .addCase(acceptAccessRequest.fulfilled, (state, action) => {
         const { patientId, requestor, files } = action.payload;
         const patient = state.find(
           (patient) => patient.patient_id === patientId
         );
+        console.log(action.payload);
         if (patient) {
+          console.log("we in the patient");
+          console.log(typeof patient.accessRequests);
+          console.log(patient.accessRequests);
+          if (typeof patient.accessRequests === "string") {
+            try {
+              patient.accessRequests = JSON.parse(patient.accessRequests);
+            } catch (error) {
+              console.error("Failed to parse accessRequests:", error);
+              patient.accessRequests = [];
+            }
+          }
           if (!Array.isArray(patient.accessRequests)) {
             console.error(
               `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
@@ -449,8 +466,13 @@ export const patientSlice = createSlice({
           patient.accessRequests = patient.accessRequests.filter(
             (req) => req !== requestor
           );
+
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
+
           patient.history.push(
-            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+            `Access request accepted for ${requestor} on ${new Date().toISOString()}`
           );
         }
       })
