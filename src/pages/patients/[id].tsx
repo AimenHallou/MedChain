@@ -98,7 +98,13 @@ const PatientPage: FC = () => {
   };
 
   const handleUnshare = (address: string) => {
-    dispatch(unsharePatient({ patientId: patient.patient_id, address }));
+    dispatch(unsharePatient({ patientId: patient.patient_id, address }))
+      .then(() => {
+        return dispatch(fetchSinglePatient(id as string)).unwrap();
+      })
+      .then((updatedPatient) => {
+        setPatientData(updatedPatient);
+      });
   };
 
   const handleRequestAccess = () => {
