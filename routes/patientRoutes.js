@@ -305,66 +305,104 @@ router.put("/:id/remove-file", (req, res) => {
   );
 });
 
-//Update shared files
+// Update shared files
 router.put("/:id/update-shared", (req, res) => {
   const id = req.params.id;
   const { address, files } = req.body;
 
-  // Update sharedWith for a specific address and update history
-  db.run(
-    `UPDATE patients SET 
-            sharedWith = json_set(sharedWith, 
-                                  '$.${address}', 
-                                  json(?)), 
-            history = json_insert(history, 
-                                  "$[0]", ?) 
-          WHERE patient_id = ?`,
-    [
-      JSON.stringify(files),
-      `Files updated for ${address} on ${new Date().toISOString()}`,
-      id,
-    ],
-    function (err) {
+  db.get(
+    `SELECT history, sharedWith FROM patients WHERE patient_id = ?`,
+    [id],
+    (err, row) => {
       if (err) {
-        res.status(500).json({
-          error:
-            "An error occurred while updating shared files for the patient.",
-        });
-      } else {
-        res.json({
-          message: `Shared files updated for address: ${address} on patient with id: ${id}`,
-        });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
+
+      if (!row) {
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${id}` });
+      }
+
+      let sharedWith = JSON.parse(row.sharedWith || "{}");
+      sharedWith[address] = files;
+
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `Files updated for ${address} on ${new Date().toISOString()}`
+      );
+
+      db.run(
+        `UPDATE patients SET sharedWith = ?, history = ? WHERE patient_id = ?`,
+        [
+          JSON.stringify(sharedWith),
+          JSON.stringify(history),
+          id,
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error:
+                "An error occurred while updating shared files in the database.",
+              details: err.message,
+            });
+          }
+          console.log(`Files updated for ${address} on patient with id: ${id}`);
+          res.json({
+            message: `Shared files updated for address: ${address} on patient with id: ${id}`,
+          });
+        }
+      );
     }
   );
 });
 
-//Add a shared file
-router.put("/:id/add-file", (req, res) => {
-  const id = req.params.id;
+
+// Add a shared file
+router.put("/:patient_id/add-file", (req, res) => {
+  const patient_id = req.params.patient_id;
   const file = req.body.file;
 
-  // Add file to 'content' and update history
-  db.run(
-    `UPDATE patients SET 
-            content = json_array_append(content, '$', json(?)), 
-            history = json_insert(history, 
-                                  "$[0]", ?) 
-          WHERE patient_id = ?`,
-    [
-      JSON.stringify(file),
-      `New files added on ${new Date().toISOString()}`,
-      id,
-    ],
-    function (err) {
+  db.get(
+    `SELECT history, content FROM patients WHERE patient_id = ?`,
+    [patient_id],
+    (err, row) => {
       if (err) {
-        res.status(500).json({
-          error:
-            "An error occurred while adding the file to the patient record.",
-        });
-      } else {
-        res.json({ message: `File added to patient with id: ${id}` });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
+
+      if (!row) {
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${patient_id}` });
+      }
+
+      let content = JSON.parse(row.content || "[]");
+      content.push(file);
+
+      let history = JSON.parse(row.history || "[]");
+      history.unshift(
+        `File added by ${file.name} on ${new Date().toISOString()}`
+      );
+
+      db.run(
+        `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,
+        [JSON.stringify(content), JSON.stringify(history), patient_id],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "An error occurred while adding the file to the patient record.",
+              details: err.message,
+            });
+          }
+          console.log(`File added to patient with id: ${patient_id}`);
+          res.json({ message: `File added to patient with id: ${patient_id}` });
+        }
+      );
     }
   );
 });

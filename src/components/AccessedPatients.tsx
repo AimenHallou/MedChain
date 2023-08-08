@@ -11,13 +11,22 @@ const AccessedPatients: FC = () => {
   const patients = useSelector((state: RootState) => state.patients);
 
   const currentUser = users.find((user) => user.address === currentUserAddress);
-  console.log("Current User Address:", currentUser?.address);
+
   const accessedPatients = patients.filter((patient) => {
-    return Object.keys(patient.sharedWith).includes(currentUser?.address || "");
+    let sharedWithObj = patient.sharedWith;
+  
+    if (typeof patient.sharedWith === "string") {
+      try {
+        sharedWithObj = JSON.parse(patient.sharedWith);
+      } catch (error) {
+        console.error("Failed to parse sharedWith:", error);
+        return false;
+      }
+    }
+  
+    return Object.keys(sharedWithObj).includes(currentUser?.address || "");
   });
-
-  console.log("Accessed Patients:", accessedPatients);
-
+  
   return (
     <div>
       {accessedPatients.map((patient) => (

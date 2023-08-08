@@ -153,7 +153,7 @@ export const removeFile = createAsyncThunk(
   "patients/removeFile",
   async (payload: { patientId: string; fileName: string }) => {
     const response = await fetch(
-      `/api/patients/${payload.patientId}/remove-file`,
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/remove-file`,
       {
         method: "PUT",
         headers: {
@@ -175,7 +175,7 @@ export const updateSharedFiles = createAsyncThunk(
   "patients/updateSharedFiles",
   async (payload: { patientId: string; address: string; files: string[] }) => {
     const response = await fetch(
-      `/api/patients/${payload.patientId}/update-shared`,
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/update-shared`,
       {
         method: "PUT",
         headers: {
@@ -197,8 +197,9 @@ export const updateSharedFiles = createAsyncThunk(
 export const addFile = createAsyncThunk(
   "patients/addFile",
   async (payload: { patientId: string; file: FileData }) => {
+    console.log(payload)
     const response = await fetch(
-      `/api/patients/${payload.patientId}/add-file`,
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/add-file`,
       {
         method: "PUT",
         headers: {
@@ -365,8 +366,19 @@ export const patientSlice = createSlice({
         const patient = state.find(
           (patient) => patient.patient_id === patientId
         );
-        if (patient && patient.sharedWith) {
+        if (patient) {
+          if (typeof patient.sharedWith === "string") {
+            try {
+              patient.sharedWith = JSON.parse(patient.sharedWith);
+            } catch (error) {
+              console.error("Failed to parse sharedWith:", error);
+              patient.sharedWith = {};
+            }
+          }
           patient.sharedWith[address] = files;
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
           patient.history.push(
             `Shared files updated for ${address} on ${new Date().toISOString()}`
           );

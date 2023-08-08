@@ -214,7 +214,13 @@ const PatientPage: FC = () => {
           address: selectedUsers,
           files,
         })
-      );
+      )
+        .then(() => {
+          return dispatch(fetchSinglePatient(id as string)).unwrap();
+        })
+        .then((updatedPatient) => {
+          setPatientData(updatedPatient);
+        });
     }
   };
 

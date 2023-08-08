@@ -39,8 +39,13 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
 }) => {
   let parsedSharedWith: string[] = [];
   try {
-    parsedSharedWith = Object.keys(sharedWith).filter(key => key !== 'undefined');
-    console.log(parsedSharedWith)
+    if (typeof sharedWith === "string") {
+      sharedWith = JSON.parse(sharedWith);
+    }
+    parsedSharedWith = Object.keys(sharedWith).filter(
+      (key) => key !== "undefined"
+    );
+    console.log(parsedSharedWith);
   } catch (error) {
     console.error("Failed to parse sharedWith:", error);
   }
