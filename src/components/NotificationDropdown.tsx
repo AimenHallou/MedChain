@@ -17,6 +17,7 @@ const NotificationDropdown: React.FC = () => {
   const unreadNotifications = notifications?.filter((notification) => !notification.read) || [];
 
   const toggleDropdown = () => {
+    console.log(currentUser)
     setIsOpen(!isOpen);
     markAllNotificationsAsRead();
   };

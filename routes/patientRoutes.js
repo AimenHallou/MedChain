@@ -3,13 +3,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/database");
 
-//Request Access
+// Request a patient
 router.put("/:patient_id/request", (req, res) => {
   const patient_id = req.params.patient_id;
   const requestor = req.body.requestor;
 
   db.get(
-    `SELECT history FROM patients WHERE patient_id = ?`,
+    `SELECT history, owner FROM patients WHERE patient_id = ?`,
     [patient_id],
     (err, row) => {
       if (err) {
@@ -23,6 +23,8 @@ router.put("/:patient_id/request", (req, res) => {
           .status(404)
           .json({ error: `No patient found with ID: ${patient_id}` });
       }
+
+      const owner = row.owner;
 
       let history = JSON.parse(row.history || "[]");
       history.unshift(
@@ -41,22 +43,53 @@ router.put("/:patient_id/request", (req, res) => {
             });
           }
           console.log(`${requestor} just requested ${patient_id}`);
-          res.json({
-            message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
-          });
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [owner],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `${requestor} has requested access to ${patient_id}`,
+                patient_id: patient_id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), owner],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
+                  });
+                }
+              );
+            }
+          );
         }
       );
     }
   );
 });
 
-//Cancel Request Access
+// Cancel a patient request
 router.put("/:patient_id/cancel-request", (req, res) => {
   const patient_id = req.params.patient_id;
   const requestor = req.body.requestor;
 
   db.get(
-    `SELECT history, accessRequests FROM patients WHERE patient_id = ?`,
+    `SELECT history, owner, accessRequests FROM patients WHERE patient_id = ?`,
     [patient_id],
     (err, row) => {
       if (err) {
@@ -70,6 +103,8 @@ router.put("/:patient_id/cancel-request", (req, res) => {
           .status(404)
           .json({ error: `No patient found with ID: ${patient_id}` });
       }
+
+      const owner = row.owner;
 
       let accessRequests = JSON.parse(row.accessRequests || "[]");
       accessRequests = accessRequests.filter((item) => item !== requestor);
@@ -91,9 +126,40 @@ router.put("/:patient_id/cancel-request", (req, res) => {
             });
           }
           console.log(`${requestor} just unrequested ${patient_id}`);
-          res.json({
-            message: `Access request by ${requestor} for patient with id: ${patient_id} cancelled`,
-          });
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [owner],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Access request by ${requestor} for patient with id: ${patient_id} cancelled`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `${requestor} has cancelled their access request to ${patient_id}`,
+                patient_id: patient_id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), owner],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Access request by ${requestor} for patient with id: ${patient_id} cancelled`,
+                  });
+                }
+              );
+            }
+          );
         }
       );
     }
@@ -140,24 +206,75 @@ router.put("/:id/transfer", (req, res) => {
   const id = req.params.id;
   const newOwner = req.body.newOwner;
 
-  db.run(
-    'UPDATE patients SET owner = ?, history = json_insert(history, "$[0]", ?) WHERE patient_id = ?',
-    [
-      newOwner,
-      `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`,
-      id,
-    ],
-    function (err) {
+  db.get(
+    `SELECT owner FROM patients WHERE patient_id = ?`,
+    [id],
+    (err, row) => {
       if (err) {
-        res.status(500).json({
-          error:
-            "An error occurred while updating the ownership in the database.",
-        });
-      } else {
-        res.json({
-          message: `Ownership of patient with id: ${id} transferred to ${newOwner}`,
-        });
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err.message });
       }
+
+      if (!row) {
+        return res
+          .status(404)
+          .json({ error: `No patient found with ID: ${id}` });
+      }
+
+      const currentOwner = row.owner;
+
+      db.run(
+        'UPDATE patients SET owner = ?, history = json_insert(history, "$[0]", ?) WHERE patient_id = ?',
+        [
+          newOwner,
+          `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`,
+          id,
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error:
+                "An error occurred while updating the ownership in the database.",
+              details: err.message,
+            });
+          }
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [newOwner],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Ownership of patient with id: ${id} transferred to ${newOwner}`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `You have been granted ownership of patient record with ID: ${id} by ${currentOwner}`,
+                patient_id: id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), newOwner],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Ownership of patient with id: ${id} transferred to ${newOwner}`,
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
     }
   );
 });
@@ -211,10 +328,40 @@ router.put("/:patient_id/accept-request", (req, res) => {
               details: err.message,
             });
           }
-          console.log(`${address} has been accepted for ${patient_id}`);
-          res.json({
-            message: `Access request by ${address} for patient with id: ${patient_id} accepted`,
-          });
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [address],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Access request by ${address} for patient with id: ${patient_id} accepted`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `Your access request for patient record with ID: ${patient_id} has been accepted.`,
+                patient_id: patient_id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), address],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Access request by ${address} for patient with id: ${patient_id} accepted`,
+                  });
+                }
+              );
+            }
+          );
         }
       );
     }
@@ -261,10 +408,40 @@ router.put("/:id/unshare", (req, res) => {
               details: err.message,
             });
           }
-          console.log(`Patient with id: ${id} unshared with ${address}`);
-          res.json({
-            message: `Patient with id: ${id} unshared with ${address}`,
-          });
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [address],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Patient with id: ${id} unshared with ${address}`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `Access to patient record with ID: ${id} has been revoked.`,
+                patient_id: id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), address],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Patient with id: ${id} unshared with ${address}`,
+                  });
+                }
+              );
+            }
+          );
         }
       );
     }
@@ -276,7 +453,6 @@ router.put("/:id/remove-file", (req, res) => {
   const id = req.params.id;
   const fileName = req.body.fileName;
 
-  // Remove file from 'content' and update sharedWith and history
   db.run(
     `UPDATE patients SET 
             content = json_remove(content, 
@@ -349,16 +525,45 @@ router.put("/:id/update-shared", (req, res) => {
               details: err.message,
             });
           }
-          console.log(`Files updated for ${address} on patient with id: ${id}`);
-          res.json({
-            message: `Shared files updated for address: ${address} on patient with id: ${id}`,
-          });
+
+          db.get(
+            `SELECT notifications FROM users WHERE address = ?`,
+            [address],
+            (err, userRow) => {
+              if (err) {
+                console.error("Failed to fetch notifications:", err.message);
+                return res.json({
+                  message: `Shared files updated for address: ${address} on patient with id: ${id}`,
+                });
+              }
+
+              let notifications = JSON.parse(userRow.notifications || "[]");
+              notifications.push({
+                id: new Date().toISOString(),
+                read: false,
+                message: `Shared files for patient record with ID: ${id} have been updated.`,
+                patient_id: id,
+              });
+
+              db.run(
+                `UPDATE users SET notifications = ? WHERE address = ?`,
+                [JSON.stringify(notifications), address],
+                function (err) {
+                  if (err) {
+                    console.error("Failed to update notifications:", err.message);
+                  }
+                  res.json({
+                    message: `Shared files updated for address: ${address} on patient with id: ${id}`,
+                  });
+                }
+              );
+            }
+          );
         }
       );
     }
   );
 });
-
 
 // Add a shared file
 router.put("/:patient_id/add-file", (req, res) => {
@@ -440,7 +645,6 @@ router.post("/", (req, res) => {
         return;
       }
 
-      // Fetch the newly created patient to return it in the response
       db.get(
         "SELECT * FROM patients WHERE patient_id = ?",
         patient_id,
