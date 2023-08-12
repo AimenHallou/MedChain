@@ -2,12 +2,22 @@
 import React, { FC, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { setCurrentUser, fetchUsers, addUser } from "../redux/slices/userSlice";
+import {
+  setCurrentUser,
+  fetchUsers,
+  createUser,
+} from "../redux/slices/userSlice";
 import { RootState } from "../redux/store";
 import PublishedPatients from "./PublishedPatient";
 import AccessedPatients from "./AccessedPatients";
 import { useAppDispatch } from "../app/hook";
-import { createUser } from "../redux/slices/userSlice";
+import Web3 from "web3";
+
+declare global {
+  interface Window {
+    ethereum: any;
+  }
+}
 
 const UserAccount: FC = () => {
   const dispatch = useAppDispatch();
@@ -16,10 +26,11 @@ const UserAccount: FC = () => {
   );
 
   const [showSection, setShowSection] = useState("published");
-  const [newUserAddress, setNewUserAddress] = useState("");
-  const [newUserTitle, setNewUserTitle] = useState("");
-
-  const currentUser = users.find((user) => user.address === currentUserAddress);
+  const [newUserName, setNewUserName] = useState("");
+  const [healthcareType, setHealthcareType] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
+  const [web3Address, setWeb3Address] = useState<string | null>(null);
+  const userExists = users.some((user) => user.address === web3Address);
 
   useEffect(() => {
     dispatch(fetchUsers())
@@ -27,41 +38,70 @@ const UserAccount: FC = () => {
       .catch((error) => console.error("Failed to fetch users:", error));
   }, [dispatch]);
 
-  const handleSwitchUser = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(setCurrentUser(event.target.value));
-  };
-
   const handleAddUser = () => {
-    if (newUserAddress && newUserTitle) {
-      const userExists = users.some((user) => user.address === newUserAddress);
+    if (web3Address && newUserName) {
+      const userExists = users.some((user) => user.address === web3Address);
+      console.log({
+        newUserName,
+        healthcareType,
+        organizationName,
+        web3Address,
+      });
       if (userExists) {
-        console.error(`User with address ${newUserAddress} already exists.`);
+        console.error(`User with address ${web3Address} already exists.`);
         return;
       }
-    
+
       dispatch(
         createUser({
-          address: newUserAddress,
-          title: newUserTitle,
+          address: web3Address,
+          name: newUserName,
+          healthcareType: healthcareType,
+          organizationName: organizationName,
           notifications: [],
         })
-      )
-      setNewUserAddress("");
-      setNewUserTitle("");
+      );
+      dispatch(setCurrentUser(web3Address));
     }
-    dispatch(setCurrentUser(newUserAddress));
-  };  
-
-  const handleNewUserAddressChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setNewUserAddress(event.target.value);
   };
 
-  const handleNewUserTitleChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setNewUserTitle(event.target.value);
+  // const handleNewUserTitleChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   setNewUserTitle(event.target.value);
+  // };
+
+  const handleLogin = async () => {
+    if (window.ethereum) {
+      const web3 = new Web3(window.ethereum);
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setWeb3Address(accounts[0]);
+
+        const existingUser = users.find((user) => user.address === accounts[0]);
+        if (existingUser) {
+          dispatch(setCurrentUser(accounts[0]));
+
+          setNewUserName(existingUser.name);
+          setHealthcareType(existingUser.healthcareType);
+          setOrganizationName(existingUser.organizationName);
+        }
+      } catch (error) {
+        if (error.code === 4001) {
+          console.error("User denied account access");
+        } else {
+          console.error(error);
+        }
+      }
+    } else {
+      console.error("Ethereum browser not detected. Consider using MetaMask.");
+    }
+};
+
+  const handleLogout = () => {
+    setWeb3Address(null);
   };
 
   return (
@@ -72,34 +112,55 @@ const UserAccount: FC = () => {
         </div>
         <div className="mb-4">
           <div className="mb-4">
-            <div className="mb-4">
-              <div className="mb-4">
+            <div className="font-bold mb-2">{web3Address || "N/A"}</div>
+            <div className="font-bold mb-2">{newUserName || "N/A"}</div>
+            <div className="font-bold mb-2">{healthcareType || "N/A"}</div>
+            <div className="font-bold mb-2">{organizationName || "N/A"}</div>
+            {web3Address && !userExists && (
+              <>
                 <input
                   type="text"
-                  value={newUserAddress}
-                  placeholder="Address"
-                  onChange={handleNewUserAddressChange}
+                  value={newUserName}
+                  placeholder="Name"
+                  onChange={(e) => setNewUserName(e.target.value)}
                   className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
                 />
                 <input
                   type="text"
-                  value={newUserTitle}
-                  placeholder="Title"
-                  onChange={handleNewUserTitleChange}
-                  className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full"
+                  value={healthcareType}
+                  placeholder="Type of Healthcare Provider"
+                  onChange={(e) => setHealthcareType(e.target.value)}
+                  className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
                 />
-              </div>
-              <div className="">
+                <input
+                  type="text"
+                  value={organizationName}
+                  placeholder="Organization Name"
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                  className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
+                />
+              </>
+            )}
+
+            <div className="flex mt-4">
+              <button
+                onClick={web3Address ? handleLogout : handleLogin}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+              >
+                {web3Address ? "Logout" : "Login with MetaMask"}
+              </button>
+
+              {web3Address && !currentUserAddress && (
                 <button
                   onClick={handleAddUser}
                   className="block bg-blue-500 text-white px-4 py-2 rounded-lg"
                 >
                   Add User
                 </button>
-              </div>
+              )}
             </div>
           </div>
-          <div className="flex justify-center gap-x-10 mb-4">
+          <div className="flex justify-center gap-x-10 mb-4 mt-6">
             <button
               onClick={() => setShowSection("published")}
               className={`py-2 px-2  ${
@@ -125,24 +186,6 @@ const UserAccount: FC = () => {
           {showSection === "accessed" && <AccessedPatients />}
         </div>
       </div>
-      {users.length > 0 && (
-        <div className="bg-gray-700 p-4 rounded mt-10 text-white lg:w-[20rem] border-2 border-gray-600">
-          <h2 className="flex text-2xl justify-center font-bold mb-2">
-            Switch User
-          </h2>
-          <select
-            value={currentUserAddress || ""}
-            onChange={handleSwitchUser}
-            className="block bg-gray-800 text-white border border-gray-600 rounded p-2 w-full mb-4"
-          >
-            {users.map((user) => (
-              <option key={user.address} value={user.address}>
-                {user.title} ({user.address})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
     </div>
   );
 };

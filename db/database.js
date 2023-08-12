@@ -12,7 +12,9 @@ const db = new sqlite3.Database('./medchain.db', sqlite3.OPEN_READWRITE | sqlite
   db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS users(
       address TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
+      name TEXT NOT NULL,
+      healthcareType TEXT NOT NULL,
+      organizationName TEXT NOT NULL,
       notifications TEXT
     )`, (err) => {
       if (err) {

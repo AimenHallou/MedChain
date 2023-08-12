@@ -30,9 +30,12 @@ export interface UserNotification {
 
 export interface User {
   address: string;
-  title: string;
+  name: string;
+  healthcareType: string;
+  organizationName: string;
   notifications: UserNotification[];
 }
+
 
 export interface UsersState {
   users: User[];

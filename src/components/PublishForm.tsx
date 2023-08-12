@@ -34,14 +34,12 @@ const PublishForm: FC = () => {
       sharedWith[sharedUser] = [];
     });
     const ownerAddress = currentUser?.address || "";
-    const ownerTitle = currentUser?.title || "";
 
     dispatch(
       createPatient({
         ...form,
         patient_id: form.patient_id,
         owner: ownerAddress,
-        ownerTitle: ownerTitle,
         createdDate,
         sharedWith,
         history: [`Patient created on ${createdDate}`],
