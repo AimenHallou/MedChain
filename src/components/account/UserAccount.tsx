@@ -42,6 +42,7 @@ const UserAccount: FC = () => {
   }, [dispatch]);
 
   const handleAddUser = () => {
+
     if (web3Address && newUserName) {
       const userExists = users.some((user) => user.address === web3Address);
       console.log({
@@ -103,9 +104,8 @@ const UserAccount: FC = () => {
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
       <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
-        {!web3Address ? (
-          <NotLoggedInView handleLogin={handleLogin} />
-        ) : !userExists ? (
+        {!web3Address &&  <NotLoggedInView handleLogin={handleLogin} />}
+        {web3Address && !userExists && (
           <UserDetailView
             web3Address={web3Address}
             userExists={userExists}
@@ -119,7 +119,8 @@ const UserAccount: FC = () => {
             organizationName={organizationName}
             setOrganizationName={setOrganizationName}
           />
-        ) : (
+        )}
+        {web3Address && userExists && (
           <>
             <UserDetailView
               web3Address={web3Address}

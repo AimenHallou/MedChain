@@ -43,10 +43,14 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
           </>
         )}
         <div className="mb-4">
-          <div className="font-bold mb-2">{web3Address || "N/A"}</div>
-          <div className="font-bold mb-2">{newUserName || "N/A"}</div>
-          <div className="font-bold mb-2">{healthcareType || "N/A"}</div>
-          <div className="font-bold mb-2">{organizationName || "N/A"}</div>
+          <div className="font-bold mb-2">Address: {web3Address || "N/A"}</div>
+          <div className="font-bold mb-2">Name: {newUserName || "N/A"}</div>
+          <div className="font-bold mb-2">
+            Healthcare Type: {healthcareType || "N/A"}
+          </div>
+          <div className="font-bold mb-2">
+            Organization: {organizationName || "N/A"}
+          </div>
           {web3Address && !userExists && (
             <>
               <input
