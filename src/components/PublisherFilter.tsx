@@ -3,9 +3,10 @@ import React, { FC, useState } from "react";
 
 interface PublisherFilterProps {
   onFilterChange: (filters: string[]) => void;
+  filterType: "patient" | "file";
 }
 
-const PublisherFilter: FC<PublisherFilterProps> = ({ onFilterChange }) => {
+const PublisherFilter: FC<PublisherFilterProps> = ({ onFilterChange, filterType }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>("");
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -14,13 +15,23 @@ const PublisherFilter: FC<PublisherFilterProps> = ({ onFilterChange }) => {
     onFilterChange([filter]);
   };
 
-  const filterOptions = {
+  const patientFilterOptions = {
     "": "All Patients",
     "address": "Address",
     "name": "Name",
     "healthcareType": "Healthcare Type",
     "organizationName": "Organization Name",
   };
+
+  const fileFilterOptions = {
+    "": "All File Types",
+    "Lab results": "Lab Results",
+    "Medical images": "Medical Images",
+    "Medication history": "Medication History",
+    "Clinician notes": "Clinician Notes"
+  };
+
+  const filterOptions = filterType === "patient" ? patientFilterOptions : fileFilterOptions;
 
   return (
     <select

@@ -15,6 +15,7 @@ const PatientList: FC = () => {
   const users = useSelector((state: RootState) => state.user.users);
 
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedFileFilters, setSelectedFileFilters] = useState<string[]>([]);
 
   useEffect(() => {
     dispatch(fetchPatients());
@@ -30,35 +31,65 @@ const PatientList: FC = () => {
     setSelectedFilters(filters);
   };
 
+  const handleFileFilterChange = (filters: string[]) => {
+    setSelectedFileFilters(filters);
+  };
+
   const filterPatientsBasedOnCriteria = (filter: string) => {
-    if (filter === "") {
+    if (searchTerm === "") {
       return patients;
     }
 
-    return Array.isArray(patients)
-      ? patients.filter((patient) => {
-          const user = users.find((u) => u.address === patient.owner);
-          const searchTermExistsInField = (field: string) => {
-            switch (field) {
-              case "address":
-                return patient.owner.toLowerCase().includes(searchTerm.toLowerCase());
-              case "name":
-                return user?.name.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-              case "healthcareType":
-                return user?.healthcareType.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-              case "organizationName":
-                return user?.organizationName.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-              default:
-                return false;
-            }
-        };        
+    return patients.filter((patient) => {
+      const user = users.find((u) => u.address === patient.owner);
 
-          return searchTermExistsInField(filter);
-        })
-      : [];
+      const stringContainsSearchTerm = (str: string | undefined) => {
+        return str?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      };
+
+      switch (filter) {
+        case "address":
+          return stringContainsSearchTerm(patient.owner);
+        case "name":
+          return stringContainsSearchTerm(user?.name);
+        case "healthcareType":
+          return stringContainsSearchTerm(user?.healthcareType);
+        case "organizationName":
+          return stringContainsSearchTerm(user?.organizationName);
+        default:
+          return false;
+      }
+    });
   };
 
-  const filteredPatients = filterPatientsBasedOnCriteria(selectedFilters[0] || "");
+  const filterPatientsByFileTypes = (patient: any, fileType: string) => {
+    if (fileType === "") return true;
+
+    let patientContent;
+    try {
+      patientContent = JSON.parse(patient.content);
+    } catch (error) {
+      console.error("Error parsing patient content:", error);
+      return false;
+    }
+
+    if (Array.isArray(patientContent)) {
+      const doesMatch = patientContent.some((file: any) => {
+        return file.dataType === fileType;
+      });
+      return doesMatch;
+    }
+    return false;
+  };
+
+  const filteredPatients = patients.filter((patient) => {
+    const patientCriteria = selectedFilters[0] || "";
+    const fileCriteria = selectedFileFilters[0] || "";
+    const isPatientCriteriaMet =
+      filterPatientsBasedOnCriteria(patientCriteria).includes(patient);
+    const isFileCriteriaMet = filterPatientsByFileTypes(patient, fileCriteria);
+    return isPatientCriteriaMet && isFileCriteriaMet;
+  });
 
   return (
     <div className="bg-gray-700 text-white rounded-lg p-4 shadow border-2 border-gray-600">
@@ -66,7 +97,14 @@ const PatientList: FC = () => {
         <h2 className="text-lg font-bold">Patients</h2>
         <div className="flex items-center space-x-4">
           <SearchBar onSearch={handleSearch} />
-          <PublisherFilter onFilterChange={handleFilterChange} />
+          <PublisherFilter
+            onFilterChange={handleFilterChange}
+            filterType="patient"
+          />
+          <PublisherFilter
+            onFilterChange={handleFileFilterChange}
+            filterType="file"
+          />
           <Link href="/publish">
             <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
               Add Patient
@@ -75,8 +113,11 @@ const PatientList: FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPatients && filteredPatients.map((patient, index) => (
-          <PatientCard key={patient.patient_id || `fallback-${index}`} {...patient} />
+        {filteredPatients.map((patient, index) => (
+          <PatientCard
+            key={patient.patient_id || `fallback-${index}`}
+            {...patient}
+          />
         ))}
       </div>
     </div>

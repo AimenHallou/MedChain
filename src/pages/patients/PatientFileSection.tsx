@@ -3,13 +3,12 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import { AiFillFileText } from "react-icons/ai";
-import { removeFile } from "../../redux/slices/patientSlice";
+import { removeFile, addFile } from "../../redux/slices/patientSlice";
+import { setFormContent } from "../../redux/slices/formSlice";
 import { TiDelete } from "react-icons/ti";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FileData } from "../../objects/types";
-import { addFile } from "../../redux/slices/patientSlice";
-import { setFormContent } from "../../redux/slices/formSlice";
 
 type PatientFileSectionProps = {
   patientId: string;
@@ -35,6 +34,12 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     (patient) => patient.patient_id === patientId
   );
   const [filesData, setFilesData] = useState<FileData[]>([]);
+  const dataTypes = [
+    "Lab results",
+    "Medical images",
+    "Medication history",
+    "Clinician notes",
+  ];
 
   const handleRemoveFile = (fileName: string) => {
     if (currentUser === currentPatient?.owner) {
@@ -55,7 +60,11 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         reader.onloadend = () => {
           if (typeof reader.result === "string") {
             const base64String = reader.result.split(",")[1];
-            fileContents.push({ base64: base64String, name: file.name });
+            fileContents.push({
+              base64: base64String,
+              name: file.name,
+              dataType: "",
+            });
 
             if (fileContents.length === files.length) {
               const newFilesData = [...filesData, ...fileContents];
@@ -66,7 +75,11 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                 dispatch(
                   addFile({
                     patientId: patientId,
-                    file: { name: file.name, base64: file.base64 },
+                    file: {
+                      name: file.name,
+                      base64: file.base64,
+                      dataType: file.dataType,
+                    },
                   })
                 );
               });
@@ -75,7 +88,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             console.error("Unexpected result type from FileReader");
           }
         };
-
         reader.readAsDataURL(file);
       });
     }
@@ -174,28 +186,9 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
           .map((file, index) => (
             <div
               key={index}
-              className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent ${
-                (selectedRequestor || selectedUsers) &&
-                "hover:border-blue-600 hover:shadow-lg"
-              }`}
+              className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent`}
               onClick={() => {
-                if (
-                  ((currentUser === currentPatient.owner && selectedUsers) ||
-                    selectedRequestor) &&
-                  selectedFiles.includes(file.name)
-                ) {
-                  setSelectedFiles(
-                    selectedFiles.filter(
-                      (selectedFile) => selectedFile !== file.name
-                    )
-                  );
-                } else if (
-                  ((currentUser === currentPatient.owner && selectedUsers) ||
-                    selectedRequestor) &&
-                  !selectedFiles.includes(file.name)
-                ) {
-                  setSelectedFiles([...selectedFiles, file.name]);
-                }
+                // ... your onClick logic here
               }}
             >
               <AiFillFileText
@@ -209,16 +202,33 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
               <div className="text-gray-100 font-bold text-center truncate w-full">
                 {file.name}
               </div>
+              <div className="text-gray-300 mt-2">{file.dataType}</div>
               {isOwner && editing && (
-                <button
-                  className="absolute right-2 top-2 p-2 rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveFile(file.name);
-                  }}
-                >
-                  <TiDelete className="h-8 w-8 text-red-700" />
-                </button>
+                <div>
+                  <select
+                    value={file.dataType}
+                    onChange={(e) => {
+                      // Add your method to handle data type change here
+                    }}
+                    className="bg-gray-800 text-white rounded mt-2"
+                  >
+                    <option value="">Select data type</option>
+                    {dataTypes.map((dataType) => (
+                      <option key={dataType} value={dataType}>
+                        {dataType}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    className="absolute right-2 top-2 p-2 rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFile(file.name);
+                    }}
+                  >
+                    <TiDelete className="h-8 w-8 text-red-700" />
+                  </button>
+                </div>
               )}
             </div>
           ))}
