@@ -1,14 +1,19 @@
 // src/components/publish/ContentSection.tsx
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setBase64Content, setFormContent } from '../../redux/slices/formSlice';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setBase64Content, setFormContent } from "../../redux/slices/formSlice";
 import { FileData } from "../../objects/types";
 
 const ContentSection: React.FC = () => {
   const dispatch = useDispatch();
   const [filesData, setFilesData] = useState<FileData[]>([]);
 
-  const dataTypes = ["Lab results", "Medical images", "Medication history", "Clinician notes"];
+  const dataTypes = [
+    "Lab results",
+    "Medical images",
+    "Medication history",
+    "Clinician notes",
+  ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -21,7 +26,11 @@ const ContentSection: React.FC = () => {
         reader.onloadend = () => {
           if (typeof reader.result === "string") {
             const base64String = reader.result.split(",")[1];
-            fileContents.push({ base64: base64String, name: file.name, dataType: "" });
+            fileContents.push({
+              base64: base64String,
+              name: file.name,
+              dataType: "",
+            });
             if (fileContents.length === files.length) {
               const newFilesData = [...filesData, ...fileContents];
               setFilesData(newFilesData);
@@ -46,7 +55,6 @@ const ContentSection: React.FC = () => {
     setFilesData(updatedFilesData);
     dispatch(setFormContent(updatedFilesData));
   };
-  
 
   return (
     <div className="mb-4">
@@ -63,9 +71,11 @@ const ContentSection: React.FC = () => {
           multiple
         />
         <div className="mt-4">
-          <label className="block text-white font-bold mb-2">
-            Data Types
-          </label>
+          {filesData.length > 0 && (
+            <label className="block text-white font-bold mb-2">
+              Data Types
+            </label>
+          )}
           {filesData.map((fileData, index) => (
             <div key={index} className="flex items-center justify-between mb-2">
               <span className="text-white">{fileData.name}</span>

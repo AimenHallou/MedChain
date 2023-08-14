@@ -1,4 +1,4 @@
-// src/components/PublisherFilter.tsx
+// src/components/homepage/PublisherFilter.tsx
 import React, { FC, useState } from "react";
 
 interface PublisherFilterProps {

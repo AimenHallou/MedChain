@@ -1,10 +1,10 @@
-// src/components/PatientList.tsx
+// src/components/homepage/PatientList.tsx
 import React, { FC, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import PatientCard from "./PatientCard";
-import { RootState, AppDispatch } from "../redux/store";
-import { fetchPatients } from "../redux/slices/patientSlice";
+import PatientCard from "../PatientCard";
+import { RootState, AppDispatch } from "../../redux/store";
+import { fetchPatients } from "../../redux/slices/patientSlice";
 import Link from "next/link";
 import SearchBar from "./SearchBar";
 import PublisherFilter from "./PublisherFilter";
@@ -112,14 +112,23 @@ const PatientList: FC = () => {
           </Link>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPatients.map((patient, index) => (
-          <PatientCard
-            key={patient.patient_id || `fallback-${index}`}
-            {...patient}
-          />
-        ))}
-      </div>
+      {filteredPatients.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPatients.map((patient, index) => (
+            <PatientCard
+              key={patient.patient_id || `fallback-${index}`}
+              {...patient}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center mt-4">
+          <h3 className="text-xl font-semibold">No Patients to Display</h3>
+          <p className="text-gray-400 mt-2">
+            Please add or search for a patient to view their details.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

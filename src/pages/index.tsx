@@ -1,6 +1,6 @@
 // src/pages/index.tsx
 import React from "react";
-import HomePage from "../components/HomePage";
+import HomePage from "../components/homepage/HomePage";
 
 interface IndexPageProps {
   searchTerm: string;
@@ -8,6 +8,6 @@ interface IndexPageProps {
 
 const IndexPage: React.FC<IndexPageProps> = ({ searchTerm }) => {
   return <HomePage searchTerm={searchTerm} />;
-}
+};
 
 export default IndexPage;

@@ -1,4 +1,4 @@
-// src/components/SearchBar.tsx
+// src/components/homepage/SearchBar.tsx
 import React, { FC, useState } from "react";
 import { BiSearch } from 'react-icons/bi';
 

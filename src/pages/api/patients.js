@@ -10,7 +10,6 @@ export default async function handler(req, res) {
       res.status(200).json(response.data);
       
     } else if (req.method === 'POST') {
-      console.log("TESTERETESTER")
       const response = await axios.post(apiUrl, req.body);
       res.status(200).json(response.data);
 
@@ -27,7 +26,6 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    console.log("TESTERETESTE22222R")
     res.status(500).json({ error: error.message });
   }
 }

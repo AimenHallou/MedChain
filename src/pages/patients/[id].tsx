@@ -75,8 +75,6 @@ const PatientPage: FC = () => {
   };
 
   const handleShare = () => {
-    console.log("Inside handleShare function");
-
     if (sharedAddress) {
       console.log("Shared address is present:", sharedAddress);
 

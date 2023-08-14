@@ -9,7 +9,6 @@ interface PatientCardProps extends Patient {}
 const PatientCard: FC<PatientCardProps> = ({
   patient_id,
   owner,
-  ownerTitle,
   createdDate,
 }) => {
   const router = useRouter();
@@ -28,7 +27,7 @@ const PatientCard: FC<PatientCardProps> = ({
       <div className="flex-grow space-y-2 flex flex-col justify-between">
         <div>
           <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">{patient_id}</h2>
-          <p className="text-sm font-light">{ownerTitle} {owner}</p>
+          <p className="text-sm font-light">{owner}</p>
         </div>
         <p className="text-xs text-gray-400">Created: {createdDate}</p>
       </div>

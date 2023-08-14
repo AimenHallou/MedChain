@@ -17,7 +17,6 @@ export const fetchPatients = createAsyncThunk(
 export const createPatient = createAsyncThunk(
   "patients/createPatient",
   async (patient: Patient) => {
-    console.log(patient, "here is data");
     const response = await fetch("/api/patients", {
       method: "POST",
       headers: {
@@ -75,7 +74,6 @@ export const transferOwnership = createAsyncThunk(
 export const sharePatient = createAsyncThunk(
   "patients/sharePatient",
   async (payload: { patientId: string; address: string; files: string[] }) => {
-    console.log("HERE, ", payload);
     const response = await fetch(
       `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
       {
@@ -197,7 +195,6 @@ export const updateSharedFiles = createAsyncThunk(
 export const addFile = createAsyncThunk(
   "patients/addFile",
   async (payload: { patientId: string; file: FileData }) => {
-    console.log(payload)
     const response = await fetch(
       `${API_ENDPOINT}/api/patients/${payload.patientId}/add-file`,
       {
@@ -224,7 +221,6 @@ export const acceptAccessRequest = createAsyncThunk(
     requestor: string;
     files: string[];
   }) => {
-    console.log("detail", payload);
     const response = await fetch(
       `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
       {
@@ -265,7 +261,6 @@ export const rejectAccessRequest = createAsyncThunk(
 export const cancelRequest = createAsyncThunk(
   "patients/cancelRequest",
   async (payload: { patient_id: string; requestor: string }) => {
-    console.log(payload);
     const response = await fetch(
       `${API_ENDPOINT}/api/patients/${payload.patient_id}/cancel-request`,
       {
@@ -417,7 +412,6 @@ export const patientSlice = createSlice({
           patient.history.push(
             `Access requested by ${requestor} on ${new Date().toISOString()}`
           );
-          console.log(patient);
         }
       })
       .addCase(cancelRequest.fulfilled, (state, action) => {
@@ -454,11 +448,7 @@ export const patientSlice = createSlice({
         const patient = state.find(
           (patient) => patient.patient_id === patientId
         );
-        console.log(action.payload);
         if (patient) {
-          console.log("we in the patient");
-          console.log(typeof patient.accessRequests);
-          console.log(patient.accessRequests);
           if (typeof patient.accessRequests === "string") {
             try {
               patient.accessRequests = JSON.parse(patient.accessRequests);
