@@ -38,6 +38,15 @@ const UserAccount: FC = () => {
   useEffect(() => {
     dispatch(fetchUsers())
       .then(unwrapResult)
+      .then(() => {
+              const existingUser = users.find((user) => user.address === currentUserAddress);
+              if (existingUser) {
+                setNewUserName(existingUser.name);
+                setHealthcareType(existingUser.healthcareType);
+                setOrganizationName(existingUser.organizationName);
+                setWeb3Address(currentUserAddress);
+          };
+      })
       .catch((error) => console.error("Failed to fetch users:", error));
   }, [dispatch]);
 
@@ -99,13 +108,18 @@ const UserAccount: FC = () => {
 
   const handleLogout = () => {
     setWeb3Address(null);
-  };
+    dispatch(setCurrentUser(null));
+    setNewUserName('');
+    setHealthcareType('');
+    setOrganizationName('');
+};
+
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
       <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
-        {!web3Address &&  <NotLoggedInView handleLogin={handleLogin} />}
-        {web3Address && !userExists && (
+      {!web3Address && !currentUserAddress && <NotLoggedInView handleLogin={handleLogin} />}
+        {currentUserAddress && (
           <UserDetailView
             web3Address={web3Address}
             userExists={userExists}
@@ -120,30 +134,16 @@ const UserAccount: FC = () => {
             setOrganizationName={setOrganizationName}
           />
         )}
+  
         {web3Address && userExists && (
-          <>
-            <UserDetailView
-              web3Address={web3Address}
-              userExists={userExists}
-              handleLogin={handleLogin}
-              handleLogout={handleLogout}
-              handleAddUser={handleAddUser}
-              newUserName={newUserName}
-              setNewUserName={setNewUserName}
-              healthcareType={healthcareType}
-              setHealthcareType={setHealthcareType}
-              organizationName={organizationName}
-              setOrganizationName={setOrganizationName}
-            />
-            <PatientDetailView
-              showSection={showSection}
-              setShowSection={setShowSection}
-            />
-          </>
+          <PatientDetailView
+            showSection={showSection}
+            setShowSection={setShowSection}
+          />
         )}
       </div>
     </div>
-  );
+  );  
 };
 
 export default UserAccount;
