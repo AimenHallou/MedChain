@@ -3,15 +3,28 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/database");
 
+const Web3 = require("web3");
+const fs = require("fs");
+
+const web3 = new Web3("http://127.0.0.1:8545");
+
+const contractJSON = JSON.parse(
+  fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
+);
+const abi = contractJSON.abi;
+
+const contractAddress = "0x5914331d5342C700044B4DdD65E68221C32e1877";
+const contractInstance = new web3.eth.Contract(abi, contractAddress);
+
 // Request a patient
-router.put("/:patient_id/request", (req, res) => {
+router.put("/:patient_id/request", async (req, res) => {
   const patient_id = req.params.patient_id;
   const requestor = req.body.requestor;
 
   db.get(
     `SELECT history, owner FROM patients WHERE patient_id = ?`,
     [patient_id],
-    (err, row) => {
+    async (err, row) => {
       if (err) {
         return res
           .status(500)
@@ -30,6 +43,19 @@ router.put("/:patient_id/request", (req, res) => {
       history.unshift(
         `Access requested by ${requestor} on ${new Date().toISOString()}`
       );
+
+      try {
+        await contractInstance.methods
+          .requestAccess(patient_id, requestor)
+          .send({
+            from: requestor,
+            gas: 3000000,
+            gasPrice: "20000000000",
+          });
+      } catch (error) {
+        console.error("Error interacting with the contract", error);
+        return res.status(500).send("Error interacting with blockchain");
+      }
 
       db.run(
         `UPDATE patients SET accessRequests = json_insert(ifnull(accessRequests, '[]'), '$[0]', ?), history = ? WHERE patient_id = ?`,
@@ -68,7 +94,10 @@ router.put("/:patient_id/request", (req, res) => {
                 [JSON.stringify(notifications), owner],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
                     message: `Access requested by ${requestor} for patient with id: ${patient_id}`,
@@ -84,14 +113,14 @@ router.put("/:patient_id/request", (req, res) => {
 });
 
 // Cancel a patient request
-router.put("/:patient_id/cancel-request", (req, res) => {
+router.put("/:patient_id/cancel-request", async (req, res) => {
   const patient_id = req.params.patient_id;
   const requestor = req.body.requestor;
 
   db.get(
     `SELECT history, owner, accessRequests FROM patients WHERE patient_id = ?`,
     [patient_id],
-    (err, row) => {
+    async (err, row) => {
       if (err) {
         return res
           .status(500)
@@ -113,6 +142,19 @@ router.put("/:patient_id/cancel-request", (req, res) => {
       history.unshift(
         `Access request by ${requestor} cancelled on ${new Date().toISOString()}`
       );
+
+      try {
+        await contractInstance.methods
+          .cancelAccessRequest(patient_id, requestor)
+          .send({
+            from: requestor,
+            gas: 3000000,
+            gasPrice: "20000000000",
+          });
+      } catch (error) {
+        console.error("Error interacting with the contract", error);
+        return res.status(500).send("Error interacting with blockchain");
+      }
 
       db.run(
         `UPDATE patients SET accessRequests = ?, history = ? WHERE patient_id = ?`,
@@ -151,7 +193,10 @@ router.put("/:patient_id/cancel-request", (req, res) => {
                 [JSON.stringify(notifications), owner],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
                     message: `Access request by ${requestor} for patient with id: ${patient_id} cancelled`,
@@ -264,7 +309,10 @@ router.put("/:id/transfer", (req, res) => {
                 [JSON.stringify(notifications), newOwner],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
                     message: `Ownership of patient with id: ${id} transferred to ${newOwner}`,
@@ -280,7 +328,7 @@ router.put("/:id/transfer", (req, res) => {
 });
 
 //Share a patient
-router.put("/:patient_id/accept-request", (req, res) => {
+router.put("/:patient_id/accept-request", async (req, res) => {
   const patient_id = req.params.patient_id;
   const address = req.body.requestor;
   const files = req.body.files;
@@ -288,7 +336,7 @@ router.put("/:patient_id/accept-request", (req, res) => {
   db.get(
     `SELECT history, accessRequests, sharedWith FROM patients WHERE patient_id = ?`,
     [patient_id],
-    (err, row) => {
+    async (err, row) => {
       if (err) {
         return res
           .status(500)
@@ -311,6 +359,19 @@ router.put("/:patient_id/accept-request", (req, res) => {
       history.unshift(
         `Access request by ${address} accepted on ${new Date().toISOString()}`
       );
+
+      try {
+        await contractInstance.methods
+          .acceptAccessRequest(patient_id, address, files)
+          .send({
+            from: address,
+            gas: 3000000,
+            gasPrice: "20000000000",
+          });
+      } catch (error) {
+        console.error("Error interacting with the contract", error);
+        return res.status(500).send("Error interacting with blockchain");
+      }
 
       db.run(
         `UPDATE patients SET accessRequests = ?, sharedWith = ?, history = ? WHERE patient_id = ?`,
@@ -353,7 +414,10 @@ router.put("/:patient_id/accept-request", (req, res) => {
                 [JSON.stringify(notifications), address],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
                     message: `Access request by ${address} for patient with id: ${patient_id} accepted`,
@@ -368,15 +432,15 @@ router.put("/:patient_id/accept-request", (req, res) => {
   );
 });
 
-//Unshare a patient
-router.put("/:id/unshare", (req, res) => {
-  const id = req.params.id;
+// Unshare a patient
+router.put("/:patient_id/unshare", async (req, res) => {
+  const patient_id = req.params.patient_id;
   const address = req.body.address;
 
   db.get(
-    `SELECT history, accessRequests FROM patients WHERE patient_id = ?`,
-    [id],
-    (err, row) => {
+    `SELECT history, accessRequests, sharedWith FROM patients WHERE patient_id = ?`,
+    [patient_id],
+    async (err, row) => {
       if (err) {
         return res
           .status(500)
@@ -386,20 +450,41 @@ router.put("/:id/unshare", (req, res) => {
       if (!row) {
         return res
           .status(404)
-          .json({ error: `No patient found with ID: ${id}` });
+          .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
       let accessRequests = JSON.parse(row.accessRequests || "[]");
       accessRequests = accessRequests.filter((item) => item !== address);
+
+      let sharedWith = JSON.parse(row.sharedWith || "{}");
+      delete sharedWith[address];
 
       let history = JSON.parse(row.history || "[]");
       history.unshift(
         `Patient unshared with ${address} on ${new Date().toISOString()}`
       );
 
+      try {
+        await contractInstance.methods
+          .unsharePatient(patient_id, address)
+          .send({
+            from: address,
+            gas: 3000000,
+            gasPrice: "20000000000",
+          });
+      } catch (error) {
+        console.error("Error interacting with the contract", error);
+        return res.status(500).send("Error interacting with blockchain");
+      }
+
       db.run(
-        `UPDATE patients SET accessRequests = ?, sharedWith = json_remove(sharedWith, '$.${address}'), history = ? WHERE patient_id = ?`,
-        [JSON.stringify(accessRequests), JSON.stringify(history), id],
+        `UPDATE patients SET accessRequests = ?, sharedWith = ?, history = ? WHERE patient_id = ?`,
+        [
+          JSON.stringify(accessRequests),
+          JSON.stringify(sharedWith),
+          JSON.stringify(history),
+          patient_id,
+        ],
         function (err) {
           if (err) {
             return res.status(500).json({
@@ -416,7 +501,7 @@ router.put("/:id/unshare", (req, res) => {
               if (err) {
                 console.error("Failed to fetch notifications:", err.message);
                 return res.json({
-                  message: `Patient with id: ${id} unshared with ${address}`,
+                  message: `Patient with id: ${patient_id} unshared with ${address}`,
                 });
               }
 
@@ -424,8 +509,8 @@ router.put("/:id/unshare", (req, res) => {
               notifications.push({
                 id: new Date().toISOString(),
                 read: false,
-                message: `Access to patient record with ID: ${id} has been revoked.`,
-                patient_id: id,
+                message: `Access to patient record with ID: ${patient_id} has been revoked.`,
+                patient_id: patient_id,
               });
 
               db.run(
@@ -433,10 +518,13 @@ router.put("/:id/unshare", (req, res) => {
                 [JSON.stringify(notifications), address],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
-                    message: `Patient with id: ${id} unshared with ${address}`,
+                    message: `Patient with id: ${patient_id} unshared with ${address}`,
                   });
                 }
               );
@@ -512,11 +600,7 @@ router.put("/:id/update-shared", (req, res) => {
 
       db.run(
         `UPDATE patients SET sharedWith = ?, history = ? WHERE patient_id = ?`,
-        [
-          JSON.stringify(sharedWith),
-          JSON.stringify(history),
-          id,
-        ],
+        [JSON.stringify(sharedWith), JSON.stringify(history), id],
         function (err) {
           if (err) {
             return res.status(500).json({
@@ -550,7 +634,10 @@ router.put("/:id/update-shared", (req, res) => {
                 [JSON.stringify(notifications), address],
                 function (err) {
                   if (err) {
-                    console.error("Failed to update notifications:", err.message);
+                    console.error(
+                      "Failed to update notifications:",
+                      err.message
+                    );
                   }
                   res.json({
                     message: `Shared files updated for address: ${address} on patient with id: ${id}`,
@@ -600,7 +687,8 @@ router.put("/:patient_id/add-file", (req, res) => {
         function (err) {
           if (err) {
             return res.status(500).json({
-              error: "An error occurred while adding the file to the patient record.",
+              error:
+                "An error occurred while adding the file to the patient record.",
               details: err.message,
             });
           }
@@ -612,8 +700,8 @@ router.put("/:patient_id/add-file", (req, res) => {
   );
 });
 
-//Create a patient
-router.post("/", (req, res) => {
+// Create a patient
+router.post("/", async (req, res) => {
   const {
     patient_id,
     owner,
@@ -625,47 +713,60 @@ router.post("/", (req, res) => {
     accessRequests,
   } = req.body;
 
-  db.run(
-    "INSERT INTO patients(patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-    [
-      patient_id,
-      owner,
-      ownerTitle,
-      createdDate,
-      JSON.stringify(content),
-      JSON.stringify(sharedWith),
-      JSON.stringify(history),
-      JSON.stringify(accessRequests),
-    ],
-    function (err) {
-      if (err) {
-        res.status(500).json({
-          error: "An error occurred while inserting into the database.",
-        });
-        return;
-      }
+  try {
+    const txReceipt = await contractInstance.methods
+      .createPatient(patient_id, history[0])
+      .send({
+        from: owner,
+        gas: 3000000,
+        gasPrice: "20000000000",
+      });
 
-      db.get(
-        "SELECT * FROM patients WHERE patient_id = ?",
+    db.run(
+      "INSERT INTO patients(patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+      [
         patient_id,
-        (err, row) => {
-          if (err) {
-            res.status(500).json({
-              error: "An error occurred while querying the database.",
-            });
-            return;
-          }
-
-          row.content = JSON.parse(row.content);
-          row.sharedWith = JSON.parse(row.sharedWith);
-          row.history = JSON.parse(row.history);
-          row.accessRequests = JSON.parse(row.accessRequests);
-
-          res.json(row);
+        owner,
+        ownerTitle,
+        createdDate,
+        JSON.stringify(content),
+        JSON.stringify(sharedWith),
+        JSON.stringify(history),
+        JSON.stringify(accessRequests),
+      ],
+      function (err) {
+        if (err) {
+          res.status(500).json({
+            error: "An error occurred while inserting into the database.",
+          });
+          return;
         }
-      );
-    }
-  );
+
+        db.get(
+          "SELECT * FROM patients WHERE patient_id = ?",
+          patient_id,
+          (err, row) => {
+            if (err) {
+              res.status(500).json({
+                error: "An error occurred while querying the database.",
+              });
+              return;
+            }
+
+            row.content = JSON.parse(row.content);
+            row.sharedWith = JSON.parse(row.sharedWith);
+            row.history = JSON.parse(row.history);
+            row.accessRequests = JSON.parse(row.accessRequests);
+
+            res.json(row);
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error("Error interacting with the contract", error);
+    res.status(500).send("Error interacting with blockchain");
+  }
 });
 
 // Delete a patient

@@ -42,7 +42,7 @@ const PublishForm: FC = () => {
         owner: ownerAddress,
         createdDate,
         sharedWith,
-        history: [`Patient created on ${createdDate}`],
+        history: [`Patient created by ${ownerAddress} on ${createdDate}`],
       })
     );
   

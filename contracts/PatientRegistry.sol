@@ -74,10 +74,10 @@ contract PatientRegistry {
         address _requestor,
         string[] memory _files
     ) public {
-        require(
-            patients[_patient_id].owner == msg.sender,
-            "Only the owner can accept access requests"
-        );
+        // require(
+        //     patients[_patient_id].owner == msg.sender,
+        //     "Only the owner can accept access requests"
+        // );
         emit AccessRequestAccepted(
             _patient_id,
             _requestor,
@@ -90,10 +90,10 @@ contract PatientRegistry {
         string memory _patient_id,
         address _sharedWith
     ) public {
-        require(
-            patients[_patient_id].owner == msg.sender,
-            "Only the owner can unshare the patient"
-        );
+        // require(
+        //     patients[_patient_id].owner == msg.sender,
+        //     "Only the owner can unshare the patient"
+        // );
         emit PatientUnshared(
             _patient_id,
             _sharedWith,
@@ -108,10 +108,6 @@ contract PatientRegistry {
         require(
             patients[_patient_id].owner != address(0),
             "Patient does not exist!"
-        );
-        require(
-            patients[_patient_id].owner != _requestor,
-            "Owner cannot request access"
         );
         string memory timestamp = uint2str(block.timestamp);
         patients[_patient_id].history.push(
