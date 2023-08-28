@@ -511,7 +511,8 @@ export const patientSlice = createSlice({
               `Access request rejected for ${requestor} on ${new Date().toISOString()}`
           );
       }
-      });
+      
+      })
   },
 });
 

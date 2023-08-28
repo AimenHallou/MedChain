@@ -2,6 +2,8 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { UsersState, UserNotification, User } from "../../objects/types";
 
+const API_ENDPOINT = "http://localhost:3001";
+
 const initialState: UsersState = {
   users: [],
   currentUserAddress: null,
@@ -11,7 +13,7 @@ const initialState: UsersState = {
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const response = await fetch("/api/users");
   const users = await response.json();
-  users.forEach(user => {
+  users.forEach((user) => {
     user.notifications = JSON.parse(user.notifications);
   });
   return users;
@@ -33,13 +35,35 @@ export const createUser = createAsyncThunk(
   }
 );
 
+export const readNotifications = createAsyncThunk(
+  "users/readNotifications",
+  async (payload: { address: string }) => {
+    console.log("we in read notification");
+    const response = await fetch(
+      `${API_ENDPOINT}/api/users/${payload.address}/readNotifications`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    const updatedNotifications = await response.json();
+    if (!response.ok || !Array.isArray(updatedNotifications)) {
+      throw new Error("Failed to read notifications");
+    }
+    return { address: payload.address, notifications: updatedNotifications };
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     setCurrentUser: (state, action: PayloadAction<string | null>) => {
       state.currentUserAddress = action.payload;
-    },    
+    },
     addUser: (state, action: PayloadAction<User>) => {
       state.users.push(action.payload);
     },
@@ -97,6 +121,14 @@ export const userSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.users.push(action.payload);
         console.log("State after user has been added:", state);
+      })
+      .addCase(readNotifications.fulfilled, (state, action) => {
+        const user = state.users.find(
+          (user) => user.address === action.payload.address
+        );
+        if (user) {
+          user.notifications = action.payload.notifications;
+        }
       });
   },
 });

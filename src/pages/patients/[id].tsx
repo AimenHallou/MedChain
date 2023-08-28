@@ -54,8 +54,6 @@ const PatientPage: FC = () => {
           if (typeof patientCopy.sharedWith === "string") {
             patientCopy.sharedWith = JSON.parse(patientCopy.sharedWith);
           }
-          console.log(patientCopy);
-
           setPatientData(patientCopy);
         })
         .catch((error) => console.error("Failed to fetch patient:", error));

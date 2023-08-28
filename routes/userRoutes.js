@@ -120,4 +120,51 @@ router.delete("/:address", (req, res) => {
   });
 });
 
+// Mark all notifications for a user as read
+router.put("/:address/readNotifications", (req, res) => {
+  const address = req.params.address;
+
+  db.get(
+    `SELECT notifications FROM users WHERE address = ?`,
+    [address],
+    (err, userRow) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Database query error",
+          details: err.message,
+        });
+      }
+
+      if (!userRow) {
+        return res.status(404).json({
+          error: `No user found with address: ${address}`,
+        });
+      }
+
+      let notifications = JSON.parse(userRow.notifications || "[]");
+      notifications = notifications.map((notif) => ({
+        ...notif,
+        read: true,
+      }));
+
+      db.run(
+        `UPDATE users SET notifications = ? WHERE address = ?`,
+        [JSON.stringify(notifications), address],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "Failed to update notifications in the database.",
+              details: err.message,
+            });
+          }
+          res.json({
+            message: `All notifications for user with address: ${address} marked as read successfully`,
+          });
+        }
+      );
+    }
+  );
+  res.json(notifications);
+});
+
 module.exports = router;

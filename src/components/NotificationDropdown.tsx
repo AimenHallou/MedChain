@@ -1,16 +1,17 @@
 // src/components/NotificationDropdown.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState, AppDispatch } from "../redux/store";
 import {
   removeNotification,
   markNotificationAsRead,
+  readNotifications,
 } from "../redux/slices/userSlice";
 import { useRouter } from "next/router";
 import { IoMdNotificationsOutline } from "react-icons/io";
 
 const NotificationDropdown: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,26 +20,28 @@ const NotificationDropdown: React.FC = () => {
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
   const notifications = currentUser?.notifications;
-  const unreadNotifications =
-    notifications?.filter((notification) => !notification.read) || [];
+  const unreadNotifications = Array.isArray(notifications)
+    ? notifications.filter((notification) => !notification.read)
+    : [];
 
   const toggleDropdown = () => {
+    console.log(notifications)
     setIsOpen(!isOpen);
     markAllNotificationsAsRead();
   };
 
-  const markAllNotificationsAsRead = () => {
-    notifications?.forEach((notification) => {
-      if (!notification.read) {
-        dispatch(
-          markNotificationAsRead({
-            address: currentUserAddress as string,
-            notificationId: notification.id,
-          })
-        );
-      }
-    });
-  };
+  // const markAllNotificationsAsRead = () => {
+  //   notifications?.forEach((notification) => {
+  //     if (!notification.read) {
+  //       dispatch(
+  //         markNotificationAsRead({
+  //           address: currentUserAddress as string,
+  //           notificationId: notification.id,
+  //         })
+  //       );
+  //     }
+  //   });
+  // };
 
   const handleCloseNotification = (id: string) => {
     dispatch(
@@ -47,6 +50,12 @@ const NotificationDropdown: React.FC = () => {
         notificationId: id,
       })
     );
+  };
+
+  const markAllNotificationsAsRead = () => {
+    if (currentUserAddress) {
+      dispatch(readNotifications({ address: currentUserAddress }));
+    }
   };
 
   const ref = useRef<HTMLDivElement | null>(null);
