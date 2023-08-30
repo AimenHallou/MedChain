@@ -12,6 +12,14 @@ import ContentSection from "./publish/ContentSection";
 import ShareSection from "./publish/ShareSection";
 import Patient_idSection from "./publish/Patient_idSection";
 import FileCardsSection from "./publish/FileCardsSection";
+import { create } from 'ipfs-http-client';
+
+const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' });
+
+const addFileToIPFS = async (buffer) => {
+    const result = await ipfs.add(buffer);
+    return result.path;
+};
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,16 +36,28 @@ const PublishForm: FC = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
-  
+    
     const sharedWith: { [address: string]: string[]; } = {};
     sharedUsers.forEach((sharedUser) => {
       sharedWith[sharedUser] = [];
     });
     const ownerAddress = currentUser?.address || "";
 
+    let updatedContent = form.content ? [...form.content] : [];
+  
+    if (form.content && form.content.length > 0) {
+      for (let i = 0; i < form.content.length; i++) {
+        const file = form.content[i];
+        const buffer = Buffer.from(file.base64, "base64");
+        const result = await ipfs.add(buffer);
+        updatedContent[i] = { ...file, ipfsCID: result.path };
+      }
+    }
+
     dispatch(
       createPatient({
         ...form,
+        content: updatedContent,
         patient_id: form.patient_id,
         owner: ownerAddress,
         createdDate,

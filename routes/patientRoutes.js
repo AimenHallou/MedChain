@@ -783,4 +783,15 @@ router.delete("/:id", (req, res) => {
   });
 });
 
+// Get a file
+router.get("/patientFile/:cid", async (req, res) => {
+  const cid = req.params.cid;
+  const fileBuffer = [];
+  for await (const chunk of ipfs.cat(cid)) {
+    fileBuffer.push(chunk);
+  }
+  res.send(Buffer.concat(fileBuffer));
+});
+
+
 module.exports = router;

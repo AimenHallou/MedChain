@@ -9,6 +9,9 @@ import { TiDelete } from "react-icons/ti";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FileData } from "../../objects/types";
+import { create } from "ipfs-http-client";
+
+const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
 type PatientFileSectionProps = {
   patientId: string;
@@ -49,47 +52,54 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleAddFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
       let fileContents: FileData[] = [];
 
-      files.forEach((file, index) => {
+      for (const file of files) {
         const reader = new FileReader();
 
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            const base64String = reader.result.split(",")[1];
-            fileContents.push({
-              base64: base64String,
-              name: file.name,
-              dataType: "",
-            });
+        const result: Promise<FileData> = new Promise((resolve, reject) => {
+          reader.onloadend = async () => {
+            if (typeof reader.result === "string") {
+              const base64String = reader.result.split(",")[1];
 
-            if (fileContents.length === files.length) {
-              const newFilesData = [...filesData, ...fileContents];
-              setFilesData(newFilesData);
-              dispatch(setFormContent(newFilesData));
-
-              fileContents.forEach((file) => {
-                dispatch(
-                  addFile({
-                    patientId: patientId,
-                    file: {
-                      name: file.name,
-                      base64: file.base64,
-                      dataType: file.dataType,
-                    },
-                  })
-                );
-              });
+              const buffer = Buffer.from(base64String, "base64");
+              try {
+                const ipfsResult = await ipfs.add(buffer);
+                resolve({
+                  base64: base64String,
+                  name: file.name,
+                  dataType: "",
+                  ipfsCID: ipfsResult.path,
+                });
+              } catch (ipfsError) {
+                console.error("Error uploading to IPFS:", ipfsError);
+                reject(ipfsError);
+              }
+            } else {
+              reject(new Error("Unexpected result type from FileReader"));
             }
-          } else {
-            console.error("Unexpected result type from FileReader");
-          }
-        };
+          };
+        });
+
         reader.readAsDataURL(file);
-      });
+
+        const fileData = await result;
+        fileContents.push(fileData);
+
+        dispatch(
+          addFile({
+            patientId: patientId,
+            file: fileData,
+          })
+        );
+      }
+
+      const newFilesData = [...filesData, ...fileContents];
+      setFilesData(newFilesData);
+      dispatch(setFormContent(newFilesData));
     }
   };
 
@@ -137,6 +147,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
       const parsedContent = JSON.parse(currentPatient.content);
       if (Array.isArray(parsedContent)) {
         contentArray = parsedContent;
+        console.log(contentArray)
       }
     } catch (error) {
       console.error("Failed to parse currentPatient.content:", error);
@@ -187,9 +198,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             <div
               key={index}
               className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent`}
-              onClick={() => {
-                // ... your onClick logic here
-              }}
+              onClick={() => {}}
             >
               <AiFillFileText
                 className={`file-image w-16 h-16 mb-2 ${
@@ -207,9 +216,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                 <div>
                   <select
                     value={file.dataType}
-                    onChange={(e) => {
-                      // Add your method to handle data type change here
-                    }}
+                    onChange={(e) => {}}
                     className="bg-gray-800 text-white rounded mt-2"
                   >
                     <option value="">Select data type</option>
