@@ -32,6 +32,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
+
   const patient = useSelector((state: RootState) => state.patients);
   const currentPatient = patient.find(
     (patient) => patient.patient_id === patientId
@@ -43,6 +44,43 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     "Medication history",
     "Clinician notes",
   ];
+
+  const fetchFileFromIPFS = async (cid: string): Promise<string> => {
+    try {
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of ipfs.cat(cid)) {
+        chunks.push(chunk);
+      }
+
+      const blob = new Blob(chunks, { type: 'application/octet-stream' });
+
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            const base64 = reader.result.split(",")[1];
+            resolve(base64);
+          } else {
+            reject(new Error("Failed to convert Blob to base64"));
+          }
+        };
+        reader.readAsDataURL(blob);
+      });
+
+    } catch (error) {
+      console.error(`Failed to fetch file from IPFS with CID ${cid}:`, error);
+      return "";
+    }
+  };
+
+  const handleFileClick = async (file: FileData) => {
+    if (file.ipfsCID) {
+      const base64Content = await fetchFileFromIPFS(file.ipfsCID);
+      if (base64Content) {
+        console.log(base64Content);
+      }
+    }
+  };
 
   const handleRemoveFile = (fileName: string) => {
     if (currentUser === currentPatient?.owner) {
@@ -56,20 +94,20 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     if (event.target.files) {
       const files = Array.from(event.target.files);
       let fileContents: FileData[] = [];
-
+  
       for (const file of files) {
         const reader = new FileReader();
-
+  
         const result: Promise<FileData> = new Promise((resolve, reject) => {
           reader.onloadend = async () => {
             if (typeof reader.result === "string") {
               const base64String = reader.result.split(",")[1];
-
+  
               const buffer = Buffer.from(base64String, "base64");
               try {
                 const ipfsResult = await ipfs.add(buffer);
                 resolve({
-                  base64: base64String,
+                  base64: "",
                   name: file.name,
                   dataType: "",
                   ipfsCID: ipfsResult.path,
@@ -83,25 +121,26 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             }
           };
         });
-
+  
         reader.readAsDataURL(file);
-
+  
         const fileData = await result;
         fileContents.push(fileData);
-
+  
         dispatch(
           addFile({
             patientId: patientId,
             file: fileData,
+            owner: currentUser || "",
           })
         );
       }
-
+  
       const newFilesData = [...filesData, ...fileContents];
       setFilesData(newFilesData);
       dispatch(setFormContent(newFilesData));
     }
-  };
+  };  
 
   const [editing, setEditing] = useState(false);
 
@@ -147,7 +186,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
       const parsedContent = JSON.parse(currentPatient.content);
       if (Array.isArray(parsedContent)) {
         contentArray = parsedContent;
-        console.log(contentArray)
+        console.log(contentArray);
       }
     } catch (error) {
       console.error("Failed to parse currentPatient.content:", error);
@@ -198,7 +237,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             <div
               key={index}
               className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent`}
-              onClick={() => {}}
+              onClick={() => handleFileClick(file)}
             >
               <AiFillFileText
                 className={`file-image w-16 h-16 mb-2 ${

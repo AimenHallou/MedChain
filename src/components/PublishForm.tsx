@@ -50,7 +50,12 @@ const PublishForm: FC = () => {
         const file = form.content[i];
         const buffer = Buffer.from(file.base64, "base64");
         const result = await ipfs.add(buffer);
-        updatedContent[i] = { ...file, ipfsCID: result.path };
+        updatedContent[i] = {
+          base64: "",
+          name: file.name,
+          dataType: file.dataType,
+          ipfsCID: result.path
+        };
       }
     }
 
@@ -83,6 +88,7 @@ const PublishForm: FC = () => {
     dispatch(resetForm());
     router.push("/");
   };
+
   
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white ">

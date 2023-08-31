@@ -194,7 +194,7 @@ export const updateSharedFiles = createAsyncThunk(
 
 export const addFile = createAsyncThunk(
   "patients/addFile",
-  async (payload: { patientId: string; file: FileData }) => {
+  async (payload: { patientId: string; file: FileData; owner: string }) => {
     const response = await fetch(
       `${API_ENDPOINT}/api/patients/${payload.patientId}/add-file`,
       {
@@ -204,6 +204,7 @@ export const addFile = createAsyncThunk(
         },
         body: JSON.stringify({
           file: payload.file,
+          owner: payload.owner,
         }),
       }
     );
@@ -385,10 +386,14 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
-          if (!patient.content) {
+          if (!Array.isArray(patient.content)) {
             patient.content = [];
           }
           patient.content.push(file);
+
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
           patient.history.push(`File added on ${new Date().toISOString()}`);
         }
       })
@@ -493,26 +498,25 @@ export const patientSlice = createSlice({
             }
           }
           if (!Array.isArray(patient.accessRequests)) {
-              console.error(
-                  `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
-                  patient.accessRequests
-              );
-              patient.accessRequests = [];
+            console.error(
+              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
+              patient.accessRequests
+            );
+            patient.accessRequests = [];
           }
           patient.accessRequests = patient.accessRequests.filter(
-              (req) => req !== requestor
+            (req) => req !== requestor
           );
           console.log(`[rejectAccessRequest] After:`, patient.accessRequests);
-      
+
           if (!Array.isArray(patient.history)) {
-              patient.history = [];
+            patient.history = [];
           }
           patient.history.push(
-              `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
           );
-      }
-      
-      })
+        }
+      });
   },
 });
 

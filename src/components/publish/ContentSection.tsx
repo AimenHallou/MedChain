@@ -30,6 +30,7 @@ const ContentSection: React.FC = () => {
               base64: base64String,
               name: file.name,
               dataType: "",
+              ipfsCID: ""
             });
             if (fileContents.length === files.length) {
               const newFilesData = [...filesData, ...fileContents];

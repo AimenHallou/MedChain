@@ -783,7 +783,7 @@ router.delete("/:id", (req, res) => {
   });
 });
 
-// Get a file
+// Get a file using IPFS
 router.get("/patientFile/:cid", async (req, res) => {
   const cid = req.params.cid;
   const fileBuffer = [];
@@ -792,6 +792,5 @@ router.get("/patientFile/:cid", async (req, res) => {
   }
   res.send(Buffer.concat(fileBuffer));
 });
-
 
 module.exports = router;
