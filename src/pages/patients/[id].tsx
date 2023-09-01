@@ -279,7 +279,7 @@ const PatientPage: FC = () => {
         user.currentUserAddress || ""
       ) ||
         user.currentUserAddress === patient.owner) && (
-        <div className="w-full lg:w-[30rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
+        <div className="w-full lg:w-[40rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
           <PatientFileSection
             patientId={id as string}
             selectedFiles={selectedFiles}

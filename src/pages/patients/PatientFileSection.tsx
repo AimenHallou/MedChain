@@ -52,7 +52,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         chunks.push(chunk);
       }
 
-      const blob = new Blob(chunks, { type: 'application/octet-stream' });
+      const blob = new Blob(chunks, { type: "application/octet-stream" });
 
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -66,7 +66,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
         };
         reader.readAsDataURL(blob);
       });
-
     } catch (error) {
       console.error(`Failed to fetch file from IPFS with CID ${cid}:`, error);
       return "";
@@ -94,15 +93,15 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     if (event.target.files) {
       const files = Array.from(event.target.files);
       let fileContents: FileData[] = [];
-  
+
       for (const file of files) {
         const reader = new FileReader();
-  
+
         const result: Promise<FileData> = new Promise((resolve, reject) => {
           reader.onloadend = async () => {
             if (typeof reader.result === "string") {
               const base64String = reader.result.split(",")[1];
-  
+
               const buffer = Buffer.from(base64String, "base64");
               try {
                 const ipfsResult = await ipfs.add(buffer);
@@ -121,12 +120,12 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             }
           };
         });
-  
+
         reader.readAsDataURL(file);
-  
+
         const fileData = await result;
         fileContents.push(fileData);
-  
+
         dispatch(
           addFile({
             patientId: patientId,
@@ -135,12 +134,12 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
           })
         );
       }
-  
+
       const newFilesData = [...filesData, ...fileContents];
       setFilesData(newFilesData);
       dispatch(setFormContent(newFilesData));
     }
-  };  
+  };
 
   const [editing, setEditing] = useState(false);
 
@@ -236,27 +235,44 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
           .map((file, index) => (
             <div
               key={index}
-              className={`file-card relative flex flex-col items-center justify-center p-6 rounded-lg cursor-pointer border-2 border-transparent`}
+              className={`file-card relative flex flex-col items-center justify-between p-4 rounded-lg cursor-pointer border-2 border-transparent`}
               onClick={() => handleFileClick(file)}
             >
-              <AiFillFileText
-                className={`file-image w-16 h-16 mb-2 ${
-                  selectedFiles.includes(file.name) &&
-                  (selectedRequestor || selectedUsers)
-                    ? "text-blue-600"
-                    : "text-gray-400"
-                }`}
-              />
+              <div className="relative">
+                <AiFillFileText
+                  className={`file-image w-16 h-16 mb-2 ${
+                    selectedFiles.includes(file.name) &&
+                    (selectedRequestor || selectedUsers)
+                      ? "text-blue-600"
+                      : "text-gray-400"
+                  }`}
+                />
+                {isOwner && editing && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFile(file.name);
+                    }}
+                    className="absolute bottom-14 left-12 z-10"
+                  >
+                    <TiDelete className="h-8 w-8 text-red-700" />
+                  </button>
+                )}
+              </div>
               <div className="text-gray-100 font-bold text-center truncate w-full">
                 {file.name}
               </div>
-              <div className="text-gray-300 mt-2">{file.dataType}</div>
+              {file.dataType ? (
+                <div className="text-gray-400 text-sm mb-2">{file.dataType}</div>
+              ) : (
+                <div className="text-red-600 text-sm mb-2">File type missing</div>
+              )}
               {isOwner && editing && (
-                <div>
+                <div className="flex flex-col space-y-2 absolute bottom-2 right-2">
                   <select
                     value={file.dataType}
                     onChange={(e) => {}}
-                    className="bg-gray-800 text-white rounded mt-2"
+                    className="bg-gray-800 text-white rounded mt-2 z-10"
                   >
                     <option value="">Select data type</option>
                     {dataTypes.map((dataType) => (
@@ -265,15 +281,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                       </option>
                     ))}
                   </select>
-                  <button
-                    className="absolute right-2 top-2 p-2 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFile(file.name);
-                    }}
-                  >
-                    <TiDelete className="h-8 w-8 text-red-700" />
-                  </button>
                 </div>
               )}
             </div>
