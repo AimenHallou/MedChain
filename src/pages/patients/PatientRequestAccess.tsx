@@ -64,7 +64,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
               className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
             >
               <span
-                className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg"
+                className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg truncate w-full"
                 onClick={() => {
                   if (selectedRequestor === requestor) {
                     setSelectedFiles([]);

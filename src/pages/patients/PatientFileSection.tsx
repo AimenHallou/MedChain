@@ -236,7 +236,9 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             <div
               key={index}
               className={`file-card relative flex flex-col items-center justify-between p-4 rounded-lg cursor-pointer border-2 border-transparent`}
-              onClick={() => handleFileClick(file)}
+              onClick={() => {handleFileClick(file);
+                setSelectedFiles(file.name);
+              }}
             >
               <div className="relative">
                 <AiFillFileText
@@ -268,7 +270,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                 <div className="text-red-600 text-sm mb-2">File type missing</div>
               )}
               {isOwner && editing && (
-                <div className="flex flex-col space-y-2 absolute bottom-2 right-2">
+                <div className="flex flex-col space-y-2 absolute bottom-0.5 right-2">
                   <select
                     value={file.dataType}
                     onChange={(e) => {}}
