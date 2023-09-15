@@ -51,7 +51,6 @@ const UserAccount: FC = () => {
   }, [dispatch]);
 
   const handleAddUser = () => {
-
     if (web3Address && newUserName) {
       const userExists = users.some((user) => user.address === web3Address);
       console.log({
@@ -86,13 +85,15 @@ const UserAccount: FC = () => {
           method: "eth_requestAccounts",
         });
         setWeb3Address(accounts[0]);
-
         const existingUser = users.find((user) => user.address === accounts[0]);
+        dispatch(setCurrentUser(accounts[0]));
         if (existingUser) {
           dispatch(setCurrentUser(accounts[0]));
           setNewUserName(existingUser.name);
           setHealthcareType(existingUser.healthcareType);
           setOrganizationName(existingUser.organizationName);
+        } else {
+
         }
       } catch (error) {
         if (error.code === 4001) {
@@ -113,7 +114,6 @@ const UserAccount: FC = () => {
     setHealthcareType('');
     setOrganizationName('');
 };
-
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">

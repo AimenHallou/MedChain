@@ -236,8 +236,26 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
             <div
               key={index}
               className={`file-card relative flex flex-col items-center justify-between p-4 rounded-lg cursor-pointer border-2 border-transparent`}
-              onClick={() => {handleFileClick(file);
-                setSelectedFiles(file.name);
+              onClick={() => {
+                handleFileClick(file);
+
+                if (
+                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                    selectedRequestor) &&
+                  selectedFiles.includes(file.name)
+                ) {
+                  setSelectedFiles(
+                    selectedFiles.filter(
+                      (selectedFile) => selectedFile !== file.name
+                    )
+                  );
+                } else if (
+                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                    selectedRequestor) &&
+                  !selectedFiles.includes(file.name)
+                ) {
+                  setSelectedFiles([...selectedFiles, file.name]);
+                }
               }}
             >
               <div className="relative">
@@ -265,9 +283,13 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                 {file.name}
               </div>
               {file.dataType ? (
-                <div className="text-gray-400 text-sm mb-2">{file.dataType}</div>
+                <div className="text-gray-400 text-sm mb-2">
+                  {file.dataType}
+                </div>
               ) : (
-                <div className="text-red-600 text-sm mb-2">File type missing</div>
+                <div className="text-red-600 text-sm mb-2">
+                  File type missing
+                </div>
               )}
               {isOwner && editing && (
                 <div className="flex flex-col space-y-2 absolute bottom-0.5 right-2">
