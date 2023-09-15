@@ -1,4 +1,39 @@
 
+# MedChain: A Blockchain-powered Data-Sharing Platform for Healthcare Professionals
+
+## Description
+
+MedChain revolutionizes healthcare data sharing by leveraging the robustness of Ethereum, the decentralized storage capabilities of IPFS, and the standardized healthcare data structure of FHIR. Designed with the modern healthcare professional in mind, it ensures secure, transparent, and efficient transfers of patient information between general practitioners and specialists. 
+
+## Key Features
+
+- **Blockchain-backed Security**: Built on the Ethereum blockchain, MedChain offers unparalleled data security and integrity.
+- **Decentralized Storage with IPFS**: Instead of relying on centralized storage solutions, MedChain utilizes IPFS for decentralized and tamper-proof data storage.
+- **Standardized Data with FHIR**: By adhering to the FHIR standard, MedChain ensures that the medical data is consistent, making the data exchange process smoother and more reliable.
+- **User-Friendly Interface**: With a design focused on the needs of healthcare professionals, our platform offers a seamless experience for data access and transfer.
+
+## Tech Stack
+
+MedChain is powered by a robust collection of modern technologies:
+- **Frontend**: React, TypeScript, and TailwindCSS offer a responsive and user-friendly interface.
+- **Backend**: Express.js provides a powerful server environment, coupled with SQLite3 for efficient data storage.
+- **Blockchain**: Solidity (for Ethereum smart contracts) and Truffle for contract testing and deployment.
+- **Others**: Node.js serves as the runtime environment, ensuring smooth integration of all the components.
+
+## Benefits
+
+- **End-to-End Security**: From the Ethereum blockchain's security features to IPFS's decentralized nature, your data's security is our top priority.
+- **Efficient Collaboration**: MedChain bridges the gap between different healthcare professionals, ensuring that they have immediate access to the data they need.
+- **Transparent Operations**: With every data transfer being recorded on the blockchain, users can verify data integrity and origin at any time.
+
+## Target Audience
+
+MedChain is designed for:
+- General Practitioners
+- Medical Specialists
+- Healthcare Institutions seeking a cutting-edge, secure data-sharing solution
+
+
 # Setup Phases
 
 ## 1. Start the Local Server
