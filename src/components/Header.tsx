@@ -25,7 +25,9 @@ const Header: FC = () => {
         </span>
         <Link href="/account">
           <button className="px-6 py-3 bg-blue-700 text-white rounded cursor-pointer">
-            {currentUser ? currentUser.address : "Account"}
+            {currentUser
+              ? `${currentUser.address.substring(0, 20)}...`
+              : "Account"}
           </button>
         </Link>
       </div>

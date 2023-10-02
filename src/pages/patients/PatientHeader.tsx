@@ -17,7 +17,7 @@ const PatientHeader: FC<PatientHeaderProps> = ({
   <div className="flex justify-between items-center text-white px-6 py-4">
     <div>
       <h2 className="text-2xl font-bold">{Patient_id}</h2>
-      <p className="text-sm text-gray-300">{ownerTitle} {owner}</p>
+      <p className="text-sm text-gray-300">{ownerTitle} {owner.substring(0, 20)}...</p>
       <p className="text-sm text-gray-300">{createdDate}</p>
     </div>
   </div>

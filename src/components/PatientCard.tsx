@@ -14,7 +14,6 @@ const PatientCard: FC<PatientCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    console.log("handle click patient id: ", patient_id)
     router.push(`/patients/${patient_id}`);
   };
 
@@ -27,9 +26,9 @@ const PatientCard: FC<PatientCardProps> = ({
       <div className="flex-grow space-y-2 flex flex-col justify-between">
         <div>
           <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">{patient_id}</h2>
-          <p className="text-sm font-light">{owner}</p>
+          <p className="text-sm font-light">{owner.substring(0, 20)}...</p>
+          <p className="text-xs text-gray-400">{createdDate}</p>
         </div>
-        <p className="text-xs text-gray-400">Created: {createdDate}</p>
       </div>
       <BsFillFilePersonFill className="text-blue-500 h-12 w-12 flex-shrink-0"/>
     </div>
