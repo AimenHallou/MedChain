@@ -92,9 +92,8 @@ const PatientList: FC = () => {
   });
 
   return (
-    <div className="bg-gray-700 text-white rounded-lg p-4 shadow border-2 border-gray-600">
+    <div className="bg-gray-700 text-white rounded-lg p-3 shadow border-2 border-gray-600">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold">Patients</h2>
         <div className="flex items-center space-x-4">
           <SearchBar onSearch={handleSearch} />
           <PublisherFilter
@@ -108,6 +107,11 @@ const PatientList: FC = () => {
           <Link href="/publish">
             <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
               Add Patient
+            </button>
+          </Link>
+          <Link href="/publish-dataset">
+            <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
+              Add Dataset
             </button>
           </Link>
         </div>

@@ -21,12 +21,12 @@ const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
           collaboration.
         </p>
       </div>
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-8 gap-6 mt-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-9 gap-6 mt-8">
         <div className="col-span-2">
           <PatientSummary />
           <RecentPatientData />
         </div>
-        <div className="col-span-6">
+        <div className="col-span-7">
           <PatientList />
         </div>
       </div>
