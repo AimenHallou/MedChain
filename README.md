@@ -36,7 +36,13 @@ MedChain is designed for:
 
 # Setup Phases
 
-## 1. Start the Local Server
+## 1. Install dependencies
+
+```bash
+npm i
+```
+
+## 2. Start the Local Server
 
 To start the local server, use the following command:
 
@@ -44,7 +50,7 @@ To start the local server, use the following command:
 npm start
 ```
 
-## 2. Start the Database
+## 3. Start the Database
 
 To start the SQLite3 database:
 
@@ -52,7 +58,7 @@ To start the SQLite3 database:
 node ./server.js
 ```
 
-## 3. Set up Development Truffle Configs
+## 4. Set up Development Truffle Configs
 
 Update the `truffle-config.js` with the development configurations:
 
@@ -63,8 +69,15 @@ development: {
     network_id: "*",       // Any network
 },
 ```
+## 5. Launch the local blockchain
 
-## 4. Test, Compile, and Migrate Contracts
+To create a local test blockchain:
+
+```bash
+ganache-cli
+```
+
+## 6. Test, Compile, and Migrate Contracts
 
 To run the contract test:
 
@@ -84,23 +97,23 @@ To push the contract to the blockchain set:
 truffle migrate
 ```
 
-## 5. Environment Variables
+## 7. Environment Variables
 
 Add the contract address to the environment variable.
 
-## 6. Local Blockchain
+## 8. Local Blockchain
 
 Use local blockchain-only addresses.
 
-## 7. MetaMask Connection
+## 9. MetaMask Connection
 
 Add the localhost server to MetaMask and establish a connection.
 
-## 8. Launch IPFS Desktop
+## 10. Launch IPFS Desktop
 
 Ensure you have IPFS Desktop launched and running.
 
-## 9. IPFS API Settings
+## 11. IPFS API Settings
 
 Make sure the IPFS API settings are set up as follows:
 
