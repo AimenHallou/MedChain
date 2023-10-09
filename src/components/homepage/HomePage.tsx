@@ -10,7 +10,7 @@ interface HomePageProps {
 
 const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
   return (
-    <div className="bg-gray-900 text-white min-h-screen py-8 px-6">
+    <div className="bg-blue-background text-white min-h-screen py-8 px-6">
       <div className="text-center max-w-2xl mx-auto">
         <h1 className="text-4xl py-2 text-white">Welcome to MedChain</h1>
         <p className="text-sm">

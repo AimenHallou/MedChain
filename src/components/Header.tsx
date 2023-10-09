@@ -13,7 +13,7 @@ const Header: FC = () => {
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   return (
-    <header className="flex justify-between px-4 py-2 bg-blue-900 text-white">
+    <header className="flex justify-between px-4 py-2 bg-blue-header text-white">
       <nav className="flex">
         <Link href="/">
           <img src="/images/logo.png" alt="Logo" className="h-12 mr-3" />
@@ -24,7 +24,7 @@ const Header: FC = () => {
           <NotificationDropdown />
         </span>
         <Link href="/account">
-          <button className="px-6 py-3 bg-blue-700 text-white rounded cursor-pointer">
+          <button className="px-6 py-3 bg-blue-button text-white rounded cursor-pointer">
             {currentUser
               ? `${currentUser.address.substring(0, 20)}...`
               : "Account"}
