@@ -1,9 +1,12 @@
-// src/components/homepage/PatientList.tsx
+// src/components/homepage/DataList.tsx
 import React, { FC, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PatientCard from "../PatientCard";
 import { RootState, AppDispatch } from "../../redux/store";
 import { fetchPatients } from "../../redux/slices/patientSlice";
+import { fetchDatasets } from "../../redux/slices/datasetSlice";
+import { FaDatabase, FaUser } from "react-icons/fa";
+
 import Link from "next/link";
 import SearchBar from "./SearchBar";
 import PublisherFilter from "./PublisherFilter";
@@ -11,6 +14,7 @@ import PublisherFilter from "./PublisherFilter";
 const PatientList: FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const patients = useSelector((state: RootState) => state.patients);
+  const datasets = useSelector((state: RootState) => state.datasets);
   const users = useSelector((state: RootState) => state.user.users);
   const [view, setView] = useState<"patients" | "datasets">("patients");
 
@@ -18,24 +22,31 @@ const PatientList: FC = () => {
   const [selectedFileFilters, setSelectedFileFilters] = useState<string[]>([]);
 
   useEffect(() => {
-    dispatch(fetchPatients());
-  }, [dispatch]);
+    if (view === "patients") {
+      dispatch(fetchPatients());
+    } else if (view === "datasets") {
+      dispatch(fetchDatasets());
+    }
+  }, [dispatch, view]);
 
   const [searchTerm, setSearchTerm] = useState("");
 
   type ViewType = "patients" | "datasets";
 
-  const viewMap: Record<ViewType, { label: string, nextView: ViewType, title: string }> = {
+  const viewMap: Record<
+    ViewType,
+    { label: string; nextView: ViewType; title: string }
+  > = {
     patients: {
       label: "View Datasets",
       nextView: "datasets",
-      title: "Patients"
+      title: "Patients",
     },
     datasets: {
       label: "View Patients",
       nextView: "patients",
-      title: "Datasets"
-    }
+      title: "Datasets",
+    },
   };
 
   const currentViewConfig = viewMap[view];
@@ -108,23 +119,26 @@ const PatientList: FC = () => {
     return isPatientCriteriaMet && isFileCriteriaMet;
   });
 
-  return (
-    <div className="flex flex-col items-center bg-gray-700 text-white rounded-lg p-3 shadow border-2 border-gray-600">
-      <div className="w-full flex justify-between items-center mb-4 px-4">
-        <h2 className="text-lg font-bold mx-auto">
-          {currentViewConfig.title} List
-        </h2>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setView(currentViewConfig.nextView)}
-            className="cursor-pointer px-4 py-2 underline text-white rounded-lg hover:text-gray-400 transition-colors duration-200"
-          >
-            {currentViewConfig.label}
-          </button>
-        </div>
-      </div>
+  let displayedItems: Array<any> =
+    view === "patients" ? filteredPatients : datasets;
 
-      <div className="flex items-center w-full mb-4 space-x-4 px-4">
+  return (
+    <div className="flex flex-col items-center bg-gray-700 text-white rounded-lg p-4 shadow border-2 border-gray-600">
+      <div className="flex items-center w-full mb-4 space-x-4">
+        <h2 className="text-lg font-bold">{currentViewConfig.title}</h2>
+        <div onClick={() => setView(currentViewConfig.nextView)}>
+          {view === "patients" ? (
+            <FaDatabase
+              size={18}
+              className="cursor-pointer hover:text-gray-400 transition-colors duration-200"
+            />
+          ) : (
+            <FaUser
+              size={18}
+              className="cursor-pointer hover:text-gray-400 transition-colors duration-200"
+            />
+          )}
+        </div>
         <SearchBar onSearch={handleSearch} />
         <PublisherFilter
           onFilterChange={handleFilterChange}
@@ -135,23 +149,31 @@ const PatientList: FC = () => {
           filterType="file"
         />
         <Link href="/publish">
-          <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
+          <button
+            className={`px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 add-btn ${
+              view === "datasets" ? "hidden" : ""
+            }`}
+          >
             Add Patient
           </button>
         </Link>
         <Link href="/publish-dataset">
-          <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">
+          <button
+            className={`px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 add-btn ${
+              view === "patients" ? "hidden" : ""
+            }`}
+          >
             Add Dataset
           </button>
         </Link>
       </div>
 
-      {filteredPatients.length > 0 ? (
+      {displayedItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4">
-          {filteredPatients.map((patient, index) => (
+          {displayedItems.map((item, index) => (
             <PatientCard
-              key={patient.patient_id || `fallback-${index}`}
-              {...patient}
+              key={item.dataset_id || item.patient_id || `fallback-${index}`}
+              {...item}
             />
           ))}
         </div>

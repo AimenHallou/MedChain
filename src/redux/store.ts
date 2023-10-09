@@ -3,12 +3,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import formReducer from "./slices/formSlice";
 import patientsReducer from "./slices/patientSlice";
 import userReducer from "./slices/userSlice";
+import datasetReducer from "./slices/datasetSlice";
 
 export const store = configureStore({
   reducer: {
     form: formReducer,
     patients: patientsReducer,
     user: userReducer,
+    datasets: datasetReducer,
   },
 });
 

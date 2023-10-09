@@ -7,6 +7,7 @@ const port = 3001;
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const patientRoutes = require('./routes/patientRoutes');
+const datasetRoutes = require('./routes/datasetRoutes');
 const blockchainRoutes = require('./routes/blockchainRoutes');
 
 // Middleware
@@ -19,6 +20,7 @@ app.use(cors({
 // Use Routes
 app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/datasets', datasetRoutes);
 app.use('/api/blockchain', blockchainRoutes);
 
 app.listen(port, () => {

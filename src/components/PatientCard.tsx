@@ -25,14 +25,18 @@ const PatientCard: FC<PatientCardProps> = ({
     >
       <div className="flex-grow space-y-2 flex flex-col justify-between">
         <div>
-          <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">{patient_id}</h2>
-          <p className="text-sm font-light">{owner.substring(0, 20)}...</p>
-          <p className="text-xs text-gray-400">{createdDate}</p>
+          <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">
+            {patient_id}
+          </h2>
+          <p className="text-sm font-light">
+            {owner ? owner.substring(0, 20) : "N/A"}...
+          </p>
+          <p className="text-xs text-gray-400">{createdDate || "N/A"}</p>
         </div>
       </div>
-      <BsFillFilePersonFill className="text-blue-500 h-12 w-12 flex-shrink-0"/>
+      <BsFillFilePersonFill className="text-blue-500 h-12 w-12 flex-shrink-0" />
     </div>
-  );  
+  );
 };
 
 export default PatientCard;

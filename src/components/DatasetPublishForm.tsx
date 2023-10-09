@@ -1,32 +1,56 @@
 // src/components/DatasetPublishForm.tsx
 import React, { FC, FormEvent, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from '../redux/store';
 import { useRouter } from "next/router";
+import { v4 as uuid } from 'uuid';
 import { create } from 'ipfs-http-client';
+import { RootState } from "../redux/store";
+import { addNotification } from "../redux/slices/userSlice";
+import { createDataset } from "../redux/slices/datasetSlice";
 
 const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' });
 
 const DatasetPublishForm: FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   
   const [description, setDescription] = useState<string>("");
   const [content, setContent] = useState<File | null>(null);
-  
+  const { users, currentUserAddress } = useSelector((state: RootState) => state.user);
+  const currentUser = users.find((user) => user.address === currentUserAddress);
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    console.log("Publishing dataset...");
+    const createdDate = new Date().toISOString();
+    let ipfsCID = "";
+    // if(content) {
+    //   const buffer = await content.arrayBuffer();
+    //   const result = await ipfs.add(new Uint8Array(buffer));
+    //   ipfsCID = result.path;
+    // }
 
-    if(content) {
-      const buffer = await content.arrayBuffer();
-      const result = await ipfs.add(new Uint8Array(buffer));
-      console.log("IPFS CID:", result.path);
-    }
+    const dataset_id = uuid();
 
-    console.log("Description:", description);
-    
-    // Dispatch actions to add dataset to the Redux store
-    // Navigate to a different page if needed
+    dispatch(
+      createDataset({
+        dataset_id,
+        description,
+        owner: currentUser?.address || "",
+        ownerTitle: currentUser?.name || "",
+        createdDate,
+        content: content ? [{
+          base64: "", 
+          name: content.name, 
+          dataType: content.type, 
+          ipfsCID
+        }] : null,
+        sharedWith: {},
+        history: [`Dataset created by ${currentUser?.address || ""} on ${createdDate}`],
+      })
+    );
+
+    router.push("/");
   };
   
   return (
