@@ -17,15 +17,31 @@ export interface Patient {
   accessRequests?: string[];
 }
 
+export interface Dataset {
+  dataset_id: string;
+  description: string;
+  owner: string;
+  ownerTitle: string;
+  createdDate: string;
+  content: FileData[] | null;
+  sharedWith: { [address: string]: string[] };
+  history: string[];
+}
+
 export interface PatientListProps {
   patients: Patient[];
+}
+
+export interface DatasetListProps {
+  datasets: Dataset[];
 }
 
 export interface UserNotification {
   id: string;
   read: boolean;
   message: string;
-  patient_id: string;
+  patient_id?: string;
+  dataset_id?: string;
   accepted?: boolean;
   rejected?: boolean;
 }
@@ -38,7 +54,6 @@ export interface User {
   notifications: UserNotification[];
 }
 
-
 export interface UsersState {
   users: User[];
   currentUserAddress: string | null;
@@ -46,4 +61,8 @@ export interface UsersState {
 
 export interface PatientState {
   patients: Patient[];
+}
+
+export interface DatasetState {
+  datasets: Dataset[];
 }
