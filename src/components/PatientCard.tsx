@@ -25,13 +25,13 @@ const PatientCard: FC<PatientCardProps> = ({
     >
       <div className="flex-grow space-y-2 flex flex-col justify-between">
         <div>
-          <h2 className="text-lg font-bold line-clamp-1 overflow-hidden">
+          <h2 className="text-lg font-bold line-clamp-1 overflow-hidden text-main-text">
             {patient_id}
           </h2>
-          <p className="text-sm font-light">
+          <p className="text-sm font-light text-main-text">
             {owner ? owner.substring(0, 20) : "N/A"}...
           </p>
-          <p className="text-xs text-gray-400">{createdDate || "N/A"}</p>
+          <p className="text-xs text-sub-text">{createdDate || "N/A"}</p>
         </div>
       </div>
       <BsFillFilePersonFill className="text-blue-500 h-12 w-12 flex-shrink-0" />

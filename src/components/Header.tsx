@@ -13,7 +13,7 @@ const Header: FC = () => {
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   return (
-    <header className="flex justify-between px-4 py-2 bg-blue-header text-white">
+    <header className="flex justify-between px-4 py-2 bg-page-header text-white">
       <nav className="flex">
         <Link href="/">
           <img src="/images/logo.png" alt="Logo" className="h-12 mr-3" />

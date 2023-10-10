@@ -123,7 +123,7 @@ const PatientList: FC = () => {
     view === "patients" ? filteredPatients : datasets;
 
   return (
-    <div className="flex flex-col items-center bg-module-background text-white rounded-lg p-4 shadow border-2 border-gray-600">
+    <div className="flex flex-col items-center bg-module-background text-white rounded-lg p-4 shadow border-2 border-module-accent">
       <div className="flex items-center w-full mb-4 space-x-4">
         <h2 className="text-lg font-bold">{currentViewConfig.title}</h2>
         <div onClick={() => setView(currentViewConfig.nextView)}>
@@ -150,7 +150,7 @@ const PatientList: FC = () => {
         />
         <Link href="/publish">
           <button
-            className={`px-4 py-2 bg-blue-button text-white rounded-lg hover:bg-blue-hover-button transition-colors duration-200 add-btn ${
+            className={`px-4 py-2 bg-blue-button text-white rounded-lg hover:bg-page-hover-button transition-colors duration-200 add-btn ${
               view === "datasets" ? "hidden" : ""
             }`}
           >
@@ -159,7 +159,7 @@ const PatientList: FC = () => {
         </Link>
         <Link href="/publish-dataset">
           <button
-            className={`px-4 py-2 bg-blue-button text-white rounded-lg hover:bg-blue-hover-button transition-colors duration-200 add-btn ${
+            className={`px-4 py-2 bg-blue-button text-white rounded-lg hover:bg-page-hover-button transition-colors duration-200 add-btn ${
               view === "patients" ? "hidden" : ""
             }`}
           >
@@ -179,8 +179,8 @@ const PatientList: FC = () => {
         </div>
       ) : (
         <div className="text-center mt-4">
-          <h3 className="text-xl font-semibold">No {view} to Display</h3>
-          <p className="text-gray-400 mt-2">
+          <h3 className="text-xl font-semibold text-main-text">No {view} to Display</h3>
+          <p className="text-sub-text mt-2">
             Please add or search for a {view.slice(0, -1)} to view their
             details.
           </p>

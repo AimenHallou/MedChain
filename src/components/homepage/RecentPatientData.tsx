@@ -16,9 +16,9 @@ const RecentPatientData: FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="bg-module-background text-white rounded-lg p-4 shadow mt-6 border-2 border-gray-600">
+    <div className="bg-module-background rounded-lg p-4 shadow mt-6 border-2 border-module-accent">
       <div className="flex space-x-2">
-        <h2 className="text-lg font-bold mb-1">Recent Patient Data</h2>
+        <h2 className="text-lg font-bold mb-1 text-main-text">Recent Patient Data</h2>
         <FaRegChartBar size={24}/>
       </div>
       {recentPatients.length > 0 ? (
@@ -29,7 +29,7 @@ const RecentPatientData: FC = () => {
           />
         ))
       ) : (
-        <p className="text-sm font-semibold text-gray-400">No patients to Display</p>
+        <p className="text-sm font-semibold text-sub-text">No patients to Display</p>
       )}
     </div>
   );

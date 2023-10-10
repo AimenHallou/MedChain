@@ -9,12 +9,12 @@ const PatientSummary: FC = () => {
   const totalPatients = patients.length;
 
   return (
-    <div className="bg-module-background text-white rounded-lg p-4 shadow border-2 border-gray-600">
+    <div className="bg-module-background text-white rounded-lg p-4 shadow border-2 border-module-accent">
       <div className="flex space-x-2">
-        <h2 className="text-lg font-bold mb-1">Patient Summary</h2>
+        <h2 className="text-lg font-bold mb-1 text-main-text">Patient Summary</h2>
         <FaUserInjured size={24}/>
       </div>
-      <p className="text-sm font-semibold text-gray-400">
+      <p className="text-sm font-semibold text-sub-text">
         Total Patients: {totalPatients}
       </p>
     </div>
