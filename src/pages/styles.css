@@ -1,7 +1,9 @@
 /* /src/pages/styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
 
 /* The base color scheme */
 body {

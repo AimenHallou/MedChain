@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import { fetchPatients } from "../../redux/slices/patientSlice";
 import PatientCard from "../PatientCard";
+import { FaRegChartBar } from "react-icons/fa";
 
 const RecentPatientData: FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -15,14 +16,21 @@ const RecentPatientData: FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="bg-module-background text-white rounded-lg p-4 shadow mt-6  border-2 border-gray-600">
-      <h2 className="text-lg font-bold mb-1">Recent Patient Data</h2>
-      {recentPatients.map((patient, index) => (
-        <PatientCard
-          key={patient.patient_id || `fallback-${index}`}
-          {...patient}
-        />
-      ))}
+    <div className="bg-module-background text-white rounded-lg p-4 shadow mt-6 border-2 border-gray-600">
+      <div className="flex space-x-2">
+        <h2 className="text-lg font-bold mb-1">Recent Patient Data</h2>
+        <FaRegChartBar size={24}/>
+      </div>
+      {recentPatients.length > 0 ? (
+        recentPatients.map((patient, index) => (
+          <PatientCard
+            key={patient.patient_id || `fallback-${index}`}
+            {...patient}
+          />
+        ))
+      ) : (
+        <p className="text-sm font-semibold text-gray-400">No patients to Display</p>
+      )}
     </div>
   );
 };

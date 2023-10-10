@@ -12,13 +12,9 @@ const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
   return (
     <div className="bg-blue-background text-white min-h-screen py-8 px-6">
       <div className="text-center max-w-2xl mx-auto">
-        <h1 className="text-4xl py-2 text-white">Welcome to MedChain</h1>
-        <p className="text-sm">
-          We're revolutionizing healthcare by providing a secure, efficient
-          platform for sharing patient data among medical professionals. Focus
-          on care while we handle the complexity of data management and
-          security. MedChain - transforming patient care through seamless
-          collaboration.
+        <h1 className="text-4xl py-1 text-white">Welcome to MedChain</h1>
+        <p className="text-sm font-semibold text-gray-400">
+        Welcome to MedChain: A secure platform for patient data collaboration.
         </p>
       </div>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-10 gap-6 mt-8">

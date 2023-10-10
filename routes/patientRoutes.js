@@ -13,7 +13,7 @@ const contractJSON = JSON.parse(
 );
 const abi = contractJSON.abi;
 
-const contractAddress = "0xDdaE7Ec47C1fB502e0bC924202EF9637E26130ef";
+const contractAddress = "0xf61EDCd038d04FfB36A1f151B12DA42C15EA72e2";
 const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
 // Request a patient

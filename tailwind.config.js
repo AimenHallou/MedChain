@@ -1,15 +1,19 @@
-/** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: ["./src/**/*.{html,ts,tsx}"],
   theme: {
     extend: {
       backgroundColor: {
-        'blue-background': '#001845',
-        'blue-header': '#001233',
-        'blue-button': '#0044cc',
+        'blue-background': '#F1EFEF',
+        'blue-header': '#6499E9',
+        'blue-button': '#9EDDFF',
         'blue-hover-button': '#468faf',
-        'module-background': '#33415c',
+        'module-background': '#6499E9',
       },
+      fontFamily: {
+        'sans': ['Lato', ...defaultTheme.fontFamily.sans]
+      }
     },
   },
   plugins: [],
