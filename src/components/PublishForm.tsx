@@ -70,7 +70,7 @@ const PublishForm: FC = () => {
         history: [`Patient created by ${ownerAddress} on ${createdDate}`],
       })
     );
-  
+
     sharedUsers.forEach((sharedUser) => {
       dispatch(
         addNotification({

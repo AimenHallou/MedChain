@@ -2,6 +2,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PatientCard from "../PatientCard";
+import DatasetCard from "../DatasetCard";
 import { RootState, AppDispatch } from "../../redux/store";
 import { fetchPatients } from "../../redux/slices/patientSlice";
 import { fetchDatasets } from "../../redux/slices/datasetSlice";
@@ -170,16 +171,25 @@ const PatientList: FC = () => {
 
       {displayedItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4">
-          {displayedItems.map((item, index) => (
-            <PatientCard
-              key={item.dataset_id || item.patient_id || `fallback-${index}`}
-              {...item}
-            />
-          ))}
+          {displayedItems.map((item, index) =>
+            view === "patients" ? (
+              <PatientCard
+                key={item.patient_id || `fallback-${index}`}
+                {...item}
+              />
+            ) : (
+              <DatasetCard
+                key={item.dataset_id || `fallback-${index}`}
+                {...item}
+              />
+            )
+          )}
         </div>
       ) : (
         <div className="text-center mt-4">
-          <h3 className="text-xl font-semibold text-main-text">No {view} to Display</h3>
+          <h3 className="text-xl font-semibold text-main-text">
+            No {view} to Display
+          </h3>
           <p className="text-sub-text mt-2">
             Please add or search for a {view.slice(0, -1)} to view their
             details.

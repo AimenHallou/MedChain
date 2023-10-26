@@ -9,7 +9,7 @@ import { FaRegChartBar } from "react-icons/fa";
 const RecentPatientData: FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const patients = useSelector((state: RootState) => state.patients);
-  const recentPatients = Array.isArray(patients) ? patients.slice(0, 3) : [];
+  const recentPatients =  patients.slice(0, 3);
 
   useEffect(() => {
     dispatch(fetchPatients());
