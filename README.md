@@ -123,7 +123,7 @@ Make sure the IPFS API settings are set up as follows:
         "Access-Control-Allow-Credentials": ["true"],
         "Access-Control-Allow-Methods": ["PUT", "POST", "GET"],
         "Access-Control-Allow-Origin": [
-            "*",
+            "http://localhost:3000",
             "https://webui.ipfs.io",
             "http://webui.ipfs.io.ipns.localhost:8080"
         ]
