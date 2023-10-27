@@ -99,7 +99,8 @@ truffle migrate
 
 ## 7. Environment Variables
 
-Add the contract address to the environment variable.
+Add the contract address to the environment variable. 
+config/development.js
 
 ## 8. Local Blockchain
 

@@ -8,12 +8,18 @@ const fs = require("fs");
 
 const web3 = new Web3("http://127.0.0.1:8545");
 
+
+
 const contractJSON = JSON.parse(
   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
 );
 const abi = contractJSON.abi;
 
-const contractAddress = "0x8E338Dc66d56903B1c8402ea2f5ad9B26E86a6e4";
+const env = process.env.NODE_ENV || 'development';
+const config = require(`../config/${env}.js`);
+
+const contractAddress = config.patientRegistryContract;
+
 const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
 // Request a patient
