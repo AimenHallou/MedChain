@@ -26,6 +26,7 @@ export interface Dataset {
   content: FileData[] | null;
   sharedWith: { [address: string]: string[] };
   history: string[];
+  accessRequests?: string[];
 }
 
 export interface PatientListProps {

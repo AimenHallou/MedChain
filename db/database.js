@@ -63,6 +63,7 @@ const db = new sqlite3.Database(
       content TEXT,
       sharedWith TEXT,
       history TEXT
+      accessRequests TEXT
     )`,
         (err) => {
           if (err) {

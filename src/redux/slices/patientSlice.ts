@@ -147,6 +147,70 @@ export const requestAccess = createAsyncThunk(
   }
 );
 
+export const acceptAccessRequest = createAsyncThunk(
+  "patients/acceptAccessRequest",
+  async (payload: {
+    patientId: string;
+    requestor: string;
+    files: string[];
+  }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to accept access request");
+    }
+    return payload;
+  }
+);
+
+export const rejectAccessRequest = createAsyncThunk(
+  "patients/rejectAccessRequest",
+  async (payload: { patientId: string; requestor: string }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patientId}/cancel-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to reject access request");
+    }
+    return payload;
+  }
+);
+
+export const cancelRequest = createAsyncThunk(
+  "patients/cancelRequest",
+  async (payload: { patient_id: string; requestor: string }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/patients/${payload.patient_id}/cancel-request`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to cancel request");
+    }
+    return payload;
+  }
+);
+
 export const removeFile = createAsyncThunk(
   "patients/removeFile",
   async (payload: { patientId: string; fileName: string }) => {
@@ -210,70 +274,6 @@ export const addFile = createAsyncThunk(
     );
     if (!response.ok) {
       throw new Error("Failed to add file");
-    }
-    return payload;
-  }
-);
-
-export const acceptAccessRequest = createAsyncThunk(
-  "patients/acceptAccessRequest",
-  async (payload: {
-    patientId: string;
-    requestor: string;
-    files: string[];
-  }) => {
-    const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to accept access request");
-    }
-    return payload;
-  }
-);
-
-export const rejectAccessRequest = createAsyncThunk(
-  "patients/rejectAccessRequest",
-  async (payload: { patientId: string; requestor: string }) => {
-    const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/cancel-request`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to reject access request");
-    }
-    return payload;
-  }
-);
-
-export const cancelRequest = createAsyncThunk(
-  "patients/cancelRequest",
-  async (payload: { patient_id: string; requestor: string }) => {
-    const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patient_id}/cancel-request`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to cancel request");
     }
     return payload;
   }
