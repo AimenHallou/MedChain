@@ -16,22 +16,31 @@ const DatasetPublishForm: FC = () => {
   const router = useRouter();
   
   const [description, setDescription] = useState<string>("");
-  const [content, setContent] = useState<File | null>(null);
+  const [content, setContent] = useState<File[]>([]);
   const { users, currentUserAddress } = useSelector((state: RootState) => state.user);
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
-    let ipfsCID = "";
-    // if(content) {
-    //   const buffer = await content.arrayBuffer();
-    //   const result = await ipfs.add(new Uint8Array(buffer));
-    //   ipfsCID = result.path;
-    // }
-
+  
+    const contentData: any[] = [];
+  
+    for (const file of content) {
+      // const buffer = await file.arrayBuffer();
+      // const result = await ipfs.add(new Uint8Array(buffer));
+      // const ipfsCID = result.path;
+  
+      contentData.push({
+        base64: "", 
+        name: file.name, 
+        dataType: file.type, 
+        ipfsCID: ""
+      });
+    }
+  
     const dataset_id = uuid();
-
+  
     dispatch(
       createDataset({
         dataset_id,
@@ -39,19 +48,15 @@ const DatasetPublishForm: FC = () => {
         owner: currentUser?.address || "",
         ownerTitle: currentUser?.name || "",
         createdDate,
-        content: content ? [{
-          base64: "", 
-          name: content.name, 
-          dataType: content.type, 
-          ipfsCID
-        }] : null,
+        content: contentData.length ? contentData : null,
         sharedWith: {},
         history: [`Dataset created by ${currentUser?.address || ""} on ${createdDate}`],
       })
     );
-
+  
     router.push("/");
   };
+  
   
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white ">
@@ -79,7 +84,8 @@ const DatasetPublishForm: FC = () => {
           <input 
             type="file"
             id="content"
-            onChange={(e) => setContent(e.target.files ? e.target.files[0] : null)}
+            multiple
+            onChange={(e) => setContent(e.target.files ? Array.from(e.target.files) : [])}
             className="w-full px-3 py-2 text-white placeholder-gray-400 bg-gray-800 rounded outline-none focus:bg-gray-900"
           />
         </div>
