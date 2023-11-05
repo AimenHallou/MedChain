@@ -1,42 +1,45 @@
-// src/components/PatientFileSection.tsx
+// src/components/DataFileSection.tsx
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
-import { AiFillFileText } from "react-icons/ai";
-import { removeFile, addFile } from "../../redux/slices/patientSlice";
-import { setFormContent } from "../../redux/slices/formSlice";
+import { AiFillFileText, AiFillFileAdd } from "react-icons/ai";
+
 import { TiDelete } from "react-icons/ti";
 import { BiSolidEditAlt } from "react-icons/bi";
-import { AiFillFileAdd } from "react-icons/ai";
 import { FileData } from "../../objects/types";
-import { create } from "ipfs-http-client";
 
-const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
-
-type PatientFileSectionProps = {
-  patientId: string;
+type DataFileSectionProps = {
+  dataId: string;
+  content: FileData[];
+  owner: string;
+  sharedWith: Record<string, string[]>;
   selectedFiles: string[];
   setSelectedFiles: (files: string[]) => void;
   selectedRequestor: string | null;
   selectedUsers: string | null;
+  handleAddFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveFile: (fileName: string) => void;
+  handleFileClick: (file: FileData) => void;
 };
 
-const PatientFileSection: React.FC<PatientFileSectionProps> = ({
-  patientId,
+const DataFileSection: React.FC<DataFileSectionProps> = ({
+  dataId,
+  content,
+  owner,
+  sharedWith,
   selectedFiles,
   setSelectedFiles,
   selectedRequestor,
   selectedUsers,
+  handleAddFile,
+  handleRemoveFile,
+  handleFileClick
 }) => {
   const dispatch: AppDispatch = useDispatch();
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
 
-  const patient = useSelector((state: RootState) => state.patients);
-  const currentPatient = patient.find(
-    (patient) => patient.patient_id === patientId
-  );
   const [filesData, setFilesData] = useState<FileData[]>([]);
   const dataTypes = [
     "Lab results",
@@ -45,111 +48,15 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     "Clinician notes",
   ];
 
-  const fetchFileFromIPFS = async (cid: string): Promise<string> => {
-    try {
-      const chunks: Uint8Array[] = [];
-      for await (const chunk of ipfs.cat(cid)) {
-        chunks.push(chunk);
-      }
-
-      const blob = new Blob(chunks, { type: "application/octet-stream" });
-
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            const base64 = reader.result.split(",")[1];
-            resolve(base64);
-          } else {
-            reject(new Error("Failed to convert Blob to base64"));
-          }
-        };
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error(`Failed to fetch file from IPFS with CID ${cid}:`, error);
-      return "";
-    }
-  };
-
-  const handleFileClick = async (file: FileData) => {
-    if (file.ipfsCID) {
-      const base64Content = await fetchFileFromIPFS(file.ipfsCID);
-      if (base64Content) {
-        console.log(base64Content);
-      }
-    }
-  };
-
-  const handleRemoveFile = (fileName: string) => {
-    if (currentUser === currentPatient?.owner) {
-      dispatch(removeFile({ patientId, fileName }));
-    }
-  };
-
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = Array.from(event.target.files);
-      let fileContents: FileData[] = [];
-
-      for (const file of files) {
-        const reader = new FileReader();
-
-        const result: Promise<FileData> = new Promise((resolve, reject) => {
-          reader.onloadend = async () => {
-            if (typeof reader.result === "string") {
-              const base64String = reader.result.split(",")[1];
-
-              const buffer = Buffer.from(base64String, "base64");
-              try {
-                const ipfsResult = await ipfs.add(buffer);
-                resolve({
-                  base64: "",
-                  name: file.name,
-                  dataType: "",
-                  ipfsCID: ipfsResult.path,
-                });
-              } catch (ipfsError) {
-                console.error("Error uploading to IPFS:", ipfsError);
-                reject(ipfsError);
-              }
-            } else {
-              reject(new Error("Unexpected result type from FileReader"));
-            }
-          };
-        });
-
-        reader.readAsDataURL(file);
-
-        const fileData = await result;
-        fileContents.push(fileData);
-
-        dispatch(
-          addFile({
-            patientId: patientId,
-            file: fileData,
-            owner: currentUser || "",
-          })
-        );
-      }
-
-      const newFilesData = [...filesData, ...fileContents];
-      setFilesData(newFilesData);
-      dispatch(setFormContent(newFilesData));
-    }
-  };
 
   const [editing, setEditing] = useState(false);
 
-  if (!currentPatient) return null;
+  if (!dataId) return null;
 
-  const isOwner = currentUser === currentPatient.owner;
+  const isOwner = currentUser === owner;
 
   let accessibleFiles: string[] = [];
-
-  let content = currentPatient.content;
 
   if (typeof content === "string") {
     try {
@@ -158,8 +65,6 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
       console.error("Failed to parse currentPatient.content:", error);
     }
   }
-
-  let sharedWith = currentPatient.sharedWith;
 
   if (typeof sharedWith === "string") {
     try {
@@ -180,9 +85,9 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
 
   let contentArray: any[] = [];
 
-  if (typeof currentPatient.content === "string") {
+  if (typeof content === "string") {
     try {
-      const parsedContent = JSON.parse(currentPatient.content);
+      const parsedContent = JSON.parse(content);
       if (Array.isArray(parsedContent)) {
         contentArray = parsedContent;
         console.log(contentArray);
@@ -190,8 +95,8 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
     } catch (error) {
       console.error("Failed to parse currentPatient.content:", error);
     }
-  } else if (Array.isArray(currentPatient.content)) {
-    contentArray = currentPatient.content;
+  } else if (Array.isArray(content)) {
+    contentArray = content;
   }
 
   return (
@@ -240,7 +145,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                 handleFileClick(file);
 
                 if (
-                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                  ((currentUser === owner && selectedUsers) ||
                     selectedRequestor) &&
                   selectedFiles.includes(file.name)
                 ) {
@@ -250,7 +155,7 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
                     )
                   );
                 } else if (
-                  ((currentUser === currentPatient.owner && selectedUsers) ||
+                  ((currentUser === owner && selectedUsers) ||
                     selectedRequestor) &&
                   !selectedFiles.includes(file.name)
                 ) {
@@ -314,4 +219,4 @@ const PatientFileSection: React.FC<PatientFileSectionProps> = ({
   );
 };
 
-export default PatientFileSection;
+export default DataFileSection;

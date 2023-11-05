@@ -8,8 +8,6 @@ const fs = require("fs");
 
 const web3 = new Web3("http://127.0.0.1:8545");
 
-
-
 const contractJSON = JSON.parse(
   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
 );

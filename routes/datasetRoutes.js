@@ -238,4 +238,81 @@ router.delete("/:dataset_id", (req, res) => {
   );
 });
 
+// Add a file to a dataset
+router.put("/:datasetId/add-file", (req, res) => {
+  const { fileName } = req.body;
+
+  db.get(`SELECT content FROM datasets WHERE dataset_id = ?`, [req.params.datasetId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const content = JSON.parse(row.content || "[]");
+    content.push({ name: fileName });
+
+    db.run(`UPDATE datasets SET content = ? WHERE dataset_id = ?`, [JSON.stringify(content), req.params.datasetId], (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: `File named: ${fileName} added successfully` });
+    });
+  });
+});
+
+// Remove a file from a dataset
+router.put("/:datasetId/remove-file", (req, res) => {
+  const { fileName } = req.body;
+
+  db.get(`SELECT content FROM datasets WHERE dataset_id = ?`, [req.params.datasetId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const content = JSON.parse(row.content || "[]");
+    const updatedContent = content.filter(file => file.name !== fileName);
+
+    db.run(`UPDATE datasets SET content = ? WHERE dataset_id = ?`, [JSON.stringify(updatedContent), req.params.datasetId], (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: `File named: ${fileName} removed successfully` });
+    });
+  });
+});
+
+// Transfer ownership of a dataset
+router.put("/:datasetId/transfer", (req, res) => {
+  const { newOwner } = req.body;
+  const datasetId = req.params.datasetId;
+
+  db.run(
+    `UPDATE datasets SET owner = ? WHERE dataset_id = ?`,
+    [newOwner, datasetId],
+    (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: `Dataset ownership transferred to: ${newOwner}` });
+    }
+  );
+});
+
+// Update shared files for a dataset
+router.put("/:datasetId/update-shared", (req, res) => {
+  const { address, files } = req.body;
+  const datasetId = req.params.datasetId;
+
+  db.run(
+    `UPDATE datasets SET sharedWith = ? WHERE dataset_id = ?`,
+    [JSON.stringify({ ...files, address }), datasetId],
+    (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: `Shared files updated for address: ${address}` });
+    }
+  );
+});
+
+
 module.exports = router;

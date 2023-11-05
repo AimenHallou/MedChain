@@ -1,10 +1,10 @@
-// src/components/pages/PatientRequestAccess.tsx
+// src/components/pages/RequestAccess.tsx
 import React, { FC, useState } from "react";
 import { IoIosClose, IoIosCheckmark } from "react-icons/io"; 
 import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 
-interface PatientRequestAccessProps {
-  patientId: string;
+interface RequestAccessProps {
+  itemId: string;
   requestPending: boolean;
   handleRequestAccess: () => void;
   handleCancelRequest: () => void;
@@ -12,7 +12,7 @@ interface PatientRequestAccessProps {
   handleRejectRequest: (requestor: string) => void;
   accessRequests?: string[];
   currentUserAddress: string | null;
-  patientOwner: string;
+  ownerAddress: string;
   accessList: string[];
   selectedFiles: string[];
   setSelectedFiles: (files: string[]) => void;
@@ -20,8 +20,8 @@ interface PatientRequestAccessProps {
   setSelectedRequestor: (requestor: string | null) => void;
 }
 
-const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
-  patientId,
+const RequestAccess: FC<RequestAccessProps> = ({
+  itemId,
   requestPending,
   handleRequestAccess,
   handleCancelRequest,
@@ -29,7 +29,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   handleRejectRequest,
   accessRequests = [],
   currentUserAddress,
-  patientOwner,
+  ownerAddress,
   accessList = [],
   selectedFiles,
   setSelectedFiles,
@@ -38,7 +38,7 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
 }) => {
   return (
     <div className="flex">
-      {currentUserAddress !== patientOwner &&
+      {currentUserAddress !== ownerAddress &&
         !accessList.includes(currentUserAddress || "") && (
           <div>
             <button
@@ -55,12 +55,12 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
             </button>
           </div>
         )}
-      {currentUserAddress === patientOwner && accessRequests.length > 0 && (
+      {currentUserAddress === ownerAddress && accessRequests.length > 0 && (
         <>
           <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
           {Array.isArray(accessRequests) && accessRequests.map((requestor) => (
             <div
-              key={`${patientId}-${requestor}`}
+              key={`${itemId}-${requestor}`}
               className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
             >
               <span
@@ -107,4 +107,4 @@ const PatientRequestAccess: FC<PatientRequestAccessProps> = ({
   );
 };
 
-export default PatientRequestAccess;
+export default RequestAccess;

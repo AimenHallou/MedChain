@@ -1,10 +1,9 @@
-// src/components/pages/PatientOwnerActions.tsx
+// src/components/pages/EntityOwnerActions.tsx
 import React, { FC } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
-import { Patient } from "../../objects/types";
 
-interface PatientOwnerActionsProps {
+interface EntityOwnerActionsProps {
   newOwner: string;
   setNewOwner: (value: string) => void;
   handleTransfer: () => void;
@@ -18,10 +17,10 @@ interface PatientOwnerActionsProps {
   selectedUser: string | null;
   setSelectedUser: (user: string | null) => void;
   handleUpdateSharedFiles: (address: string, files: string[]) => void;
-  patient: Patient;
+  entity: any;
 }
 
-const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
+const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   newOwner,
   setNewOwner,
   handleTransfer,
@@ -35,7 +34,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   selectedUser,
   setSelectedUser,
   handleUpdateSharedFiles,
-  patient,
+  entity,
 }) => {
   let parsedSharedWith: string[] = [];
   try {
@@ -45,14 +44,13 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
     parsedSharedWith = Object.keys(sharedWith).filter(
       (key) => key !== "undefined"
     );
-    console.log(parsedSharedWith);
   } catch (error) {
     console.error("Failed to parse sharedWith:", error);
   }
 
   const renderSharedAddresses = () => {
     return parsedSharedWith.map((address, index) => {
-      const currentFiles = patient.sharedWith[address] || [];
+      const currentFiles = entity.sharedWith[address] || [];
       const hasChanges =
         JSON.stringify([...currentFiles].sort()) !==
         JSON.stringify([...selectedFiles].sort());
@@ -72,7 +70,7 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
                 setSelectedFiles([]);
               } else {
                 setSelectedUser(address);
-                const userFiles = patient.sharedWith[address];
+                const userFiles = entity.sharedWith[address];
                 setSelectedFiles(userFiles || []);
               }
             }}
@@ -137,4 +135,4 @@ const PatientOwnerActions: FC<PatientOwnerActionsProps> = ({
   );
 };
 
-export default PatientOwnerActions;
+export default EntityOwnerActions;

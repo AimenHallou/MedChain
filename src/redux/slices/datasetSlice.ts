@@ -1,6 +1,6 @@
 // src/redux/slices/datasetSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Dataset } from "../../objects/types";
+import { Dataset, FileData } from "../../objects/types";
 
 const initialState: Dataset[] = [];
 const API_ENDPOINT = "http://localhost:3001";
@@ -202,6 +202,94 @@ export const cancelDatasetRequest = createAsyncThunk(
   }
 );
 
+export const removeFileFromDataset = createAsyncThunk(
+  "datasets/removeFile",
+  async (payload: { datasetId: string; fileName: string }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/datasets/${payload.datasetId}/remove-file`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: payload.fileName,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to remove file from dataset");
+    }
+    return payload;
+  }
+);
+
+export const addFileToDataset = createAsyncThunk(
+  "datasets/addFile",
+  async (payload: { datasetId: string; file: FileData; owner: string }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/datasets/${payload.datasetId}/add-file`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file: payload.file,
+          owner: payload.owner,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to add file to dataset");
+    }
+    return payload;
+  }
+);
+
+export const transferDatasetOwnership = createAsyncThunk(
+  "datasets/transferOwnership",
+  async (payload: { datasetId: string; newOwner: string }) => {
+    const response = await fetch(
+      `/api/datasets/${payload.datasetId}/transfer`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newOwner: payload.newOwner }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to transfer dataset ownership");
+    }
+    return payload;
+  }
+);
+
+export const updateSharedFiles = createAsyncThunk(
+  "datasets/updateSharedFiles",
+  async (payload: { datasetId: string; address: string; files: string[] }) => {
+    const response = await fetch(
+      `${API_ENDPOINT}/api/datasets/${payload.datasetId}/update-shared`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: payload.address,
+          files: payload.files,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update shared files for dataset");
+    }
+    return payload;
+  }
+);
+
 export const datasetSlice = createSlice({
   name: "datasets",
   initialState,
@@ -334,9 +422,71 @@ export const datasetSlice = createSlice({
             `Access request cancelled by ${requestor} on ${new Date().toISOString()}`
           );
         }
-      });
+      })
+      .addCase(addFileToDataset.fulfilled, (state, action) => {
+        const { datasetId, file } = action.payload;
+        const dataset = state.find(
+          (dataset) => dataset.dataset_id === datasetId
+        );
+        if (dataset) {
+          if (!Array.isArray(dataset.content)) {
+            dataset.content = [];
+          }
+          dataset.content.push(file);
+          dataset.history.push(`File added on ${new Date().toISOString()}`);
+        }
+      })
+      .addCase(removeFileFromDataset.fulfilled, (state, action) => {
+        const { datasetId, fileName } = action.payload;
+        const dataset = state.find(
+          (dataset) => dataset.dataset_id === datasetId
+        );
+        if (dataset) {
+          if (Array.isArray(dataset.content)) {
+            dataset.content = dataset.content.filter(
+              (content) => content.name !== fileName
+            );
+            dataset.history.push(`File removed on ${new Date().toISOString()}`);
+          }
+        }
+      })
+      .addCase(transferDatasetOwnership.fulfilled, (state, action) => {
+        const { datasetId, newOwner } = action.payload;
+        const dataset = state.find(
+          (dataset) => dataset.dataset_id === datasetId
+        );
+        if (dataset) {
+          dataset.owner = newOwner;
+          dataset.history.push(
+            `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      .addCase(updateSharedFiles.fulfilled, (state, action) => {
+        const { datasetId, address, files } = action.payload;
+        const dataset = state.find(
+          (dataset) => dataset.dataset_id === datasetId
+        );
+        if (dataset) {
+          if (typeof dataset.sharedWith === "string") {
+            try {
+              dataset.sharedWith = JSON.parse(dataset.sharedWith);
+            } catch (error) {
+              console.error("Failed to parse sharedWith:", error);
+              dataset.sharedWith = {};
+            }
+          }
+          dataset.sharedWith[address] = files;
+          if (!Array.isArray(dataset.history)) {
+            dataset.history = [];
+          }
+          dataset.history.push(
+            `Shared files updated for ${address} on ${new Date().toISOString()}`
+          );
+        }
+      })
+      
   },
 });
 
 export default datasetSlice.reducer;
-

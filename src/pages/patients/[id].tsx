@@ -13,15 +13,20 @@ import {
   cancelRequest,
   updateSharedFiles,
   fetchSinglePatient,
+  removeFile,
+  addFile
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
+import { FileData } from "../../objects/types";
 
-import PatientOwnerActions from "./PatientOwnerActions";
-import PatientHistory from "./PatientHistory";
-import PatientRequestAccess from "./PatientRequestAccess";
-import PatientFileSection from "./PatientFileSection";
-import PatientHeader from "./PatientHeader";
+import PatientOwnerActions from "../components/EntityOwnerActions";
+import GenericHistory from '../components/GenericHistory';
+import RequestAccess from "../components/RequestAccess";
+import DataFileSection from "../components/DataFileSection";
+import EntityHeader from "../components/PatientHeader";
 import { addNotification } from "../../redux/slices/userSlice";
+import { setFormContent } from "../../redux/slices/formSlice";
+import { create } from "ipfs-http-client";
 
 const PatientPage: FC = () => {
   const router = useRouter();
@@ -30,6 +35,7 @@ const PatientPage: FC = () => {
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const [patientData, setPatientData] = useState<any | null>(null);
+  const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -158,6 +164,11 @@ const PatientPage: FC = () => {
     }
   };
 
+  const getPatientById = (patientId: string) => {
+    const patients = useSelector((state: RootState) => state.patients);
+    return patients.find((patient) => patient.patient_id === patientId);
+  };
+
   const handleAcceptRequest = (requestor: string, files: string[]) => {
     dispatch(
       acceptAccessRequest({ patientId: patient.patient_id, requestor, files })
@@ -220,14 +231,109 @@ const PatientPage: FC = () => {
     }
   };
 
+  const fetchFileFromIPFS = async (cid: string): Promise<string> => {
+    try {
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of ipfs.cat(cid)) {
+        chunks.push(chunk);
+      }
+
+      const blob = new Blob(chunks, { type: "application/octet-stream" });
+
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            const base64 = reader.result.split(",")[1];
+            resolve(base64);
+          } else {
+            reject(new Error("Failed to convert Blob to base64"));
+          }
+        };
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error(`Failed to fetch file from IPFS with CID ${cid}:`, error);
+      return "";
+    }
+  };
+
+  const handleFileClick = async (file: FileData) => {
+    if (file.ipfsCID) {
+      const base64Content = await fetchFileFromIPFS(file.ipfsCID);
+      if (base64Content) {
+        console.log(base64Content);
+      }
+    }
+  };
+
+  const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      let fileContents: FileData[] = [];
+
+      for (const file of files) {
+        const reader = new FileReader();
+
+        const result: Promise<FileData> = new Promise((resolve, reject) => {
+          reader.onloadend = async () => {
+            if (typeof reader.result === "string") {
+              const base64String = reader.result.split(",")[1];
+
+              const buffer = Buffer.from(base64String, "base64");
+              try {
+                const ipfsResult = await ipfs.add(buffer);
+                resolve({
+                  base64: "",
+                  name: file.name,
+                  dataType: "",
+                  ipfsCID: ipfsResult.path,
+                });
+              } catch (ipfsError) {
+                console.error("Error uploading to IPFS:", ipfsError);
+                reject(ipfsError);
+              }
+            } else {
+              reject(new Error("Unexpected result type from FileReader"));
+            }
+          };
+        });
+
+        reader.readAsDataURL(file);
+
+        const fileData = await result;
+        fileContents.push(fileData);
+
+        dispatch(
+          addFile({
+            patientId: patient.patient_id,
+            file: fileData,
+            owner: currentUserAddress || "",
+          })
+        );
+      }
+
+      const newFilesData = [...patientData, ...fileContents];
+      setPatientData(newFilesData);
+      dispatch(setFormContent(newFilesData));
+    }
+  };
+
+  const handleRemoveFile = (fileName: string) => {
+    if (currentUserAddress === patient?.owner) {
+      dispatch(removeFile({ patientId: patient.patient_id, fileName }));
+    }
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
       <div className="w-full lg:w-[20rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
-        <PatientHeader
-          Patient_id={patient.patient_id}
+        <EntityHeader
+          entityId={patient.patient_id}
           owner={patient.owner}
           ownerTitle={patient.ownerTitle}
           createdDate={patient.createdDate}
+          entityType="Patient"
         />
         <div className="px-6 py-2 space-y-4 border-t border-gray-700">
           {user.currentUserAddress === patient.owner && (
@@ -245,11 +351,11 @@ const PatientPage: FC = () => {
               selectedUser={selectedUsers}
               setSelectedUser={setSelectedUsers}
               handleUpdateSharedFiles={handleUpdateSharedFiles}
-              patient={patient}
+              entity={patient}
             />
           )}
-          <PatientRequestAccess
-            patientId={id as string}
+          <RequestAccess
+            itemId={id as string}
             handleRequestAccess={handleRequestAccess}
             requestPending={
               patient.accessRequests
@@ -266,26 +372,32 @@ const PatientPage: FC = () => {
                 : []
             }
             currentUserAddress={currentUserAddress || ""}
-            patientOwner={patient.owner}
+            ownerAddress={patient.owner}
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
             selectedRequestor={selectedRequestor}
             setSelectedRequestor={setSelectedRequestor}
           />
         </div>
-        <PatientHistory history={patient.history} />
+        <GenericHistory title="Patient History" data={patient?.history || []} />
       </div>
       {(Object.keys(patient.sharedWith || {}).includes(
         user.currentUserAddress || ""
       ) ||
         user.currentUserAddress === patient.owner) && (
         <div className="w-full lg:w-[40rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
-          <PatientFileSection
-            patientId={id as string}
+          <DataFileSection
+            dataId={id as string}
+            content={patient.content}
+            owner={patient.owner}
+            sharedWith={patient.sharedWith}
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
             selectedRequestor={selectedRequestor}
             selectedUsers={selectedUsers}
+            handleAddFile={handleAddFile}
+            handleRemoveFile={handleRemoveFile}
+            handleFileClick={handleFileClick}
           />
         </div>
       )}
