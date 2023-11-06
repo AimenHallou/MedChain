@@ -6,7 +6,7 @@ import { RootState } from "../../redux/store";
 import { useAppDispatch } from "../../app/hook";
 import { AiFillFileText } from "react-icons/ai";
 import { BiCheckboxSquare, BiCheckbox } from "react-icons/bi";
-import EntityHeader from "../components/PatientHeader";
+import EntityHeader from "../components/EntityHeader";
 import GenericHistory from "../components/GenericHistory";
 import RequestAccess from "../components/RequestAccess";
 import EntityOwnerActions from "../components/EntityOwnerActions";
@@ -38,11 +38,15 @@ const DatasetPage: FC = () => {
   const datasets = useSelector((state: RootState) => state.datasets);
   const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.user);
+  const users = useSelector((state: RootState) => state.user.users);
+
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
   const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
   const [sharedAddress, setSharedAddress] = useState("");
+  const [healthcareType, setHealthcareType] = useState<string>('');
+  const [organizationName, setOrganizationName] = useState<string>('');
 
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
@@ -90,6 +94,12 @@ const DatasetPage: FC = () => {
             }
             if (typeof datasetCopy.sharedWith === "string") {
               datasetCopy.sharedWith = JSON.parse(datasetCopy.sharedWith);
+            }
+            const ownerUser = users.find(user => user.address === datasetCopy.owner);
+            console.log(ownerUser)
+            if (ownerUser) {
+              setHealthcareType(ownerUser.healthcareType);
+              setOrganizationName(ownerUser.organizationName);
             }
             setDatasetData(datasetCopy); 
           } else {
@@ -384,7 +394,8 @@ const DatasetPage: FC = () => {
         <EntityHeader
           entityId={datasetData.dataset_id}
           owner={datasetData.owner}
-          ownerTitle={datasetData.ownerTitle}
+          healthcareType={healthcareType}
+          organizationName={organizationName}
           createdDate={datasetData.createdDate}
           entityType="Dataset"
         />

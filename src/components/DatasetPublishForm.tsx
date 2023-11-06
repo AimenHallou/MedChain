@@ -46,7 +46,6 @@ const DatasetPublishForm: FC = () => {
         dataset_id,
         description,
         owner: currentUser?.address || "",
-        ownerTitle: currentUser?.name || "",
         createdDate,
         content: contentData.length ? contentData : null,
         sharedWith: {},

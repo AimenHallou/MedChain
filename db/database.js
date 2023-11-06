@@ -36,7 +36,6 @@ const db = new sqlite3.Database(
         `CREATE TABLE IF NOT EXISTS patients(
       patient_id TEXT PRIMARY KEY,
       owner TEXT NOT NULL,
-      ownerTitle TEXT NOT NULL,
       createdDate TEXT NOT NULL,
       content TEXT,
       sharedWith TEXT,
@@ -58,7 +57,6 @@ const db = new sqlite3.Database(
       dataset_id TEXT PRIMARY KEY,
       description TEXT,
       owner TEXT NOT NULL,
-      ownerTitle TEXT NOT NULL,
       createdDate TEXT NOT NULL,
       content TEXT,
       sharedWith TEXT,

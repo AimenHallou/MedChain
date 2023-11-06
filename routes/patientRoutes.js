@@ -709,7 +709,6 @@ router.post("/", async (req, res) => {
   const {
     patient_id,
     owner,
-    ownerTitle,
     createdDate,
     content,
     sharedWith,
@@ -727,11 +726,10 @@ router.post("/", async (req, res) => {
       });
 
     db.run(
-      "INSERT INTO patients(patient_id, owner, ownerTitle, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO patients(patient_id, owner, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?)",
       [
         patient_id,
         owner,
-        ownerTitle,
         createdDate,
         JSON.stringify(content),
         JSON.stringify(sharedWith),

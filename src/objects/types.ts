@@ -9,7 +9,6 @@ export interface FileData {
 export interface Patient {
   patient_id: string;
   owner: string;
-  ownerTitle: string;
   createdDate: string;
   content: FileData[] | null;
   sharedWith: { [address: string]: string[] };
@@ -21,7 +20,6 @@ export interface Dataset {
   dataset_id: string;
   description: string;
   owner: string;
-  ownerTitle: string;
   createdDate: string;
   content: FileData[] | null;
   sharedWith: { [address: string]: string[] };

@@ -23,7 +23,7 @@ import PatientOwnerActions from "../components/EntityOwnerActions";
 import GenericHistory from '../components/GenericHistory';
 import RequestAccess from "../components/RequestAccess";
 import DataFileSection from "../components/DataFileSection";
-import EntityHeader from "../components/PatientHeader";
+import EntityHeader from "../components/EntityHeader";
 import { addNotification } from "../../redux/slices/userSlice";
 import { setFormContent } from "../../redux/slices/formSlice";
 import { create } from "ipfs-http-client";
@@ -33,12 +33,16 @@ const PatientPage: FC = () => {
   const { id } = router.query;
   const patients = useSelector((state: RootState) => state.patients);
   const user = useSelector((state: RootState) => state.user);
+  const users = useSelector((state: RootState) => state.user.users);
+
   const dispatch = useDispatch<AppDispatch>();
   const [patientData, setPatientData] = useState<any | null>(null);
   const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
+  const [healthcareType, setHealthcareType] = useState<string>('');
+  const [organizationName, setOrganizationName] = useState<string>('');
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
@@ -59,6 +63,11 @@ const PatientPage: FC = () => {
           }
           if (typeof patientCopy.sharedWith === "string") {
             patientCopy.sharedWith = JSON.parse(patientCopy.sharedWith);
+          }
+          const ownerUser = users.find(user => user.address === patient.owner);
+          if (ownerUser) {
+            setHealthcareType(ownerUser.healthcareType);
+            setOrganizationName(ownerUser.organizationName);
           }
           setPatientData(patientCopy);
         })
@@ -331,7 +340,8 @@ const PatientPage: FC = () => {
         <EntityHeader
           entityId={patient.patient_id}
           owner={patient.owner}
-          ownerTitle={patient.ownerTitle}
+          healthcareType={healthcareType}
+          organizationName={organizationName}
           createdDate={patient.createdDate}
           entityType="Patient"
         />

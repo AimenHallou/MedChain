@@ -41,7 +41,6 @@ router.post("/", (req, res) => {
     dataset_id,
     description,
     owner,
-    ownerTitle,
     createdDate,
     content,
     sharedWith,
@@ -53,13 +52,12 @@ router.post("/", (req, res) => {
   console.log("test");
 
   db.run(
-    `INSERT INTO datasets(dataset_id, description, owner, ownerTitle, createdDate, content, sharedWith, history)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO datasets(dataset_id, description, owner, createdDate, content, sharedWith, history)
+      VALUES(?, ?, ?, ?, ?, ?, ?)`,
     [
       dataset_id,
       description,
       owner,
-      ownerTitle,
       createdDate,
       contentJSON,
       sharedWithJSON,
