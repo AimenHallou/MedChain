@@ -12,14 +12,7 @@ import ContentSection from "./publish/ContentSection";
 import ShareSection from "./publish/ShareSection";
 import Patient_idSection from "./publish/Patient_idSection";
 import FileCardsSection from "./publish/FileCardsSection";
-import { create } from 'ipfs-http-client';
-
-const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' });
-
-const addFileToIPFS = async (buffer) => {
-    const result = await ipfs.add(buffer);
-    return result.path;
-};
+import { saveFilesToIPFS, SavedFileData } from '../utils/saveToIPFS';
 
 const PublishForm: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,8 +24,6 @@ const PublishForm: FC = () => {
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
 
-  const sharedData: { [address: string]: string[]; } = {};
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const createdDate = new Date().toISOString();
@@ -43,20 +34,10 @@ const PublishForm: FC = () => {
     });
     const ownerAddress = currentUser?.address || "";
 
-    let updatedContent = form.content ? [...form.content] : [];
-  
+    let updatedContent: SavedFileData[] = [];
+      
     if (form.content && form.content.length > 0) {
-      for (let i = 0; i < form.content.length; i++) {
-        const file = form.content[i];
-        const buffer = Buffer.from(file.base64, "base64");
-        const result = await ipfs.add(buffer);
-        updatedContent[i] = {
-          base64: "",
-          name: file.name,
-          dataType: file.dataType,
-          ipfsCID: result.path
-        };
-      }
+      updatedContent = await saveFilesToIPFS(form.content);
     }
 
     dispatch(
@@ -88,7 +69,6 @@ const PublishForm: FC = () => {
     dispatch(resetForm());
     router.push("/");
   };
-
   
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 bg-gray-900 p-4 lg:p-8 text-white ">

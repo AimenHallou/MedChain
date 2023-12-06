@@ -9,7 +9,6 @@ interface FormState extends Omit<Patient, "id"> {
 const initialState: FormState = {
   patient_id: "",
   owner: "",
-  ownerTitle: "",
   createdDate: "",
   content: null,
   base64Content: null,

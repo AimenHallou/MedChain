@@ -27,6 +27,7 @@ import EntityHeader from "../components/EntityHeader";
 import { addNotification } from "../../redux/slices/userSlice";
 import { setFormContent } from "../../redux/slices/formSlice";
 import { create } from "ipfs-http-client";
+import { fetchFileFromIPFS } from '../../utils/fetchAndDecryptFromIPFS';
 
 const PatientPage: FC = () => {
   const router = useRouter();
@@ -240,41 +241,25 @@ const PatientPage: FC = () => {
     }
   };
 
-  const fetchFileFromIPFS = async (cid: string): Promise<string> => {
+  const handleFetchFile = async (cid: string): Promise<string> => {
     try {
-      const chunks: Uint8Array[] = [];
-      for await (const chunk of ipfs.cat(cid)) {
-        chunks.push(chunk);
-      }
-
-      const blob = new Blob(chunks, { type: "application/octet-stream" });
-
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            const base64 = reader.result.split(",")[1];
-            resolve(base64);
-          } else {
-            reject(new Error("Failed to convert Blob to base64"));
-          }
-        };
-        reader.readAsDataURL(blob);
-      });
+      const decryptedFileBase64 = await fetchFileFromIPFS(cid);
+      return decryptedFileBase64; 
     } catch (error) {
-      console.error(`Failed to fetch file from IPFS with CID ${cid}:`, error);
+      console.error("Error fetching and decrypting file:", error);
       return "";
     }
   };
-
+  
   const handleFileClick = async (file: FileData) => {
     if (file.ipfsCID) {
-      const base64Content = await fetchFileFromIPFS(file.ipfsCID);
+      const base64Content = await handleFetchFile(file.ipfsCID);
       if (base64Content) {
         console.log(base64Content);
       }
     }
   };
+  
 
   const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {

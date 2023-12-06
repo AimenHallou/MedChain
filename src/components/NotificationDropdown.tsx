@@ -97,7 +97,7 @@ const NotificationDropdown: React.FC = () => {
               <div
                 className="px-4 py-2 text-white hover:bg-gray-700"
                 key={notification.id}
-                onClick={() => handleNotificationClick(notification.patient_id)}
+                //onClick={() => handleNotificationClick(notification.patient_id)}
               >
                 <p>{notification.message}</p>
               </div>
