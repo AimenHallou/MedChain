@@ -7,6 +7,7 @@ contract PatientRegistry {
         string patient_id;
         uint256 createdDate;
         string[] history;
+        string[] txHashes;
     }
 
     mapping(string => Patient) public patients;
@@ -15,7 +16,8 @@ contract PatientRegistry {
         string patient_id,
         address indexed owner,
         uint256 createdDate,
-        string[] history
+        string[] history,
+        string[] txHashes
     );
 
     event AccessRequestAccepted(
@@ -45,7 +47,8 @@ contract PatientRegistry {
 
     function createPatient(
         string memory _patient_id,
-        string memory _historyEntry
+        string memory _historyEntry,
+        string memory _txHash
     ) public {
         require(
             bytes(patients[_patient_id].patient_id).length == 0,
@@ -57,15 +60,18 @@ contract PatientRegistry {
             owner: msg.sender,
             patient_id: _patient_id,
             createdDate: currentTime,
-            history: new string[](1)
+            history: new string[](1),
+            txHashes: new string[](1)
         });
         patients[_patient_id].history[0] = _historyEntry;
+        patients[_patient_id].txHashes[0] = _txHash;
 
         emit PatientCreated(
             _patient_id,
             msg.sender,
             currentTime,
-            patients[_patient_id].history
+            patients[_patient_id].history,
+            patients[_patient_id].txHashes
         );
     }
 
@@ -192,7 +198,7 @@ contract PatientRegistry {
 
     function getPatientHistory(
         string memory _patient_id
-    ) public view returns (string[] memory) {
-        return patients[_patient_id].history;
+    ) public view returns (string[] memory, string[] memory) {
+        return (patients[_patient_id].history, patients[_patient_id].txHashes);
     }
 }

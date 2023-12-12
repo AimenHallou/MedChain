@@ -13,7 +13,7 @@ const contractJSON = JSON.parse(
 );
 const abi = contractJSON.abi;
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 const config = require(`../config/${env}.js`);
 
 const contractAddress = config.patientRegistryContract;
@@ -716,14 +716,17 @@ router.post("/", async (req, res) => {
     accessRequests,
   } = req.body;
 
+  const txHash = "";
   try {
     const txReceipt = await contractInstance.methods
-      .createPatient(patient_id, history[0])
+      .createPatient(patient_id, history[0], txHash)
       .send({
         from: owner,
         gas: 3000000,
         gasPrice: "20000000000",
       });
+
+    history.push(`Transaction hash: ${txReceipt.transactionHash}`);
 
     db.run(
       "INSERT INTO patients(patient_id, owner, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?)",

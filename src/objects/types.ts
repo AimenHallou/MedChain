@@ -14,6 +14,7 @@ export interface Patient {
   sharedWith: { [address: string]: string[] };
   history: string[];
   accessRequests?: string[];
+  txHashes: string[];
 }
 
 export interface Dataset {
