@@ -1,6 +1,7 @@
 // src/tests/ipfsDataIntegrityTest.js
-const saveFilesToIPFS = require("../src/utils/saveToIPFS");
-const fetchFileFromIPFS = require("../src/utils/fetchAndDecryptFromIPFS");
+const { saveFilesToIPFS } = require('../src/utils/saveToIPFS.js');
+const { fetchAndDecryptFromIPFS } = require('../src/utils/fetchAndDecryptFromIPFS.ts');
+
 const chai = require("chai");
 const expect = chai.expect;
 
@@ -15,7 +16,7 @@ describe("IPFS Data Integrity Test", function () {
     const savedFiles = await saveFilesToIPFS([fileToSave]);
     const savedFile = savedFiles[0];
 
-    const fetchedFileBase64 = await fetchFileFromIPFS(savedFile.ipfsCID);
+    const fetchedFileBase64 = await fetchAndDecryptFromIPFS(savedFile.ipfsCID);
 
     expect(fetchedFileBase64).to.equal(fileToSave.base64);
   });

@@ -1,15 +1,15 @@
 // src/utils/saveToIPFS.ts
-import { create } from 'ipfs-http-client';
-import crypto from 'crypto';
+import {create} from "ipfs-http-client";
+import crypto from "crypto";
 
-const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' });
+const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
-const algorithm = 'aes-256-cbc';
+const algorithm = "aes-256-cbc";
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 const config = require(`../../config/${env}.js`);
 
-const key = Buffer.from(config.AES_ENCRYPTION_KEY, 'hex');
+const key = Buffer.from(config.AES_ENCRYPTION_KEY, "hex");
 
 interface FileToSave {
   base64: string;
@@ -30,11 +30,13 @@ const encryptBuffer = (buffer: Buffer, iv: Buffer): Buffer => {
   return encrypted;
 };
 
-export const saveFilesToIPFS = async (files: FileToSave[]): Promise<SavedFileData[]> => {
+export const saveFilesToIPFS = async (
+  files: FileToSave[]
+): Promise<SavedFileData[]> => {
   let savedFiles: SavedFileData[] = [];
 
   for (const file of files) {
-    const fileBuffer = Buffer.from(file.base64, 'base64');
+    const fileBuffer = Buffer.from(file.base64, "base64");
     const fileIV = crypto.randomBytes(16);
     const encryptedBuffer = encryptBuffer(fileBuffer, fileIV);
     const dataWithIv = Buffer.concat([fileIV, encryptedBuffer]);
@@ -43,12 +45,9 @@ export const saveFilesToIPFS = async (files: FileToSave[]): Promise<SavedFileDat
       base64: file.base64,
       name: file.name,
       dataType: file.dataType,
-      ipfsCID: result.path
+      ipfsCID: result.path,
     });
-  }
-
-  
-
+  };
 
   return savedFiles;
 };

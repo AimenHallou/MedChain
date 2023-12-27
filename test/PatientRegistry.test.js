@@ -236,3 +236,34 @@ contract("PatientRegistry", (accounts) => {
     }
   });
 });
+
+it("only owner can accept access requests", async () => {
+  try {
+    await patientRegistry.acceptAccessRequest(patientId, requestor, [], { from: requestor });
+  } catch (e) {
+    assert(e.message.includes("Only the owner can accept access requests"));
+    return;
+  }
+  assert(false);
+});
+
+it("only owner can unshare the patient", async () => {
+  try {
+    await patientRegistry.unsharePatient(patientId, requestor, { from: requestor });
+  } catch (e) {
+    assert(e.message.includes("Only the owner can unshare the patient"));
+    return;
+  }
+  assert(false);
+});
+
+it("only owner or requestor can cancel the access request", async () => {
+  await patientRegistry.requestAccess(patientId, { from: requestor });
+  try {
+    await patientRegistry.cancelAccessRequest(patientId, requestor, { from: accounts[2] });
+  } catch (e) {
+    assert(e.message.includes("Only the owner or requestor can cancel the access request"));
+    return;
+  }
+  assert(false);
+});
