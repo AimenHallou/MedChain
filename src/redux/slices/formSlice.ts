@@ -14,6 +14,7 @@ const initialState: FormState = {
   base64Content: null,
   sharedWith: {},
   history: [],
+  txHashes: []
 };
 
 export const formSlice = createSlice({
