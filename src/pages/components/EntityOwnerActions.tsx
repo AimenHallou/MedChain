@@ -1,4 +1,3 @@
-// src/components/pages/EntityOwnerActions.tsx
 import React, { FC } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
@@ -36,17 +35,8 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   handleUpdateSharedFiles,
   entity,
 }) => {
-  let parsedSharedWith: string[] = [];
-  try {
-    if (typeof sharedWith === "string") {
-      sharedWith = JSON.parse(sharedWith);
-    }
-    parsedSharedWith = Object.keys(sharedWith).filter(
-      (key) => key !== "undefined"
-    );
-  } catch (error) {
-    console.error("Failed to parse sharedWith:", error);
-  }
+  const parsedSharedWith =
+    sharedWith && typeof sharedWith === "object" ? Object.keys(sharedWith) : [];
 
   const renderSharedAddresses = () => {
     return parsedSharedWith.map((address, index) => {
@@ -121,15 +111,14 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
       <button
         className="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-b-lg focus:outline-none focus:shadow-outline w-full"
         onClick={() => {
-          if (selectedUser) {
-            handleShare(selectedUser);
-            setSelectedUser(null);
+          if (sharedAddress) {
+            handleShare(sharedAddress);
+            setSharedAddress("");
           }
         }}
       >
         Share Patient
       </button>
-      <div></div>
       <div className="py-2">{renderSharedAddresses()}</div>
     </div>
   );
