@@ -22,10 +22,10 @@ const EntityHeader: FC<EntityHeaderProps> = ({
     <div>
       <h2 className="text-2xl font-bold">{entityType}: {entityId}</h2>
       <p className="text-sm text-gray-400 mt-1">{healthcareType} at {organizationName}</p>
-      <p className="text-sm text-gray-400 mt-1">Owned by: {owner.substring(0, 20)}...</p>
+      <p className="text-sm text-gray-400 mt-1">Owned by: {owner ? `${owner.substring(0, 20)}...` : 'Unavailable'}</p>
     </div>
     <div className="mt-4 sm:mt-0">
-      <p className="text-sm text-gray-400">Created on: {createdDate.substring(0, 10)}</p>
+      <p className="text-sm text-gray-400">Created on: {createdDate ? createdDate.substring(0, 10) : 'Unavailable'}</p>
     </div>
   </div>
 );
