@@ -1,5 +1,5 @@
 // src/redux/slices/patientSlice.ts
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Patient, FileData } from "../../objects/types";
 
 const initialState: Patient[] = [];

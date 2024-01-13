@@ -11,7 +11,6 @@ import GenericHistory from "../components/GenericHistory";
 import RequestAccess from "../components/RequestAccess";
 import EntityOwnerActions from "../components/EntityOwnerActions";
 import { setFormContent } from "../../redux/slices/formSlice";
-import { create } from "ipfs-http-client";
 import { FileData } from "../../objects/types";
 import DataFileSection from "../components/DataFileSection";
 
@@ -33,7 +32,6 @@ import {
 const DatasetPage: FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
   const datasets = useSelector((state: RootState) => state.datasets);
   const dispatch = useAppDispatch();
@@ -332,42 +330,42 @@ const DatasetPage: FC = () => {
       for (const file of files) {
         const reader = new FileReader();
 
-        const result: Promise<FileData> = new Promise((resolve, reject) => {
-          reader.onloadend = async () => {
-            if (typeof reader.result === "string") {
-              const base64String = reader.result.split(",")[1];
+        // const result: Promise<FileData> = new Promise((resolve, reject) => {
+        //   reader.onloadend = async () => {
+        //     if (typeof reader.result === "string") {
+        //       const base64String = reader.result.split(",")[1];
 
-              const buffer = Buffer.from(base64String, "base64");
-              try {
-                const ipfsResult = await ipfs.add(buffer);
-                resolve({
-                  base64: "",
-                  name: file.name,
-                  dataType: "",
-                  ipfsCID: ipfsResult.path,
-                });
-              } catch (ipfsError) {
-                console.error("Error uploading to IPFS:", ipfsError);
-                reject(ipfsError);
-              }
-            } else {
-              reject(new Error("Unexpected result type from FileReader"));
-            }
-          };
-        });
+        //       const buffer = Buffer.from(base64String, "base64");
+        //       try {
+        //         const ipfsResult = await ipfs.add(buffer);
+        //         resolve({
+        //           base64: "",
+        //           name: file.name,
+        //           dataType: "",
+        //           ipfsCID: ipfsResult.path,
+        //         });
+        //       } catch (ipfsError) {
+        //         console.error("Error uploading to IPFS:", ipfsError);
+        //         reject(ipfsError);
+        //       }
+        //     } else {
+        //       reject(new Error("Unexpected result type from FileReader"));
+        //     }
+        //   };
+        // });
 
-        reader.readAsDataURL(file);
+        // reader.readAsDataURL(file);
 
-        const fileData = await result;
-        fileContents.push(fileData);
+        // const fileData = await result;
+        // fileContents.push(fileData);
 
-        dispatch(
-          addFileToDataset({
-            datasetId: dataset.dataset_id,
-            file: fileData,
-            owner: currentUserAddress || "",
-          })
-        );
+        // dispatch(
+        //   addFileToDataset({
+        //     datasetId: dataset.dataset_id,
+        //     file: fileData,
+        //     owner: currentUserAddress || "",
+        //   })
+        // );
       }
 
       const newFilesData = [...datasetData, ...fileContents];

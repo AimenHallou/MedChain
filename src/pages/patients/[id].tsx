@@ -26,7 +26,6 @@ import DataFileSection from "../components/DataFileSection";
 import EntityHeader from "../components/EntityHeader";
 import { addNotification } from "../../redux/slices/userSlice";
 import { setFormContent } from "../../redux/slices/formSlice";
-import { create } from "ipfs-http-client";
 import { fetchFileFromIPFS } from '../../utils/fetchAndDecryptFromIPFS';
 
 const PatientPage: FC = () => {
@@ -38,7 +37,6 @@ const PatientPage: FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const [patientData, setPatientData] = useState<any | null>(null);
-  const ipfs = create({ host: "localhost", port: 5001, protocol: "http" });
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -260,7 +258,6 @@ const PatientPage: FC = () => {
     }
   };
   
-
   const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
@@ -269,42 +266,42 @@ const PatientPage: FC = () => {
       for (const file of files) {
         const reader = new FileReader();
 
-        const result: Promise<FileData> = new Promise((resolve, reject) => {
-          reader.onloadend = async () => {
-            if (typeof reader.result === "string") {
-              const base64String = reader.result.split(",")[1];
+        // const result: Promise<FileData> = new Promise((resolve, reject) => {
+        //   reader.onloadend = async () => {
+        //     if (typeof reader.result === "string") {
+        //       const base64String = reader.result.split(",")[1];
 
-              const buffer = Buffer.from(base64String, "base64");
-              try {
-                const ipfsResult = await ipfs.add(buffer);
-                resolve({
-                  base64: "",
-                  name: file.name,
-                  dataType: "",
-                  ipfsCID: ipfsResult.path,
-                });
-              } catch (ipfsError) {
-                console.error("Error uploading to IPFS:", ipfsError);
-                reject(ipfsError);
-              }
-            } else {
-              reject(new Error("Unexpected result type from FileReader"));
-            }
-          };
-        });
+        //       const buffer = Buffer.from(base64String, "base64");
+        //       try {
+        //         const ipfsResult = await ipfs.add(buffer);
+        //         resolve({
+        //           base64: "",
+        //           name: file.name,
+        //           dataType: "",
+        //           ipfsCID: ipfsResult.path,
+        //         });
+        //       } catch (ipfsError) {
+        //         console.error("Error uploading to IPFS:", ipfsError);
+        //         reject(ipfsError);
+        //       }
+        //     } else {
+        //       reject(new Error("Unexpected result type from FileReader"));
+        //     }
+        //   };
+        // });
 
-        reader.readAsDataURL(file);
+        // reader.readAsDataURL(file);
 
-        const fileData = await result;
-        fileContents.push(fileData);
+        // const fileData = await result;
+        // fileContents.push(fileData);
 
-        dispatch(
-          addFile({
-            patientId: patient.patient_id,
-            file: fileData,
-            owner: currentUserAddress || "",
-          })
-        );
+        // dispatch(
+        //   addFile({
+        //     patientId: patient.patient_id,
+        //     file: fileData,
+        //     owner: currentUserAddress || "",
+        //   })
+        // );
       }
 
       const newFilesData = [...patientData, ...fileContents];
