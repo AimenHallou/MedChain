@@ -1,8 +1,6 @@
 // src/pages/Settings.tsx
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { saveSettings } from "../utils/config";
 import { Settings as SettingsType } from "../objects/settings";
 import Web3 from "web3";
@@ -12,10 +10,6 @@ import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
-
-const SettingsSchema = z.object({
-  storageMode: z.enum(["database", "blockchain"]),
-});
 
 export const SettingsPage: React.FC = () => {
   const [serverAddress, setServerAddress] = useState<string | null>(null);
@@ -33,7 +27,7 @@ export const SettingsPage: React.FC = () => {
 
   const [expandedStatus, setExpandedStatus] = useState("");
 
-  const toggleStatus = (statusName) => {
+  const toggleStatus = (statusName: string) => {
     setExpandedStatus(expandedStatus === statusName ? "" : statusName);
   };
 
@@ -135,7 +129,6 @@ export const SettingsPage: React.FC = () => {
   }, []);
 
   const form = useForm({
-    resolver: zodResolver(SettingsSchema),
     defaultValues: {
       storageMode: "database",
     },
