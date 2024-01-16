@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import NotificationDropdown from "./NotificationDropdown";
+import { MdSettings } from "react-icons/md";
 
 const Header: FC = () => {
   const { users, currentUserAddress } = useSelector(
@@ -29,6 +30,9 @@ const Header: FC = () => {
               ? `${currentUser.address.substring(0, 20)}...`
               : "Account"}
           </button>
+        </Link>
+        <Link className="flex items-center" href="/settings">
+          <MdSettings size={24}/>
         </Link>
       </div>
     </header>
