@@ -8,74 +8,32 @@ import { Settings as SettingsType } from "../objects/settings";
 import Web3 from "web3";
 import { LuRefreshCw } from "react-icons/lu";
 import { initializeHelia, getHeliaInstance } from "../utils/initHelia";
+import {
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
 
 const SettingsSchema = z.object({
   storageMode: z.enum(["database", "blockchain"]),
 });
 
-const checkServerStatus = async () => {
-  try {
-    const response = await fetch("http://localhost:3001/api/test");
-    if (response.ok) {
-      await response.json();
-      console.log("Server is running.");
-      return true;
-    }
-  } catch (error) {
-    console.error("Error pinging server:", error);
-    return false;
-  }
-};
-
-const checkDatabaseStatus = async () => {
-  try {
-    const response = await fetch("http://localhost:3001/api/checkDatabase");
-    if (response.ok) {
-      await response.json();
-      console.log("Database is running.");
-      return true;
-    }
-  } catch (error) {
-    console.error("Error pinging database:", error);
-    return false;
-  }
-};
-
-const checkBlockchainStatus = async () => {
-  try {
-    const web3 = new Web3("http://127.0.0.1:8545");
-    await web3.eth.getBlockNumber();
-    console.log("Blockchain is running.");
-    return true;
-  } catch (error) {
-    console.error("Error accessing the blockchain:", error);
-    return false;
-  }
-};
-
-const checkIPFSStatus = async () => {
-  try {
-    await initializeHelia();
-    const helia = getHeliaInstance();
-    if (!helia) {
-      throw new Error("Helia is not initialized.");
-    }
-    helia.stop();
-    console.log("IPFS is running.");
-    return true;
-  } catch (error) {
-    console.error("Error checking IPFS status:", error);
-    return false;
-  }
-};
-
 export const SettingsPage: React.FC = () => {
+  const [serverAddress, setServerAddress] = useState<string | null>(null);
+  const [databaseAddress, setDatabaseAddress] = useState<string | null>(null);
+  const [blockchainAddress, setBlockchainAddress] = useState<string | null>(null);
+
   const [systemStatus, setSystemStatus] = useState({
     server: false,
     database: false,
     blockchain: false,
     ipfs: false,
   });
+
+  const [expandedStatus, setExpandedStatus] = useState("");
+
+  const toggleStatus = (statusName) => {
+    setExpandedStatus(expandedStatus === statusName ? "" : statusName);
+  };
 
   const getSystemStatus = async () => {
     const serverStatus = await checkServerStatus();
@@ -89,6 +47,65 @@ export const SettingsPage: React.FC = () => {
       blockchain: blockchainStatus,
       ipfs: ipfsStatus,
     };
+  };
+
+  const checkServerStatus = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/api/test");
+      if (response.ok) {
+        await response.json();
+        console.log("Server is running.");
+        setServerAddress("http://localhost:3001");
+        return true;
+      }
+    } catch (error) {
+      console.error("Error pinging server:", error);
+      return false;
+    }
+  };
+
+  const checkDatabaseStatus = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/api/checkDatabase");
+      if (response.ok) {
+        await response.json();
+        console.log("Database is running.");
+        setDatabaseAddress("http://localhost:3001");
+        return true;
+      }
+    } catch (error) {
+      console.error("Error pinging database:", error);
+      return false;
+    }
+  };
+
+  const checkBlockchainStatus = async () => {
+    try {
+      const web3 = new Web3("http://127.0.0.1:8545");
+      await web3.eth.getBlockNumber();
+      console.log("Blockchain is running.");
+      setBlockchainAddress("http://127.0.0.1:8545");
+      return true;
+    } catch (error) {
+      console.error("Error accessing the blockchain:", error);
+      return false;
+    }
+  };
+
+  const checkIPFSStatus = async () => {
+    try {
+      await initializeHelia();
+      const helia = getHeliaInstance();
+      if (!helia) {
+        throw new Error("Helia is not initialized.");
+      }
+      helia.stop();
+      console.log("IPFS is running.");
+      return true;
+    } catch (error) {
+      console.error("Error checking IPFS status:", error);
+      return false;
+    }
   };
 
   const refreshSystemStatus = async () => {
@@ -126,16 +143,41 @@ export const SettingsPage: React.FC = () => {
     saveSettings(data);
   };
 
-  const StatusLine = ({ label, isRunning }) => (
-    <p>
-      <span className="font-medium">{label}:</span>{" "}
-      {isRunning ? (
-        <span className="text-green-500">Running</span>
-      ) : (
-        <span className="text-red-500">Stopped</span>
-      )}
-    </p>
-  );
+  const StatusLine = ({
+    label,
+    isRunning,
+    children,
+  }: {
+    label: string;
+    isRunning: boolean;
+    children?: React.ReactNode;
+  }) => {
+    const isExpanded = expandedStatus === label;
+
+    return (
+      <div className="flex flex-col">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => toggleStatus(label)}
+        >
+          {isExpanded ? (
+            <MdOutlineKeyboardArrowUp size={24} className="mr-2" />
+          ) : (
+            <MdOutlineKeyboardArrowDown size={24} className="mr-2" />
+          )}
+          <span className="font-medium">{label}:</span>{" "}
+          {isRunning ? (
+            <span className="text-green-500">Running</span>
+          ) : (
+            <span className="text-red-500">Stopped</span>
+          )}
+        </div>
+        {isExpanded && (
+          <div className="pl-8 pt-2 text-sm text-gray-300">{children}</div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col justify-center items-center mt-10">
@@ -150,9 +192,33 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-lg mb-6">
-          <StatusLine label="Server" isRunning={systemStatus.server} />
-          <StatusLine label="Database" isRunning={systemStatus.database} />
-          <StatusLine label="Blockchain" isRunning={systemStatus.blockchain} />
+          <StatusLine label="Server" isRunning={systemStatus.server}>
+            {systemStatus.server ? (
+              <>
+                <p>Server Address: {serverAddress}</p>
+              </>
+            ) : (
+              <p>Server is not running.</p>
+            )}
+          </StatusLine>
+          <StatusLine label="Database" isRunning={systemStatus.database}>
+            {systemStatus.database ? (
+              <>
+                <p>Database Address: {databaseAddress}</p>
+              </>
+            ) : (
+              <p>Database is not running.</p>
+            )}
+          </StatusLine>
+          <StatusLine label="Blockchain" isRunning={systemStatus.blockchain}>
+            {systemStatus.blockchain ? (
+              <>
+                <p>Blockchain Address: {blockchainAddress}</p>
+              </>
+            ) : (
+              <p>Blockchain is not running.</p>
+            )}
+          </StatusLine>
           <StatusLine label="IPFS" isRunning={systemStatus.ipfs} />
         </div>
 
