@@ -24,11 +24,12 @@ const PublishForm: FC = () => {
     (state: RootState) => state.user
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
-  const storageMode = getSetting("storageMode");
+  const [storageMode, setStorageMode] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storageMode = getSetting("storageMode");
+      const mode = getSetting("storageMode");
+      setStorageMode(mode);
     }
   }, []);
 
