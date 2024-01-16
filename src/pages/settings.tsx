@@ -1,21 +1,124 @@
 // src/pages/Settings.tsx
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { saveSettings } from '../utils/config';
-import { Settings as SettingsType } from '../objects/settings';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { saveSettings } from "../utils/config";
+import { Settings as SettingsType } from "../objects/settings";
+import Web3 from "web3";
+import { LuRefreshCw } from "react-icons/lu";
+import { initializeHelia, getHeliaInstance } from "../utils/initHelia";
 
-// Define the schema for form data using Zod
 const SettingsSchema = z.object({
-  storageMode: z.enum(['database', 'blockchain']),
+  storageMode: z.enum(["database", "blockchain"]),
 });
 
+const checkServerStatus = async () => {
+  try {
+    const response = await fetch("http://localhost:3001/api/test");
+    if (response.ok) {
+      await response.json();
+      console.log("Server is running.");
+      return true;
+    }
+  } catch (error) {
+    console.error("Error pinging server:", error);
+    return false;
+  }
+};
+
+const checkDatabaseStatus = async () => {
+  try {
+    const response = await fetch("http://localhost:3001/api/checkDatabase");
+    if (response.ok) {
+      await response.json();
+      console.log("Database is running.");
+      return true;
+    }
+  } catch (error) {
+    console.error("Error pinging database:", error);
+    return false;
+  }
+};
+
+const checkBlockchainStatus = async () => {
+  try {
+    const web3 = new Web3("http://127.0.0.1:8545");
+    await web3.eth.getBlockNumber();
+    console.log("Blockchain is running.");
+    return true;
+  } catch (error) {
+    console.error("Error accessing the blockchain:", error);
+    return false;
+  }
+};
+
+const checkIPFSStatus = async () => {
+  try {
+    await initializeHelia();
+    const helia = getHeliaInstance();
+    if (!helia) {
+      throw new Error("Helia is not initialized.");
+    }
+    helia.stop();
+    console.log("IPFS is running.");
+    return true;
+  } catch (error) {
+    console.error("Error checking IPFS status:", error);
+    return false;
+  }
+};
+
 export const SettingsPage: React.FC = () => {
+  const [systemStatus, setSystemStatus] = useState({
+    server: false,
+    database: false,
+    blockchain: false,
+    ipfs: false,
+  });
+
+  const getSystemStatus = async () => {
+    const serverStatus = await checkServerStatus();
+    const databaseStatus = await checkDatabaseStatus();
+    const blockchainStatus = await checkBlockchainStatus();
+    const ipfsStatus = await checkIPFSStatus();
+
+    return {
+      server: serverStatus,
+      database: databaseStatus,
+      blockchain: blockchainStatus,
+      ipfs: ipfsStatus,
+    };
+  };
+
+  const refreshSystemStatus = async () => {
+    const status = await getSystemStatus();
+    setSystemStatus({
+      server: status.server || false,
+      database: status.database || false,
+      blockchain: status.blockchain || false,
+      ipfs: status.ipfs || false,
+    });
+  };
+
+  useEffect(() => {
+    const fetchSystemStatus = async () => {
+      const status = await getSystemStatus();
+      setSystemStatus({
+        server: status.server || false,
+        database: status.database || false,
+        blockchain: status.blockchain || false,
+        ipfs: status.ipfs || false,
+      });
+    };
+
+    fetchSystemStatus();
+  }, []);
+
   const form = useForm({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
-      storageMode: 'database',
+      storageMode: "database",
     },
   });
 
@@ -23,37 +126,64 @@ export const SettingsPage: React.FC = () => {
     saveSettings(data);
   };
 
+  const StatusLine = ({ label, isRunning }) => (
+    <p>
+      <span className="font-medium">{label}:</span>{" "}
+      {isRunning ? (
+        <span className="text-green-500">Running</span>
+      ) : (
+        <span className="text-red-500">Stopped</span>
+      )}
+    </p>
+  );
+
   return (
-    <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
-      <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <div className="flex flex-col justify-center items-center mt-10">
+      <div className="bg-gray-800 p-6 rounded-lg text-white w-full max-w-2xl border border-gray-600 shadow-xl">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">System Status</h2>
+          <LuRefreshCw
+            className="text-lg cursor-pointer hover:text-gray-400"
+            onClick={refreshSystemStatus}
+            size={24}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-lg mb-6">
+          <StatusLine label="Server" isRunning={systemStatus.server} />
+          <StatusLine label="Database" isRunning={systemStatus.database} />
+          <StatusLine label="Blockchain" isRunning={systemStatus.blockchain} />
+          <StatusLine label="IPFS" isRunning={systemStatus.ipfs} />
+        </div>
+
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <span className="text-lg font-semibold">Storage Mode:</span>
-            <div className="mt-2">
-              <label className="flex items-center mt-2">
+            <span className="text-xl font-semibold">Storage Mode:</span>
+            <div className="mt-3">
+              <label className="flex items-center mt-3">
                 <input
                   type="radio"
                   value="database"
-                  {...form.register('storageMode')}
-                  className="form-radio h-5 w-5 text-blue-500 border-gray-300"
+                  {...form.register("storageMode")}
+                  className="form-radio h-5 w-5 text-blue-600"
                 />
-                <span className="ml-2 text-md">Database Only</span>
+                <span className="ml-3 text-md">Database Only</span>
               </label>
-              <label className="flex items-center mt-2">
+              <label className="flex items-center mt-3">
                 <input
                   type="radio"
                   value="blockchain"
-                  {...form.register('storageMode')}
-                  className="form-radio h-5 w-5 text-blue-500 border-gray-300"
+                  {...form.register("storageMode")}
+                  className="form-radio h-5 w-5 text-blue-600"
                 />
-                <span className="ml-2 text-md">Blockchain/IPFS</span>
+                <span className="ml-3 text-md">Blockchain/IPFS</span>
               </label>
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-300"
           >
             Save
           </button>

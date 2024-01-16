@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const port = 3001;
 const { initializeHelia } = require('./src/utils/initHelia');
+const db = require('./db/database');
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
@@ -20,6 +21,18 @@ app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/datasets', datasetRoutes);
 app.use('/api/blockchain', blockchainRoutes);
+
+// Check if the database is operational
+app.get('/api/checkDatabase', (req, res) => {
+  db.get("SELECT name FROM sqlite_master WHERE type='table';", (err, row) => {
+    if (err) {
+      console.error('Error checking database:', err);
+      res.status(500).json({ message: 'Database check failed', error: err.message });
+    } else {
+      res.json({ message: 'Database is operational', table: row ? row.name : 'No tables found' });
+    }
+  });
+});
 
 let heliaInstance;
 
