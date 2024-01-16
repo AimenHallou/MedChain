@@ -20,7 +20,9 @@ const SettingsSchema = z.object({
 export const SettingsPage: React.FC = () => {
   const [serverAddress, setServerAddress] = useState<string | null>(null);
   const [databaseAddress, setDatabaseAddress] = useState<string | null>(null);
-  const [blockchainAddress, setBlockchainAddress] = useState<string | null>(null);
+  const [blockchainAddress, setBlockchainAddress] = useState<string | null>(
+    null
+  );
 
   const [systemStatus, setSystemStatus] = useState({
     server: false,
@@ -189,9 +191,8 @@ export const SettingsPage: React.FC = () => {
             onClick={refreshSystemStatus}
             size={24}
           />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-lg mb-6">
+        </div>{" "}
+        <div className="grid grid-cols-2 gap-4 text-lg mt-4">
           <StatusLine label="Server" isRunning={systemStatus.server}>
             {systemStatus.server ? (
               <>
@@ -221,7 +222,9 @@ export const SettingsPage: React.FC = () => {
           </StatusLine>
           <StatusLine label="IPFS" isRunning={systemStatus.ipfs} />
         </div>
+      </div>
 
+      <div className="bg-gray-800 p-6 rounded-lg text-white w-full max-w-2xl border border-gray-600 shadow-xl mt-4">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <span className="text-xl font-semibold">Storage Mode:</span>
