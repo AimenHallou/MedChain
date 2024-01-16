@@ -14,8 +14,8 @@ import PublisherFilter from "./PublisherFilter";
 
 const PatientList: FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const patients = useSelector((state: RootState) => state.patients);
-  const datasets = useSelector((state: RootState) => state.datasets);
+  const patients = useSelector((state: RootState) => state.patients) || {};
+  const datasets = useSelector((state: RootState) => state.datasets) || {};
   const users = useSelector((state: RootState) => state.user.users);
   const [view, setView] = useState<"patients" | "datasets">("patients");
 

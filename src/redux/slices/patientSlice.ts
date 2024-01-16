@@ -286,7 +286,7 @@ export const patientSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPatients.fulfilled, (state, action) => {
-        return action.payload;
+        return Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(createPatient.fulfilled, (state, action) => {
         state.push(action.payload);
