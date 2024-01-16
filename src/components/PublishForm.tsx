@@ -1,5 +1,5 @@
 // src/components/PublishForm.tsx
-import React, { FC, FormEvent, useState } from "react";
+import React, { FC, FormEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../redux/store";
 import { useRouter } from "next/router";
@@ -25,6 +25,12 @@ const PublishForm: FC = () => {
   );
   const currentUser = users.find((user) => user.address === currentUserAddress);
   const storageMode = getSetting("storageMode");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storageMode = getSetting("storageMode");
+    }
+  }, []);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
