@@ -15,13 +15,8 @@ import developmentConfig from "../../../../../config/development";
 import productionConfig from "../../../../../config/production";
 import { getSetting } from "../../../../utils/config";
 
-let config;
-
-if (process.env.NODE_ENV === "production") {
-  config = productionConfig;
-} else {
-  config = developmentConfig;
-}
+let config =
+  process.env.NODE_ENV === "production" ? productionConfig : developmentConfig;
 const contractAddress = config.patientRegistryContract;
 const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
@@ -60,20 +55,48 @@ function handleUnsharePatient(
       history.unshift(
         `Patient unshared with ${address} on ${new Date().toISOString()}`
       );
+
       try {
         if (storageMode === "blockchain") {
           await contractInstance.methods
             .unsharePatient(patient_id, address)
-            .send({
-              from: address,
-              gas: 3000000,
-              gasPrice: "20000000000",
-            });
+            .send({ from: address, gas: 3000000, gasPrice: "20000000000" });
         }
       } catch (error) {
-        console.error("Error interacting with the contract", error);
         return res.status(500).send("Error interacting with blockchain");
       }
+
+      db.run(
+        `UPDATE patients SET accessRequests = ?, sharedWith = ?, history = ? WHERE patient_id = ?`,
+        [
+          JSON.stringify(accessRequests),
+          JSON.stringify(sharedWith),
+          JSON.stringify(history),
+          patient_id,
+        ],
+        function (err) {
+          if (err) {
+            return res.status(500).json({
+              error: "An error occurred while updating the database.",
+              details: err.message,
+            });
+          }
+
+          db.get(
+            "SELECT * FROM patients WHERE patient_id = ?",
+            [patient_id],
+            (err, updatedRow) => {
+              if (err) {
+                return res.status(500).json({
+                  error: "Failed to fetch updated patient data",
+                  details: err.message,
+                });
+              }
+              res.json(updatedRow);
+            }
+          );
+        }
+      );
     }
   );
 }

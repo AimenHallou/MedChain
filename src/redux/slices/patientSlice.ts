@@ -109,7 +109,8 @@ export const unsharePatient = createAsyncThunk(
     if (!response.ok) {
       throw new Error("Failed to unshare patient");
     }
-    return payload;
+    const data = await response.json();
+    return data;
   }
 );
 
@@ -128,10 +129,10 @@ export const requestAccess = createAsyncThunk(
         }),
       }
     );
-    const data = await response.json();
     if (!response.ok) {
       throw new Error("Failed to request access");
     }
+    const data = await response.json();
     return data;
   }
 );
@@ -156,7 +157,8 @@ export const acceptAccessRequest = createAsyncThunk(
     if (!response.ok) {
       throw new Error("Failed to accept access request");
     }
-    return payload;
+    const updatedPatient = await response.json();
+    return updatedPatient;
   }
 );
 

@@ -174,17 +174,6 @@ const PatientPage: FC = () => {
       .then((updatedPatient) => {
         setPatientData(updatedPatient);
       });
-    dispatch(
-      addNotification({
-        address: requestor,
-        notification: {
-          id: uuid(),
-          read: false,
-          message: `Your access request to patient ${patient.patient_id} has been accepted`,
-          patient_id: patient.patient_id,
-        },
-      })
-    );
   };
 
   const handleRejectRequest = (requestor: string) => {
@@ -195,17 +184,6 @@ const PatientPage: FC = () => {
       .then((updatedPatient) => {
         setPatientData(updatedPatient);
       });
-    dispatch(
-      addNotification({
-        address: requestor,
-        notification: {
-          id: uuid(),
-          read: false,
-          message: `Your access request to patient ${patient.patient_id} has been rejected`,
-          patient_id: patient.patient_id,
-        },
-      })
-    );
   };
 
   const handleUpdateSharedFiles = (address: string, files: string[]) => {
