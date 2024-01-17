@@ -1,12 +1,21 @@
 // src/utils/saveToIPFS.ts
 import { unixfs } from "@helia/unixfs";
 import crypto from "crypto";
-import { getHeliaInstance, initializeHelia } from './initHelia.js';
-import { fetchFileFromIPFS } from "./fetchAndDecryptFromIPFS"; 
+import { getHeliaInstance, initializeHelia } from "./initHelia.js";
+import { fetchFileFromIPFS } from "./fetchAndDecryptFromIPFS";
+import developmentConfig from "../../config/development";
+import productionConfig from "../../config/production";
 
 const algorithm = "aes-256-cbc";
-const env = process.env.NODE_ENV || "development";
-const config = require(`../../config/${env}.js`);
+
+let config;
+
+if (process.env.NODE_ENV === "production") {
+  config = productionConfig;
+} else {
+  config = developmentConfig;
+}
+
 const key = Buffer.from(config.AES_ENCRYPTION_KEY, "hex");
 
 interface FileToSave {
@@ -68,7 +77,6 @@ export const saveFilesToIPFS = async (
       //   text += decoder.decode(chunk, { stream: true });
       // }
       // console.log(`Successfully fetched file ${file.name} from IPFS:`, text);
-
     } catch (error) {
       console.error(`Failed to save file ${file.name} to IPFS:`, error);
     }

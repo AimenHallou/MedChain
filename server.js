@@ -7,8 +7,8 @@ const { initializeHelia } = require('./src/utils/initHelia');
 const db = require('./db/database');
 
 // Import routes
-const userRoutes = require('./routes/userRoutes');
-const patientRoutes = require('./routes/patientRoutes');
+// const userRoutes = require('./routes/userRoutes');
+// const patientRoutes = require('./routes/patientRoutes');
 const datasetRoutes = require('./routes/datasetRoutes');
 const blockchainRoutes = require('./routes/blockchainRoutes');
 
@@ -17,7 +17,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(cors({ origin: "http://localhost:3000" }));
 
 // Use Routes
-app.use('/api/users', userRoutes);
+// app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/datasets', datasetRoutes);
 app.use('/api/blockchain', blockchainRoutes);

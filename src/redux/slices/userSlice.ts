@@ -2,8 +2,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { UsersState, UserNotification, User } from "../../objects/types";
 
-const API_ENDPOINT = "http://localhost:3001";
-
 const initialState: UsersState = {
   users: [],
   currentUserAddress: null,
@@ -13,10 +11,10 @@ const initialState: UsersState = {
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const response = await fetch("/api/users");
   const users = await response.json();
-  users.forEach((user) => {
-    user.notifications = JSON.parse(user.notifications);
-  });
-  return users;
+  return users.map((user) => ({
+    ...user,
+    notifications: JSON.parse(user.notifications || "[]"),
+  }));
 });
 
 // Async thunk for adding a new user
@@ -30,32 +28,27 @@ export const createUser = createAsyncThunk(
       },
       body: JSON.stringify(user),
     });
-    const userData = await response.json();
-    return userData;
+    return await response.json();
   }
 );
 
+// Async thunk for reading notifications
 export const readNotifications = createAsyncThunk(
   "users/readNotifications",
   async (payload: { address: string }) => {
-    console.log("we in read notification");
-    const response = await fetch(
-      `${API_ENDPOINT}/api/users/${payload.address}/readNotifications`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    const updatedNotifications = await response.json();
-    if (!response.ok || !Array.isArray(updatedNotifications)) {
+    const response = await fetch(`/api/users/${payload.address}/readNotifications`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
       throw new Error("Failed to read notifications");
     }
-    return { address: payload.address, notifications: updatedNotifications };
+    return { address: payload.address, notifications: await response.json() };
   }
 );
+
 
 export const userSlice = createSlice({
   name: "user",
@@ -71,28 +64,19 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ address: string; notification: UserNotification }>
     ) => {
-      const user = state.users.find(
-        (user) => user.address === action.payload.address
-      );
+      const user = state.users.find((u) => u.address === action.payload.address);
       if (user) {
-        user.notifications.push({
-          ...action.payload.notification,
-          patient_id: action.payload.notification.patient_id,
-          accepted: action.payload.notification.accepted || false,
-          rejected: action.payload.notification.rejected || false,
-        });
+        user.notifications.push(action.payload.notification);
       }
     },
     removeNotification: (
       state,
       action: PayloadAction<{ address: string; notificationId: string }>
     ) => {
-      const user = state.users.find(
-        (user) => user.address === action.payload.address
-      );
+      const user = state.users.find((u) => u.address === action.payload.address);
       if (user) {
         user.notifications = user.notifications.filter(
-          (notification) => notification.id !== action.payload.notificationId
+          (notif) => notif.id !== action.payload.notificationId
         );
       }
     },
@@ -100,12 +84,10 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ address: string; notificationId: string }>
     ) => {
-      const user = state.users.find(
-        (user) => user.address === action.payload.address
-      );
+      const user = state.users.find((u) => u.address === action.payload.address);
       if (user) {
         const notification = user.notifications.find(
-          (notification) => notification.id === action.payload.notificationId
+          (notif) => notif.id === action.payload.notificationId
         );
         if (notification) {
           notification.read = true;
@@ -120,12 +102,9 @@ export const userSlice = createSlice({
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.users.push(action.payload);
-        console.log("State after user has been added:", state);
       })
       .addCase(readNotifications.fulfilled, (state, action) => {
-        const user = state.users.find(
-          (user) => user.address === action.payload.address
-        );
+        const user = state.users.find((u) => u.address === action.payload.address);
         if (user) {
           user.notifications = action.payload.notifications;
         }

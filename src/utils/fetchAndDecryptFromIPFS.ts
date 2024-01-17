@@ -1,15 +1,22 @@
 // src/utils/fetchAndDecryptFromIPFS.ts
-import crypto from 'crypto';
-import { CID } from 'multiformats/cid';
-import { getHeliaInstance, initializeHelia } from './initHelia.js';
-import { unixfs } from '@helia/unixfs';
+import crypto from "crypto";
+import { CID } from "multiformats/cid";
+import { getHeliaInstance, initializeHelia } from "./initHelia.js";
+import { unixfs } from "@helia/unixfs";
+import productionConfig from "../../config/production";
+import developmentConfig from "../../config/development";
 
-const algorithm = 'aes-256-cbc';
-const env = process.env.NODE_ENV || 'development';
-const config = require(`../../config/${env}.js`);
+const algorithm = "aes-256-cbc";
 
+let config;
+
+if (process.env.NODE_ENV === "production") {
+  config = productionConfig;
+} else {
+  config = developmentConfig;
+}
 const AES_ENCRYPTION_KEY = config.AES_ENCRYPTION_KEY;
-const key = Buffer.from(AES_ENCRYPTION_KEY, 'hex');
+const key = Buffer.from(AES_ENCRYPTION_KEY, "hex");
 
 export const fetchFileFromIPFS = async (cidString: string): Promise<string> => {
   await initializeHelia();
@@ -19,7 +26,7 @@ export const fetchFileFromIPFS = async (cidString: string): Promise<string> => {
   }
   let heliaFs = unixfs(helia);
 
-  try { 
+  try {
     let data: Buffer[] = [];
     const cid = CID.parse(cidString);
     for await (const chunk of heliaFs.cat(cid)) {
@@ -29,7 +36,10 @@ export const fetchFileFromIPFS = async (cidString: string): Promise<string> => {
     await helia.stop();
     return decryptBuffer(buffer);
   } catch (error) {
-    console.error(`Failed to fetch file from Helia with CID ${cidString}:`, error);
+    console.error(
+      `Failed to fetch file from Helia with CID ${cidString}:`,
+      error
+    );
     throw new Error(`Failed to fetch file from Helia: ${error}`);
   }
 };
@@ -43,7 +53,10 @@ const decryptBuffer = (buffer: Buffer): string => {
   const encryptedData = buffer.slice(16);
 
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
-  let decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()]);
-  
+  let decrypted = Buffer.concat([
+    decipher.update(encryptedData),
+    decipher.final(),
+  ]);
+
   return decrypted.toString();
 };

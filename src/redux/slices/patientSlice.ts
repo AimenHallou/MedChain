@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Patient, FileData } from "../../objects/types";
 
 const initialState: Patient[] = [];
-const API_ENDPOINT = "http://localhost:3001";
 
 export const fetchPatients = createAsyncThunk(
   "patients/fetchPatients",
@@ -45,7 +44,7 @@ export const deletePatient = createAsyncThunk(
 export const fetchSinglePatient = createAsyncThunk(
   "patients/fetchSinglePatient",
   async (patient_id: string) => {
-    const response = await fetch(`${API_ENDPOINT}/api/patients/${patient_id}`);
+    const response = await fetch(`/api/patients/${patient_id}`);
     const patient = await response.json();
     return patient;
   }
@@ -75,7 +74,7 @@ export const sharePatient = createAsyncThunk(
   "patients/sharePatient",
   async (payload: { patientId: string; address: string; files: string[] }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
+      `/api/patients/${payload.patientId}/accept-request`,
       {
         method: "PUT",
         headers: {
@@ -97,18 +96,15 @@ export const sharePatient = createAsyncThunk(
 export const unsharePatient = createAsyncThunk(
   "patients/unsharePatient",
   async (payload: { patientId: string; address: string }) => {
-    const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/unshare`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: payload.address,
-        }),
-      }
-    );
+    const response = await fetch(`/api/patients/${payload.patientId}/unshare`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: payload.address,
+      }),
+    });
     if (!response.ok) {
       throw new Error("Failed to unshare patient");
     }
@@ -124,7 +120,7 @@ export const requestAccess = createAsyncThunk(
       payload
     );
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patient_id}/request`,
+      `/api/patients/${payload.patient_id}/request`,
       {
         method: "PUT",
         headers: {
@@ -155,7 +151,7 @@ export const acceptAccessRequest = createAsyncThunk(
     files: string[];
   }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/accept-request`,
+      `/api/patients/${payload.patientId}/accept-request`,
       {
         method: "PUT",
         headers: {
@@ -175,7 +171,7 @@ export const rejectAccessRequest = createAsyncThunk(
   "patients/rejectAccessRequest",
   async (payload: { patientId: string; requestor: string }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/cancel-request`,
+      `/api/patients/${payload.patientId}/cancel-request`,
       {
         method: "PUT",
         headers: {
@@ -195,7 +191,7 @@ export const cancelRequest = createAsyncThunk(
   "patients/cancelRequest",
   async (payload: { patient_id: string; requestor: string }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patient_id}/cancel-request`,
+      `/api/patients/${payload.patient_id}/cancel-request`,
       {
         method: "PUT",
         headers: {
@@ -215,7 +211,7 @@ export const removeFile = createAsyncThunk(
   "patients/removeFile",
   async (payload: { patientId: string; fileName: string }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/remove-file`,
+      `/api/patients/${payload.patientId}/remove-file`,
       {
         method: "PUT",
         headers: {
@@ -237,7 +233,7 @@ export const updateSharedFiles = createAsyncThunk(
   "patients/updateSharedFiles",
   async (payload: { patientId: string; address: string; files: string[] }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/update-shared`,
+      `/api/patients/${payload.patientId}/update-shared`,
       {
         method: "PUT",
         headers: {
@@ -260,7 +256,7 @@ export const addFile = createAsyncThunk(
   "patients/addFile",
   async (payload: { patientId: string; file: FileData; owner: string }) => {
     const response = await fetch(
-      `${API_ENDPOINT}/api/patients/${payload.patientId}/add-file`,
+      `/api/patients/${payload.patientId}/add-file`,
       {
         method: "PUT",
         headers: {
