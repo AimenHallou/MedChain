@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../../db/database";
 
 function fetchPatient(patient_id: string, res: NextApiResponse) {
-  db.get(
+   db.get(
     "SELECT * FROM patients WHERE patient_id = ?",
     [patient_id],
     (err, row) => {

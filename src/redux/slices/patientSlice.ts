@@ -46,6 +46,7 @@ export const fetchSinglePatient = createAsyncThunk(
   async (patient_id: string) => {
     const response = await fetch(`/api/patients/${patient_id}`);
     const patient = await response.json();
+    console.log("patient:", patient);
     return patient;
   }
 );
@@ -115,10 +116,6 @@ export const unsharePatient = createAsyncThunk(
 export const requestAccess = createAsyncThunk(
   "patients/requestAccess",
   async (payload: { patient_id: string; requestor: string }) => {
-    console.log(
-      "Redux Action: requestAccess dispatched with payload:",
-      payload
-    );
     const response = await fetch(
       `/api/patients/${payload.patient_id}/request`,
       {
@@ -190,6 +187,7 @@ export const rejectAccessRequest = createAsyncThunk(
 export const cancelRequest = createAsyncThunk(
   "patients/cancelRequest",
   async (payload: { patient_id: string; requestor: string }) => {
+    console.log("Redux Action: cancelRequest received payload:", payload);
     const response = await fetch(
       `/api/patients/${payload.patient_id}/cancel-request`,
       {
@@ -417,31 +415,20 @@ export const patientSlice = createSlice({
       })
       .addCase(cancelRequest.fulfilled, (state, action) => {
         const { patient_id, requestor } = action.payload;
-        const patient = state.find(
-          (patient) => patient.patient_id === patient_id
-        );
+        const patient = state.find((p) => p.patient_id === patient_id);
         if (patient) {
-          if (typeof patient.accessRequests === "string") {
-            patient.accessRequests = JSON.parse(patient.accessRequests);
-          }
+          patient.accessRequests = Array.isArray(patient.accessRequests)
+            ? patient.accessRequests.filter((req) => req !== requestor)
+            : [];
 
-          if (!Array.isArray(patient.accessRequests)) {
-            console.error(
-              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. After parsing, it's currently: `,
-              patient.accessRequests
-            );
-            patient.accessRequests = [];
-          }
-          patient.accessRequests = patient.accessRequests.filter(
-            (req) => req !== requestor
-          );
-
-          if (!Array.isArray(patient.history)) {
-            patient.history = [];
-          }
-          patient.history.push(
-            `Access request cancelled by ${requestor} on ${new Date().toISOString()}`
-          );
+          patient.history = Array.isArray(patient.history)
+            ? [
+                ...patient.history,
+                `Access request cancelled by ${requestor} on ${new Date().toISOString()}`,
+              ]
+            : [
+                `Access request cancelled by ${requestor} on ${new Date().toISOString()}`,
+              ];
         }
       })
       .addCase(acceptAccessRequest.fulfilled, (state, action) => {

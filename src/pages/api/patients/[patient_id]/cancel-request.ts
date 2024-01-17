@@ -44,15 +44,21 @@ async function handleCancelRequest(
           .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
-      let accessRequests = row.accessRequests || "";
+      let accessRequests = Array.isArray(row.accessRequests)
+        ? row.accessRequests
+        : [];
+      accessRequests = accessRequests.filter(
+        (req: string) => req !== requestor
+      );
+
       let history = JSON.parse(row.history.toString());
       history.unshift(
         `Access request by ${requestor} cancelled on ${new Date().toISOString()}`
       );
 
       try {
-        if (storageMode === "blockchain"){
-            await contractInstance.methods
+        if (storageMode === "blockchain") {
+          await contractInstance.methods
             .cancelAccessRequest(patient_id, requestor)
             .send({
               from: requestor,
@@ -61,25 +67,24 @@ async function handleCancelRequest(
             });
         }
       } catch (error) {
-        console.error("Error interacting with the contract", error);
         return res
           .status(500)
           .json({ error: "Error interacting with blockchain" });
       }
+
       db.run(
         `UPDATE patients SET accessRequests = ?, history = ? WHERE patient_id = ?`,
         [JSON.stringify(accessRequests), JSON.stringify(history), patient_id],
         function (err) {
           if (err) {
             return res.status(500).json({
-              error:
-                "An error occurred while cancelling the access request in the database.",
+              error: "An error occurred while updating the database.",
               details: err.message,
             });
           }
-          console.log(
-            `${requestor} just unrequested access to patient ${patient_id}`
-          );
+          res.json({
+            message: `Access request cancelled for patient ${patient_id}`,
+          });
         }
       );
     }
@@ -87,16 +92,16 @@ async function handleCancelRequest(
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { patient_id } = req.query;
-  
-    if (typeof patient_id !== "string") {
-      return res.status(400).json({ error: "Invalid patient ID" });
-    }
-  
-    if (req.method === "PUT") {
-      handleCancelRequest(patient_id, req.body, res);
-    } else {
-      res.setHeader("Allow", ["PUT"]);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
+  const { patient_id } = req.query;
+
+  if (typeof patient_id !== "string") {
+    return res.status(400).json({ error: "Invalid patient ID" });
   }
+
+  if (req.method === "PUT") {
+    handleCancelRequest(patient_id, req.body, res);
+  } else {
+    res.setHeader("Allow", ["PUT"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}

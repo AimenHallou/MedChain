@@ -50,7 +50,6 @@ const PatientPage: FC = () => {
     null
   );
   const [selectedUsers, setSelectedUsers] = useState<string | null>(null);
-
   useEffect(() => {
     if (id) {
       dispatch(fetchSinglePatient(id as string))
@@ -135,23 +134,24 @@ const PatientPage: FC = () => {
           .then((updatedPatient) => {
             setPatientData(updatedPatient);
           });
-        dispatch(
-          addNotification({
-            address: patient.owner,
-            notification: {
-              id: uuid(),
-              read: false,
-              message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
-              patient_id: patient.patient_id,
-            },
-          })
-        );
+        // dispatch(
+        //   addNotification({
+        //     address: patient.owner,
+        //     notification: {
+        //       id: uuid(),
+        //       read: false,
+        //       message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
+        //       patient_id: patient.patient_id,
+        //     },
+        //   })
+        // );
       }
     }
   };
 
   const handleCancelRequest = () => {
     if (currentUserAddress) {
+      console.log("Cancel request")
       const requestPending = patient.accessRequests
         ? patient.accessRequests.includes(currentUserAddress)
         : false;
