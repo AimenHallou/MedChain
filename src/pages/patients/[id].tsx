@@ -14,19 +14,19 @@ import {
   updateSharedFiles,
   fetchSinglePatient,
   removeFile,
-  addFile
+  addFile,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 import { FileData } from "../../objects/types";
 
 import PatientOwnerActions from "../components/EntityOwnerActions";
-import GenericHistory from '../components/GenericHistory';
+import GenericHistory from "../components/GenericHistory";
 import RequestAccess from "../components/RequestAccess";
 import DataFileSection from "../components/DataFileSection";
 import EntityHeader from "../components/EntityHeader";
 import { addNotification } from "../../redux/slices/userSlice";
 import { setFormContent } from "../../redux/slices/formSlice";
-import { fetchFileFromIPFS } from '../../utils/fetchAndDecryptFromIPFS';
+import { fetchFileFromIPFS } from "../../utils/fetchAndDecryptFromIPFS";
 
 const PatientPage: FC = () => {
   const router = useRouter();
@@ -40,8 +40,8 @@ const PatientPage: FC = () => {
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
-  const [healthcareType, setHealthcareType] = useState<string>('');
-  const [organizationName, setOrganizationName] = useState<string>('');
+  const [healthcareType, setHealthcareType] = useState<string>("");
+  const [organizationName, setOrganizationName] = useState<string>("");
   const currentUserAddress = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
@@ -62,7 +62,9 @@ const PatientPage: FC = () => {
           if (typeof patientCopy.sharedWith === "string") {
             patientCopy.sharedWith = JSON.parse(patientCopy.sharedWith);
           }
-          const ownerUser = users.find(user => user.address === patient.owner);
+          const ownerUser = users.find(
+            (user) => user.address === patient.owner
+          );
           if (ownerUser) {
             setHealthcareType(ownerUser.healthcareType);
             setOrganizationName(ownerUser.organizationName);
@@ -127,31 +129,16 @@ const PatientPage: FC = () => {
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        )
-          .then(() => {
-            return dispatch(fetchSinglePatient(id as string)).unwrap();
-          })
-          .then((updatedPatient) => {
-            setPatientData(updatedPatient);
-          });
-        // dispatch(
-        //   addNotification({
-        //     address: patient.owner,
-        //     notification: {
-        //       id: uuid(),
-        //       read: false,
-        //       message: `${currentUserAddress} has requested access to patient ${patient.patient_id}`,
-        //       patient_id: patient.patient_id,
-        //     },
-        //   })
-        // );
+        ).then((action) => {
+          const updatedPatient = action.payload;
+          setPatientData(updatedPatient);
+        });
       }
     }
   };
 
   const handleCancelRequest = () => {
     if (currentUserAddress) {
-      console.log("Cancel request")
       const requestPending = patient.accessRequests
         ? patient.accessRequests.includes(currentUserAddress)
         : false;
@@ -242,13 +229,13 @@ const PatientPage: FC = () => {
   const handleFetchFile = async (cid: string): Promise<string> => {
     try {
       const decryptedFileBase64 = await fetchFileFromIPFS(cid);
-      return decryptedFileBase64; 
+      return decryptedFileBase64;
     } catch (error) {
       console.error("Error fetching and decrypting file:", error);
       return "";
     }
   };
-  
+
   const handleFileClick = async (file: FileData) => {
     if (file.ipfsCID) {
       const base64Content = await handleFetchFile(file.ipfsCID);
@@ -257,7 +244,7 @@ const PatientPage: FC = () => {
       }
     }
   };
-  
+
   const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);

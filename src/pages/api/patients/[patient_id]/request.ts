@@ -77,6 +77,21 @@ async function handleRequestAccess(
               details: err.message,
             });
           }
+          db.get(
+            "SELECT * FROM patients WHERE patient_id = ?",
+            [patient_id],
+            (err, updatedRow) => {
+              if (err) {
+                return res
+                  .status(500)
+                  .json({
+                    error: "Failed to fetch updated patient data",
+                    details: err.message,
+                  });
+              }
+              res.json(updatedRow);
+            }
+          );
         }
       );
     }

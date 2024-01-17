@@ -128,15 +128,11 @@ export const requestAccess = createAsyncThunk(
         }),
       }
     );
-    console.log(
-      "Redux Action: requestAccess received response:",
-      response.status,
-      await response.json()
-    );
+    const data = await response.json();
     if (!response.ok) {
       throw new Error("Failed to request access");
     }
-    return payload;
+    return data;
   }
 );
 
@@ -187,7 +183,6 @@ export const rejectAccessRequest = createAsyncThunk(
 export const cancelRequest = createAsyncThunk(
   "patients/cancelRequest",
   async (payload: { patient_id: string; requestor: string }) => {
-    console.log("Redux Action: cancelRequest received payload:", payload);
     const response = await fetch(
       `/api/patients/${payload.patient_id}/cancel-request`,
       {
@@ -392,25 +387,12 @@ export const patientSlice = createSlice({
         }
       })
       .addCase(requestAccess.fulfilled, (state, action) => {
-        const { patient_id, requestor } = action.payload;
-        const patient = state.find(
-          (patient) => patient.patient_id === patient_id
+        const updatedPatient = action.payload;
+        const patientIndex = state.findIndex(
+          (patient) => patient.patient_id === updatedPatient.patient_id
         );
-        if (patient) {
-          if (!Array.isArray(patient.accessRequests)) {
-            patient.accessRequests = [];
-          }
-          if (!patient.accessRequests.includes(requestor)) {
-            patient.accessRequests.push(requestor);
-          }
-
-          if (!Array.isArray(patient.history)) {
-            patient.history = [];
-          }
-
-          patient.history.push(
-            `Access requested by ${requestor} on ${new Date().toISOString()}`
-          );
+        if (patientIndex !== -1) {
+          state[patientIndex] = updatedPatient;
         }
       })
       .addCase(cancelRequest.fulfilled, (state, action) => {
