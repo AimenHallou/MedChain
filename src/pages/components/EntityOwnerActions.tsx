@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useMemo } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
 
@@ -35,6 +35,12 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   handleUpdateSharedFiles,
   entity,
 }) => {
+  sharedWith = useMemo(() => {
+    return JSON.parse(sharedWith.toString());
+  }, [sharedWith]);
+  const entitySharedWith = useMemo(() => {
+    return JSON.parse(entity.sharedWith.toString());
+  }, [entity.sharedWith]);
   useEffect(() => {
     console.log("sharedWith prop updated:", sharedWith);
   }, [sharedWith]);
@@ -44,7 +50,7 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
 
   const renderSharedAddresses = () => {
     return parsedSharedWith.map((address, index) => {
-      const currentFiles = entity.sharedWith[address] || [];
+      const currentFiles = entitySharedWith[address] || [];
       const hasChanges =
         JSON.stringify([...currentFiles].sort()) !==
         JSON.stringify([...selectedFiles].sort());
@@ -52,23 +58,21 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
       return (
         <div
           key={index}
-          className={`grid grid-cols-10 gap-2 items-center p-2 mb-1 rounded-md ${
+          className={`grid grid-cols-10 gap-2 items-center p-2 mb-1 rounded-md cursor-pointer ${
             selectedUser === address ? "bg-gray-900" : "bg-gray-800"
           }`}
+          onClick={() => {
+            if (selectedUser === address) {
+              setSelectedUser(null);
+              setSelectedFiles([]);
+            } else {
+              setSelectedUser(address);
+              const userFiles = entitySharedWith[address];
+              setSelectedFiles(userFiles || []);
+            }
+          }}
         >
-          <span
-            className="col-span-7 text-sm text-gray-200 cursor-pointer"
-            onClick={() => {
-              if (selectedUser === address) {
-                setSelectedUser(null);
-                setSelectedFiles([]);
-              } else {
-                setSelectedUser(address);
-                const userFiles = entity.sharedWith[address];
-                setSelectedFiles(userFiles || []);
-              }
-            }}
-          >
+          <span className="col-span-7 text-sm text-gray-200 select-none truncate">
             {address}
           </span>
           <MdUpdate

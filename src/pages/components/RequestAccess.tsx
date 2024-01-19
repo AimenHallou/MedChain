@@ -1,5 +1,5 @@
 // src/components/pages/RequestAccess.tsx
-import React, { FC, useState } from "react";
+import React, { FC, useMemo, useState } from "react";
 import { IoIosClose, IoIosCheckmark } from "react-icons/io";
 import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 
@@ -36,6 +36,9 @@ const RequestAccess: FC<RequestAccessProps> = ({
   setSelectedRequestor,
   selectedRequestor,
 }) => {
+  const accessRequestsParsed:string[] = useMemo(() => {
+    return JSON.parse(accessRequests.toString());
+  }, [accessRequests]);
   console.log("accessRequests:", accessRequests);
 
   return (
@@ -57,10 +60,10 @@ const RequestAccess: FC<RequestAccessProps> = ({
             </button>
           </div>
         )}
-      {currentUserAddress === ownerAddress && accessRequests.length > 0 && (
+      {currentUserAddress === ownerAddress && accessRequestsParsed.length > 0 && (
         <>
           <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
-          {accessRequests?.map((requestor) => {
+          {accessRequestsParsed.map((requestor) => {
             return (
               <div
                 key={`${itemId}-${requestor}`}
