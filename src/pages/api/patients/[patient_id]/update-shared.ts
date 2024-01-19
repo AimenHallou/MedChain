@@ -29,7 +29,7 @@ function handleUpdateSharedFiles(
       sharedWith[address] = files;
       let history = JSON.parse(row.history.toString() || "[]");
       history.unshift(
-        `Files updated for ${address} on ${new Date().toISOString()}`
+        {type: "updated", timestamp: new Date().toISOString(), address}
       );
 
       db.run(

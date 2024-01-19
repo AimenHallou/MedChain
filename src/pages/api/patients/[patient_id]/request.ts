@@ -46,7 +46,7 @@ async function handleRequestAccess(
       const owner = row.owner;
       let history = JSON.parse(row.history.toString());
       history.unshift(
-        `Access requested by ${requestor} on ${new Date().toISOString()}`
+        {type: "request", timestamp: new Date().toISOString(), requestor}
       );
 
       try {
@@ -82,12 +82,10 @@ async function handleRequestAccess(
             [patient_id],
             (err, updatedRow) => {
               if (err) {
-                return res
-                  .status(500)
-                  .json({
-                    error: "Failed to fetch updated patient data",
-                    details: err.message,
-                  });
+                return res.status(500).json({
+                  error: "Failed to fetch updated patient data",
+                  details: err.message,
+                });
               }
               res.json(updatedRow);
             }

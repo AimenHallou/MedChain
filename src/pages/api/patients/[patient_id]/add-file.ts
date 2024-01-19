@@ -35,7 +35,7 @@ function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
       let content = JSON.parse(row.content?.toString() || "[]");
       content.push(file);
       let history = JSON.parse(row.history.toString() || "[]");
-      history.unshift(`File added by ${file.name} on ${new Date().toISOString()}`);
+      history.unshift({type: "added", timestamp: new Date().toISOString()});
 
       db.run(
         `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,

@@ -62,7 +62,7 @@ async function handleAcceptRequest(
 
         let history = JSON.parse(row.history?.toString() || "[]");
         history.unshift(
-          `Access request by ${requestor} accepted on ${new Date().toISOString()}`
+          {type: "accepted", timestamp: new Date().toISOString(), requestor}
         );
 
         try {

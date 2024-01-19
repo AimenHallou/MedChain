@@ -52,7 +52,7 @@ export const fetchSinglePatient = createAsyncThunk(
 );
 
 export const transferOwnership = createAsyncThunk(
-  "patients/transferOwnership",
+  "patients/`transferOwnership`",
   async (payload: { patientId: string; newOwner: string }) => {
     const response = await fetch(
       `/api/patients/${payload.patientId}/transfer`,
@@ -310,7 +310,7 @@ export const patientSlice = createSlice({
         if (patient) {
           patient.owner = newOwner;
           patient.history.push(
-            `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`
+            {requestor: newOwner, type: "ownership", timestamp: new Date().toISOString()}
           );
         }
       })
@@ -325,7 +325,7 @@ export const patientSlice = createSlice({
           }
           patient.sharedWith[address] = files;
           patient.history.push(
-            `Shared with ${address} on ${new Date().toISOString()}`
+            {requestor: address, type: "shared", timestamp: new Date().toISOString()}
           );
         }
       })
@@ -337,7 +337,7 @@ export const patientSlice = createSlice({
         if (patient && patient.sharedWith && patient.sharedWith[address]) {
           delete patient.sharedWith[address];
           patient.history.push(
-            `Unshared with ${address} on ${new Date().toISOString()}`
+            {requestor: address, type: "unshared", timestamp: new Date().toISOString()}
           );
         }
       })
@@ -351,7 +351,7 @@ export const patientSlice = createSlice({
             (file) => file.name !== fileName
           );
           patient.history.push(
-            `File ${fileName} removed on ${new Date().toISOString()}`
+            {requestor: patient.owner, type: "removed", timestamp: new Date().toISOString()}
           );
         }
       })
@@ -374,7 +374,7 @@ export const patientSlice = createSlice({
             patient.history = [];
           }
           patient.history.push(
-            `Shared files updated for ${address} on ${new Date().toISOString()}`
+            {requestor: address, type: "updated", timestamp: new Date().toISOString()}
           );
         }
       })
@@ -392,7 +392,7 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
-          patient.history.push(`File added on ${new Date().toISOString()}`);
+          patient.history.push({requestor: patient.owner, type: "added", timestamp: new Date().toISOString()});
         }
       })
       .addCase(requestAccess.fulfilled, (state, action) => {
@@ -415,10 +415,10 @@ export const patientSlice = createSlice({
           patient.history = Array.isArray(patient.history)
             ? [
                 ...patient.history,
-                `Access request cancelled by ${requestor} on ${new Date().toISOString()}`,
+                { requestor, type: "cancelled", timestamp: new Date().toISOString()},
               ]
             : [
-                `Access request cancelled by ${requestor} on ${new Date().toISOString()}`,
+                { requestor, type: "cancelled", timestamp: new Date().toISOString()}
               ];
         }
       })
@@ -461,7 +461,7 @@ export const patientSlice = createSlice({
             patient.history = [];
           }
           patient.history.push(
-            `Access request rejected for ${requestor} on ${new Date().toISOString()}`
+            {requestor, type: "rejected", timestamp: new Date().toISOString()}
           );
         }
       });

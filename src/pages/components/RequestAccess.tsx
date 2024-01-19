@@ -36,8 +36,11 @@ const RequestAccess: FC<RequestAccessProps> = ({
   setSelectedRequestor,
   selectedRequestor,
 }) => {
-  const accessRequestsParsed:string[] = useMemo(() => {
-    return JSON.parse(accessRequests.toString());
+  const accessRequestsParsed: string[] = useMemo(() => {
+    console.log(accessRequests);
+    return accessRequests && !Array.isArray(accessRequests)
+      ? JSON.parse(accessRequests)
+      : [];
   }, [accessRequests]);
   console.log("accessRequests:", accessRequests);
 
@@ -60,56 +63,59 @@ const RequestAccess: FC<RequestAccessProps> = ({
             </button>
           </div>
         )}
-      {currentUserAddress === ownerAddress && accessRequestsParsed.length > 0 && (
-        <>
-          <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
-          {accessRequestsParsed.map((requestor) => {
-            return (
-              <div
-                key={`${itemId}-${requestor}`}
-                className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
-              >
-                <span
-                  className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg truncate w-full"
-                  onClick={() => {
-                    if (selectedRequestor === requestor) {
-                      setSelectedFiles([]);
-                      setSelectedRequestor(null);
-                    } else {
-                      setSelectedFiles([]);
-                      setSelectedRequestor(requestor);
-                    }
-                  }}
+      {currentUserAddress === ownerAddress &&
+        accessRequestsParsed.length > 0 && (
+          <>
+            <h3 className="text-lg font-bold text-white mt-2 mr-2">
+              Requests:
+            </h3>
+            {accessRequestsParsed.map((requestor) => {
+              return (
+                <div
+                  key={`${itemId}-${requestor}`}
+                  className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
                 >
-                  {requestor}
-                </span>
-                <div className="col-span-2 flex justify-end">
-                  {selectedRequestor === requestor ? (
-                    <>
-                      <IoIosCheckmark
-                        onClick={() => {
-                          handleAcceptRequest(requestor, selectedFiles);
-                          setSelectedFiles([]);
-                        }}
-                        className="w-6 h-6"
-                      />
-                      <IoIosClose
-                        onClick={() => handleRejectRequest(requestor)}
-                        className="w-6 h-6"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-6 h-6" />
-                      <div className="w-6 h-6" />
-                    </>
-                  )}
+                  <span
+                    className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg truncate w-full"
+                    onClick={() => {
+                      if (selectedRequestor === requestor) {
+                        setSelectedFiles([]);
+                        setSelectedRequestor(null);
+                      } else {
+                        setSelectedFiles([]);
+                        setSelectedRequestor(requestor);
+                      }
+                    }}
+                  >
+                    {requestor}
+                  </span>
+                  <div className="col-span-2 flex justify-end">
+                    {selectedRequestor === requestor ? (
+                      <>
+                        <IoIosCheckmark
+                          onClick={() => {
+                            handleAcceptRequest(requestor, selectedFiles);
+                            setSelectedFiles([]);
+                          }}
+                          className="w-6 h-6"
+                        />
+                        <IoIosClose
+                          onClick={() => handleRejectRequest(requestor)}
+                          className="w-6 h-6"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-6 h-6" />
+                        <div className="w-6 h-6" />
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </>
-      )}
+              );
+            })}
+          </>
+        )}
     </div>
   );
 };

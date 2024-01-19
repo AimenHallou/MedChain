@@ -53,7 +53,7 @@ function handleUnsharePatient(
 
       let history = JSON.parse(row.history?.toString() || "[]");
       history.unshift(
-        `Patient unshared with ${address} on ${new Date().toISOString()}`
+        {type: "unshared", timestamp: new Date().toISOString(), address}
       );
 
       try {

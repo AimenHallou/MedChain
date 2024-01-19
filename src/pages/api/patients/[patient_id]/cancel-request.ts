@@ -53,7 +53,7 @@ async function handleCancelRequest(
 
       let history = JSON.parse(row.history.toString());
       history.unshift(
-        `Access request by ${requestor} cancelled on ${new Date().toISOString()}`
+        {type: "cancelled", timestamp: new Date().toISOString(), requestor}
       );
 
       try {

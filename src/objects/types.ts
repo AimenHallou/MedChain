@@ -12,7 +12,7 @@ export interface Patient {
   createdDate: string;
   content: FileData[] | null;
   sharedWith: { [address: string]: string[] };
-  history: string[];
+  history: { type: string; timestamp: string; requestor: string, address?:string }[];
   accessRequests?: string[];
   txHashes: string[];
 }
