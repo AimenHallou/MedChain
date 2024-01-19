@@ -42,6 +42,8 @@ const GenericHistory: FC<HistoryProps> = ({ title, data }) => {
               return Unshared(entry, index);
             case "updated":
               return Updated(entry, index);
+            case "transfer":
+              return Ownership(entry, index);
             default:
               return (
                 <div
@@ -67,7 +69,7 @@ const PatientCreated = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Patient Created</p>
-      <p className="truncate">{entry.requestor}</p>
+      <p className="break-words">{entry.requestor}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -83,7 +85,7 @@ const PatientUpdated = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Patient Updated</p>
-      <p className="truncate">{entry.requestor}</p>
+      <p className="break-words">{entry.requestor}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -99,7 +101,7 @@ const RequestAccess = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Access requested by</p>
-      <p className="truncate">{entry.requestor}</p>
+      <p className="break-words">{entry.requestor}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -115,7 +117,7 @@ const AcceptRequest = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Access accepted for</p>
-      <p className="truncate">{entry.requestor}</p>
+      <p className="break-words">{entry.requestor}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -131,7 +133,7 @@ const CancelledRequest = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Access cancelled for</p>
-      <p className="truncate">{entry.requestor}</p>
+      <p className="break-words">{entry.requestor}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -147,7 +149,7 @@ const Unshared = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Access unshared for</p>
-      <p className="truncate">{entry.address}</p>
+      <p className="break-words">{entry.address}</p>
       <p>{entry.timestamp}</p>
     </div>
   );
@@ -163,7 +165,23 @@ const Updated = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       <p>Files updated for</p>
-      <p className="truncate">{entry.address}</p>
+      <p className="break-words">{entry.address}</p>
+      <p>{entry.timestamp}</p>
+    </div>
+  );
+};
+
+const Ownership = (
+  entry: Patient["history"][number],
+  key: React.Key | null | undefined
+) => {
+  return (
+    <div
+      key={key}
+      className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
+    >
+      <p>Ownership transferred to</p>
+      <p className="break-words">{entry.address}</p>
       <p>{entry.timestamp}</p>
     </div>
   );

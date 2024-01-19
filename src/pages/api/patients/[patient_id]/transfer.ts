@@ -1,18 +1,16 @@
 // pages/api/patients/[patient_id]/transfer.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../../db/database";
+import { Patient } from "../../../../objects/types";
 
-function handleTransferOwnership(
-  patient_id: string,
-  body: any,
-  res: NextApiResponse
-) {
+function handleTransferOwnership(patient_id, body, res) {
+  console.log("We are in the transfer ownership handler");
   const { newOwner } = body;
 
   db.get(
-    `SELECT owner FROM patients WHERE patient_id = ?`,
+    `SELECT history, owner FROM patients WHERE patient_id = ?`,
     [patient_id],
-    (err, row) => {
+    (err, row: Patient | undefined) => {
       if (err) {
         return res
           .status(500)
@@ -25,21 +23,37 @@ function handleTransferOwnership(
           .json({ error: `No patient found with ID: ${patient_id}` });
       }
 
+      let history = JSON.parse(row.history.toString());
+      history.unshift({
+        type: "transfer",
+        timestamp: new Date().toISOString(),
+        address: newOwner,
+      });
+
       db.run(
-        'UPDATE patients SET owner = ?, history = json_insert(history, "$[0]", ?) WHERE patient_id = ?',
-        [
-          newOwner,
-          `Ownership transferred to ${newOwner} on ${new Date().toISOString()}`,
-          patient_id,
-        ],
-        (updateErr) => {
-          if (updateErr) {
+        "UPDATE patients SET owner = ?, history = ? WHERE patient_id = ?",
+        [newOwner, JSON.stringify(history), patient_id],
+        (err) => {
+          if (err) {
+            return res
+              .status(500)
+              .json({ error: "Database query error", details: err.message });
+          }
+
+          res.json({ message: "Ownership successfully transferred" });
+        }
+      );
+      db.get(
+        "SELECT * FROM patients WHERE patient_id = ?",
+        [patient_id],
+        (err, updatedRow) => {
+          if (err) {
             return res.status(500).json({
-              error:
-                "An error occurred while updating the ownership in the database.",
-              details: updateErr.message,
+              error: "Failed to fetch updated patient data",
+              details: err.message,
             });
           }
+          res.json(updatedRow);
         }
       );
     }
@@ -47,16 +61,16 @@ function handleTransferOwnership(
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { patient_id } = req.query;
-  
-    if (typeof patient_id !== "string") {
-      return res.status(400).json({ error: "Invalid patient ID" });
-    }
-  
-    if (req.method === "PUT") {
-      handleTransferOwnership(patient_id, req.body, res);
-    } else {
-      res.setHeader("Allow", ["PUT"]);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
+  const { patient_id } = req.query;
+
+  if (typeof patient_id !== "string") {
+    return res.status(400).json({ error: "Invalid patient ID" });
   }
+
+  if (req.method === "PUT") {
+    handleTransferOwnership(patient_id, req.body, res);
+  } else {
+    res.setHeader("Allow", ["PUT"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}

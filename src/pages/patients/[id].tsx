@@ -84,6 +84,7 @@ const PatientPage: FC = () => {
     if (newOwner) {
       dispatch(transferOwnership({ patientId: patient.patient_id, newOwner }));
       setNewOwner("");
+      router.push("/");
     }
   };
 

@@ -52,9 +52,11 @@ function handleUnsharePatient(
       delete sharedWith[address];
 
       let history = JSON.parse(row.history?.toString() || "[]");
-      history.unshift(
-        {type: "unshared", timestamp: new Date().toISOString(), address}
-      );
+      history.unshift({
+        type: "unshared",
+        timestamp: new Date().toISOString(),
+        address,
+      });
 
       try {
         if (storageMode === "blockchain") {

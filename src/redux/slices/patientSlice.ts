@@ -46,7 +46,6 @@ export const fetchSinglePatient = createAsyncThunk(
   async (patient_id: string) => {
     const response = await fetch(`/api/patients/${patient_id}`);
     const patient = await response.json();
-    console.log("patient:", patient);
     return patient;
   }
 );
@@ -54,6 +53,7 @@ export const fetchSinglePatient = createAsyncThunk(
 export const transferOwnership = createAsyncThunk(
   "patients/`transferOwnership`",
   async (payload: { patientId: string; newOwner: string }) => {
+    console.log("payload:", payload);
     const response = await fetch(
       `/api/patients/${payload.patientId}/transfer`,
       {
@@ -67,7 +67,8 @@ export const transferOwnership = createAsyncThunk(
     if (!response.ok) {
       throw new Error("Failed to transfer ownership");
     }
-    return payload;
+    const data = await response.json();
+    return data;
   }
 );
 
@@ -308,10 +309,15 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
           patient.owner = newOwner;
-          patient.history.push(
-            {requestor: newOwner, type: "ownership", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor: newOwner,
+            type: "transfer",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(sharePatient.fulfilled, (state, action) => {
@@ -324,9 +330,11 @@ export const patientSlice = createSlice({
             patient.sharedWith = {};
           }
           patient.sharedWith[address] = files;
-          patient.history.push(
-            {requestor: address, type: "shared", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor: address,
+            type: "shared",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(unsharePatient.fulfilled, (state, action) => {
@@ -336,9 +344,11 @@ export const patientSlice = createSlice({
         );
         if (patient && patient.sharedWith && patient.sharedWith[address]) {
           delete patient.sharedWith[address];
-          patient.history.push(
-            {requestor: address, type: "unshared", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor: address,
+            type: "unshared",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(removeFile.fulfilled, (state, action) => {
@@ -350,9 +360,11 @@ export const patientSlice = createSlice({
           patient.content = patient.content.filter(
             (file) => file.name !== fileName
           );
-          patient.history.push(
-            {requestor: patient.owner, type: "removed", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor: patient.owner,
+            type: "removed",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(updateSharedFiles.fulfilled, (state, action) => {
@@ -373,9 +385,11 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
-          patient.history.push(
-            {requestor: address, type: "updated", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor: address,
+            type: "updated",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(addFile.fulfilled, (state, action) => {
@@ -392,7 +406,11 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
-          patient.history.push({requestor: patient.owner, type: "added", timestamp: new Date().toISOString()});
+          patient.history.push({
+            requestor: patient.owner,
+            type: "added",
+            timestamp: new Date().toISOString(),
+          });
         }
       })
       .addCase(requestAccess.fulfilled, (state, action) => {
@@ -415,10 +433,18 @@ export const patientSlice = createSlice({
           patient.history = Array.isArray(patient.history)
             ? [
                 ...patient.history,
-                { requestor, type: "cancelled", timestamp: new Date().toISOString()},
+                {
+                  requestor,
+                  type: "cancelled",
+                  timestamp: new Date().toISOString(),
+                },
               ]
             : [
-                { requestor, type: "cancelled", timestamp: new Date().toISOString()}
+                {
+                  requestor,
+                  type: "cancelled",
+                  timestamp: new Date().toISOString(),
+                },
               ];
         }
       })
@@ -460,9 +486,11 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
-          patient.history.push(
-            {requestor, type: "rejected", timestamp: new Date().toISOString()}
-          );
+          patient.history.push({
+            requestor,
+            type: "rejected",
+            timestamp: new Date().toISOString(),
+          });
         }
       });
   },
