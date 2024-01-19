@@ -6,7 +6,7 @@ function fetchPatient(patient_id: string, res: NextApiResponse) {
    db.get(
     "SELECT * FROM patients WHERE patient_id = ?",
     [patient_id],
-    (err, row) => {
+    (err, row:any) => {
       if (err) {
         return res
           .status(500)
@@ -17,6 +17,7 @@ function fetchPatient(patient_id: string, res: NextApiResponse) {
           .status(404)
           .json({ error: `No patient found with ID: ${patient_id}` });
       }
+      row.accessRequests = JSON.parse(row.accessRequests);
       res.status(200).json(row);
     }
   );

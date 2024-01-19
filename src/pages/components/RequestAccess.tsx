@@ -1,6 +1,6 @@
 // src/components/pages/RequestAccess.tsx
 import React, { FC, useState } from "react";
-import { IoIosClose, IoIosCheckmark } from "react-icons/io"; 
+import { IoIosClose, IoIosCheckmark } from "react-icons/io";
 import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 
 interface RequestAccessProps {
@@ -36,6 +36,8 @@ const RequestAccess: FC<RequestAccessProps> = ({
   setSelectedRequestor,
   selectedRequestor,
 }) => {
+  console.log("accessRequests:", accessRequests);
+
   return (
     <div className="flex">
       {currentUserAddress !== ownerAddress &&
@@ -58,49 +60,51 @@ const RequestAccess: FC<RequestAccessProps> = ({
       {currentUserAddress === ownerAddress && accessRequests.length > 0 && (
         <>
           <h3 className="text-lg font-bold text-white mt-2 mr-2">Requests:</h3>
-          {Array.isArray(accessRequests) && accessRequests.map((requestor) => (
-            <div
-              key={`${itemId}-${requestor}`}
-              className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
-            >
-              <span
-                className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg truncate w-full"
-                onClick={() => {
-                  if (selectedRequestor === requestor) {
-                    setSelectedFiles([]);
-                    setSelectedRequestor(null);
-                  } else {
-                    setSelectedFiles([]);
-                    setSelectedRequestor(requestor);
-                  }
-                }}
+          {accessRequests?.map((requestor) => {
+            return (
+              <div
+                key={`${itemId}-${requestor}`}
+                className="grid grid-cols-6 gap-1 items-center p-1 mb-1 rounded-lg bg-gray-800"
               >
-                {requestor}
-              </span>
-              <div className="col-span-2 flex justify-end">
-                {selectedRequestor === requestor ? (
-                  <>
-                    <IoIosCheckmark
-                      onClick={() => {
-                        handleAcceptRequest(requestor, selectedFiles);
-                        setSelectedFiles([]);
-                      }}
-                      className="w-6 h-6"
-                    />
-                    <IoIosClose
-                      onClick={() => handleRejectRequest(requestor)}
-                      className="w-6 h-6"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <div className="w-6 h-6" />
-                    <div className="w-6 h-6" />
-                  </>
-                )}
+                <span
+                  className="col-span-4 text-xxs py-1 px-1 text-gray-200 cursor-pointer bg-gray-800 rounded-t-lg truncate w-full"
+                  onClick={() => {
+                    if (selectedRequestor === requestor) {
+                      setSelectedFiles([]);
+                      setSelectedRequestor(null);
+                    } else {
+                      setSelectedFiles([]);
+                      setSelectedRequestor(requestor);
+                    }
+                  }}
+                >
+                  {requestor}
+                </span>
+                <div className="col-span-2 flex justify-end">
+                  {selectedRequestor === requestor ? (
+                    <>
+                      <IoIosCheckmark
+                        onClick={() => {
+                          handleAcceptRequest(requestor, selectedFiles);
+                          setSelectedFiles([]);
+                        }}
+                        className="w-6 h-6"
+                      />
+                      <IoIosClose
+                        onClick={() => handleRejectRequest(requestor)}
+                        className="w-6 h-6"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-6 h-6" />
+                      <div className="w-6 h-6" />
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </>
       )}
     </div>

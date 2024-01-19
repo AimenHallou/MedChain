@@ -139,26 +139,33 @@ export const requestAccess = createAsyncThunk(
 
 export const acceptAccessRequest = createAsyncThunk(
   "patients/acceptAccessRequest",
-  async (payload: {
-    patientId: string;
-    requestor: string;
-    files: string[];
-  }) => {
-    const response = await fetch(
-      `/api/patients/${payload.patientId}/accept-request`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+  async (
+    payload: {
+      patientId: string;
+      requestor: string;
+      files: string[];
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(
+        `/api/patients/${payload.patientId}/accept-request`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to accept access request");
+      const updatedPatient = await response.json();
+      return updatedPatient;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-    const updatedPatient = await response.json();
-    return updatedPatient;
   }
 );
 
@@ -416,38 +423,12 @@ export const patientSlice = createSlice({
         }
       })
       .addCase(acceptAccessRequest.fulfilled, (state, action) => {
-        const { patientId, requestor, files } = action.payload;
-        const patient = state.find(
-          (patient) => patient.patient_id === patientId
+        const updatedPatient = action.payload;
+        const patientIndex = state.findIndex(
+          (patient) => patient.patient_id === updatedPatient.patient_id
         );
-        if (patient) {
-          if (typeof patient.accessRequests === "string") {
-            try {
-              patient.accessRequests = JSON.parse(patient.accessRequests);
-            } catch (error) {
-              console.error("Failed to parse accessRequests:", error);
-              patient.accessRequests = [];
-            }
-          }
-          if (!Array.isArray(patient.accessRequests)) {
-            console.error(
-              `patient.accessRequests is not an array for patient with ID: ${patient.patient_id}. It's currently: `,
-              patient.accessRequests
-            );
-            patient.accessRequests = [];
-          }
-
-          patient.accessRequests = patient.accessRequests.filter(
-            (req) => req !== requestor
-          );
-
-          if (!Array.isArray(patient.history)) {
-            patient.history = [];
-          }
-
-          patient.history.push(
-            `Access request accepted for ${requestor} on ${new Date().toISOString()}`
-          );
+        if (patientIndex !== -1) {
+          state[patientIndex] = updatedPatient;
         }
       })
       .addCase(rejectAccessRequest.fulfilled, (state, action) => {

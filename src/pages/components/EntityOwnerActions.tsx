@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MdUpdate } from "react-icons/md";
 
@@ -35,6 +35,10 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   handleUpdateSharedFiles,
   entity,
 }) => {
+  useEffect(() => {
+    console.log("sharedWith prop updated:", sharedWith);
+  }, [sharedWith]);
+
   const parsedSharedWith =
     sharedWith && typeof sharedWith === "object" ? Object.keys(sharedWith) : [];
 

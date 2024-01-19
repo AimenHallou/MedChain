@@ -31,12 +31,13 @@ import { fetchFileFromIPFS } from "../../utils/fetchAndDecryptFromIPFS";
 const PatientPage: FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const patients = useSelector((state: RootState) => state.patients);
+  const patient = useSelector((state: RootState) =>
+    state.patients.find((p) => p.patient_id === id)
+  );
   const user = useSelector((state: RootState) => state.user);
   const users = useSelector((state: RootState) => state.user.users);
 
   const dispatch = useDispatch<AppDispatch>();
-  const [patientData, setPatientData] = useState<any | null>(null);
 
   const [newOwner, setNewOwner] = useState("");
   const [sharedAddress, setSharedAddress] = useState("");
@@ -69,17 +70,16 @@ const PatientPage: FC = () => {
             setHealthcareType(ownerUser.healthcareType);
             setOrganizationName(ownerUser.organizationName);
           }
-          setPatientData(patientCopy);
+          patient = patientCopy;
         })
         .catch((error) => console.error("Failed to fetch patient:", error));
     }
   }, [id, dispatch]);
 
-  if (!patientData) {
+  if (!patient) {
     return <div>Loading...</div>;
   }
 
-  const patient = patientData;
   const handleTransfer = () => {
     if (newOwner) {
       dispatch(transferOwnership({ patientId: patient.patient_id, newOwner }));
@@ -109,52 +109,47 @@ const PatientPage: FC = () => {
   };
 
   const handleUnshare = (address: string) => {
+    if (!patient) return;
+
     dispatch(unsharePatient({ patientId: patient.patient_id, address }))
       .then(() => {
-        return dispatch(fetchSinglePatient(id as string)).unwrap();
+        return dispatch(fetchSinglePatient(patient.patient_id)).unwrap();
       })
-      .then((updatedPatient) => {
-        setPatientData(updatedPatient);
+      .catch((error) => {
+        console.error("Error in unsharing patient:", error);
       });
   };
 
   const handleRequestAccess = () => {
-    if (currentUserAddress) {
-      const requestPending = patient.accessRequests
-        ? patient.accessRequests.includes(currentUserAddress)
-        : false;
+    if (currentUserAddress && patient) {
+      const requestPending =
+        patient.accessRequests?.includes(currentUserAddress) ?? false;
       if (!requestPending) {
         dispatch(
           requestAccess({
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
-        ).then((action) => {
-          const updatedPatient = action.payload;
-          setPatientData(updatedPatient);
-        });
+        )
+          .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+          .catch((error) => console.error("Failed to request access:", error));
       }
     }
   };
 
   const handleCancelRequest = () => {
-    if (currentUserAddress) {
-      const requestPending = patient.accessRequests
-        ? patient.accessRequests.includes(currentUserAddress)
-        : false;
-      if (requestPending && currentUserAddress) {
+    if (currentUserAddress && patient) {
+      const requestPending =
+        patient.accessRequests?.includes(currentUserAddress) ?? false;
+      if (requestPending) {
         dispatch(
           cancelRequest({
             patient_id: patient.patient_id,
             requestor: currentUserAddress,
           })
         )
-          .then(() => {
-            return dispatch(fetchSinglePatient(id as string)).unwrap();
-          })
-          .then((updatedPatient) => {
-            setPatientData(updatedPatient);
-          });
+          .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+          .catch((error) => console.error("Failed to cancel request:", error));
       }
     }
   };
@@ -165,29 +160,31 @@ const PatientPage: FC = () => {
   };
 
   const handleAcceptRequest = (requestor: string, files: string[]) => {
-    dispatch(
-      acceptAccessRequest({ patientId: patient.patient_id, requestor, files })
-    )
-      .then(() => {
-        return dispatch(fetchSinglePatient(id as string)).unwrap();
-      })
-      .then((updatedPatient) => {
-        setPatientData(updatedPatient);
-      });
+    if (patient) {
+      dispatch(
+        acceptAccessRequest({ patientId: patient.patient_id, requestor, files })
+      )
+        .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+        .catch((error) =>
+          console.error("Error in accepting access request:", error)
+        );
+    }
   };
 
   const handleRejectRequest = (requestor: string) => {
-    dispatch(rejectAccessRequest({ patientId: patient.patient_id, requestor }))
-      .then(() => {
-        return dispatch(fetchSinglePatient(id as string)).unwrap();
-      })
-      .then((updatedPatient) => {
-        setPatientData(updatedPatient);
-      });
+    if (patient) {
+      dispatch(
+        rejectAccessRequest({ patientId: patient.patient_id, requestor })
+      )
+        .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+        .catch((error) =>
+          console.error("Error in rejecting access request:", error)
+        );
+    }
   };
 
   const handleUpdateSharedFiles = (address: string, files: string[]) => {
-    if (selectedUsers) {
+    if (patient && selectedUsers) {
       dispatch(
         updateSharedFiles({
           patientId: patient.patient_id,
@@ -195,12 +192,10 @@ const PatientPage: FC = () => {
           files,
         })
       )
-        .then(() => {
-          return dispatch(fetchSinglePatient(id as string)).unwrap();
-        })
-        .then((updatedPatient) => {
-          setPatientData(updatedPatient);
-        });
+        .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+        .catch((error) =>
+          console.error("Error in updating shared files:", error)
+        );
     }
   };
 
@@ -224,55 +219,55 @@ const PatientPage: FC = () => {
   };
 
   const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = Array.from(event.target.files);
-      let fileContents: FileData[] = [];
+    // if (event.target.files) {
+    //   const files = Array.from(event.target.files);
+    //   let fileContents: FileData[] = [];
 
-      for (const file of files) {
-        const reader = new FileReader();
+    //   for (const file of files) {
+    //     const reader = new FileReader();
 
-        // const result: Promise<FileData> = new Promise((resolve, reject) => {
-        //   reader.onloadend = async () => {
-        //     if (typeof reader.result === "string") {
-        //       const base64String = reader.result.split(",")[1];
+    //     // const result: Promise<FileData> = new Promise((resolve, reject) => {
+    //     //   reader.onloadend = async () => {
+    //     //     if (typeof reader.result === "string") {
+    //     //       const base64String = reader.result.split(",")[1];
 
-        //       const buffer = Buffer.from(base64String, "base64");
-        //       try {
-        //         const ipfsResult = await ipfs.add(buffer);
-        //         resolve({
-        //           base64: "",
-        //           name: file.name,
-        //           dataType: "",
-        //           ipfsCID: ipfsResult.path,
-        //         });
-        //       } catch (ipfsError) {
-        //         console.error("Error uploading to IPFS:", ipfsError);
-        //         reject(ipfsError);
-        //       }
-        //     } else {
-        //       reject(new Error("Unexpected result type from FileReader"));
-        //     }
-        //   };
-        // });
+    //     //       const buffer = Buffer.from(base64String, "base64");
+    //     //       try {
+    //     //         const ipfsResult = await ipfs.add(buffer);
+    //     //         resolve({
+    //     //           base64: "",
+    //     //           name: file.name,
+    //     //           dataType: "",
+    //     //           ipfsCID: ipfsResult.path,
+    //     //         });
+    //     //       } catch (ipfsError) {
+    //     //         console.error("Error uploading to IPFS:", ipfsError);
+    //     //         reject(ipfsError);
+    //     //       }
+    //     //     } else {
+    //     //       reject(new Error("Unexpected result type from FileReader"));
+    //     //     }
+    //     //   };
+    //     // });
 
-        // reader.readAsDataURL(file);
+    //     // reader.readAsDataURL(file);
 
-        // const fileData = await result;
-        // fileContents.push(fileData);
+    //     // const fileData = await result;
+    //     // fileContents.push(fileData);
 
-        // dispatch(
-        //   addFile({
-        //     patientId: patient.patient_id,
-        //     file: fileData,
-        //     owner: currentUserAddress || "",
-        //   })
-        // );
-      }
+    //     // dispatch(
+    //     //   addFile({
+    //     //     patientId: patient.patient_id,
+    //     //     file: fileData,
+    //     //     owner: currentUserAddress || "",
+    //     //   })
+    //     // );
+    //   }
 
-      const newFilesData = [...patientData, ...fileContents];
-      setPatientData(newFilesData);
-      dispatch(setFormContent(newFilesData));
-    }
+    //   const newFilesData = [...patientData, ...fileContents];
+    //   setPatientData(newFilesData);
+    //   dispatch(setFormContent(newFilesData));
+    // }
   };
 
   const handleRemoveFile = (fileName: string) => {
@@ -345,7 +340,7 @@ const PatientPage: FC = () => {
         <div className="w-full lg:w-[40rem] bg-gray-700 text-white rounded-md overflow-hidden m-4 border-2 border-gray-600">
           <DataFileSection
             dataId={id as string}
-            content={patient.content}
+            content={patient.content || []}
             owner={patient.owner}
             sharedWith={patient.sharedWith}
             selectedFiles={selectedFiles}
