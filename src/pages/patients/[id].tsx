@@ -220,55 +220,38 @@ const PatientPage: FC = () => {
   };
 
   const handleAddFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // if (event.target.files) {
-    //   const files = Array.from(event.target.files);
-    //   let fileContents: FileData[] = [];
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            const base64String = reader.result.split(",")[1];
+            const fileData = {
+              base64: base64String,
+              name: file.name,
+              dataType: "",
+              ipfsCID: "",
+            };
 
-    //   for (const file of files) {
-    //     const reader = new FileReader();
-
-    //     // const result: Promise<FileData> = new Promise((resolve, reject) => {
-    //     //   reader.onloadend = async () => {
-    //     //     if (typeof reader.result === "string") {
-    //     //       const base64String = reader.result.split(",")[1];
-
-    //     //       const buffer = Buffer.from(base64String, "base64");
-    //     //       try {
-    //     //         const ipfsResult = await ipfs.add(buffer);
-    //     //         resolve({
-    //     //           base64: "",
-    //     //           name: file.name,
-    //     //           dataType: "",
-    //     //           ipfsCID: ipfsResult.path,
-    //     //         });
-    //     //       } catch (ipfsError) {
-    //     //         console.error("Error uploading to IPFS:", ipfsError);
-    //     //         reject(ipfsError);
-    //     //       }
-    //     //     } else {
-    //     //       reject(new Error("Unexpected result type from FileReader"));
-    //     //     }
-    //     //   };
-    //     // });
-
-    //     // reader.readAsDataURL(file);
-
-    //     // const fileData = await result;
-    //     // fileContents.push(fileData);
-
-    //     // dispatch(
-    //     //   addFile({
-    //     //     patientId: patient.patient_id,
-    //     //     file: fileData,
-    //     //     owner: currentUserAddress || "",
-    //     //   })
-    //     // );
-    //   }
-
-    //   const newFilesData = [...patientData, ...fileContents];
-    //   setPatientData(newFilesData);
-    //   dispatch(setFormContent(newFilesData));
-    // }
+            dispatch(
+              addFile({
+                patientId: patient.patient_id,
+                file: fileData,
+                owner: currentUserAddress ?? "",
+              })
+            )
+              .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+              .catch((error) =>
+                console.error("Error in accepting access request:", error)
+              );
+          } else {
+            console.error("Unexpected result type from FileReader");
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
   };
 
   const handleRemoveFile = (fileName: string) => {

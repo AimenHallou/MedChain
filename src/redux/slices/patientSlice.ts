@@ -406,6 +406,7 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
+          
           patient.history.push({
             requestor: patient.owner,
             type: "added",

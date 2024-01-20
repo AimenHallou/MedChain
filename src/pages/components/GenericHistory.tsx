@@ -44,6 +44,8 @@ const GenericHistory: FC<HistoryProps> = ({ title, data }) => {
               return Updated(entry, index);
             case "transfer":
               return Ownership(entry, index);
+            case "added":
+              return Added(entry, index);
             default:
               return (
                 <div
@@ -182,6 +184,21 @@ const Ownership = (
     >
       <p>Ownership transferred to</p>
       <p className="break-words">{entry.address}</p>
+      <p>{entry.timestamp}</p>
+    </div>
+  );
+};
+
+const Added = (
+  entry: Patient["history"][number],
+  key: React.Key | null | undefined
+) => {
+  return (
+    <div
+      key={key}
+      className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
+    >
+      New file added at
       <p>{entry.timestamp}</p>
     </div>
   );
