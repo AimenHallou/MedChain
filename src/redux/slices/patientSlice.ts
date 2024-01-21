@@ -453,7 +453,7 @@ export const patientSlice = createSlice({
             (f) => f.name === file.name
           );
           if (fileIndex >= 0) {
-            patient.content[fileIndex] = file; // Update with the whole file object
+            patient.content[fileIndex] = file;
           }
 
           if (!Array.isArray(patient.history)) {

@@ -285,9 +285,29 @@ const PatientPage: FC = () => {
   };
 
   const handleDataTypeChange = (fileIndex, newDataType) => {
-    if (!patient || !Array.isArray(patient.content)) return;
+    console.log("File index:", fileIndex);
+    console.log("New data type:", newDataType);
+    if (!patient) {
+      console.log("Patient data is missing.");
+      return;
+    }
 
-    const fileToEdit = patient.content[fileIndex];
+    let patientContent;
+    try {
+      if (typeof patient.content === "string")
+      patientContent = JSON.parse(patient.content);
+    } catch (error) {
+      console.log("Invalid patient content data:", error);
+      return;
+    }
+
+    if (!Array.isArray(patientContent)) {
+      console.log("Invalid patient content data.");
+      console.log("Patient content data type:", typeof patientContent);
+      return;
+    }
+
+    const fileToEdit = patientContent[fileIndex];
     if (typeof fileToEdit !== "object") {
       console.error("Invalid file data at index:", fileIndex);
       return;
@@ -306,7 +326,10 @@ const PatientPage: FC = () => {
         file: updatedFile,
       })
     )
-      .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+      .then(() => {
+        console.log("Successfully edited file data type.");
+        dispatch(fetchSinglePatient(patient.patient_id));
+      })
       .catch((error) => console.error("Failed to edit file data type:", error));
   };
 

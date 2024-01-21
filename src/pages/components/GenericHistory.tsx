@@ -48,6 +48,8 @@ const GenericHistory: FC<HistoryProps> = ({ title, data }) => {
               return Added(entry, index);
             case "removed":
               return Removed(entry, index);
+              case "edited":
+                return Edited(entry, index);
             default:
               return (
                 <div
@@ -216,6 +218,21 @@ const Removed = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       File removed at
+      <p>{entry.timestamp}</p>
+    </div>
+  );
+};
+
+const Edited = (
+  entry: Patient["history"][number],
+  key: React.Key | null | undefined
+) => {
+  return (
+    <div
+      key={key}
+      className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
+    >
+      File edited at
       <p>{entry.timestamp}</p>
     </div>
   );
