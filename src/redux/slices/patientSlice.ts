@@ -352,14 +352,19 @@ export const patientSlice = createSlice({
         }
       })
       .addCase(removeFile.fulfilled, (state, action) => {
-        const { patientId, fileName } = action.payload;
+        const { patientId } = action.payload;
         const patient = state.find(
           (patient) => patient.patient_id === patientId
         );
-        if (patient && patient.content) {
-          patient.content = patient.content.filter(
-            (file) => file.name !== fileName
-          );
+        if (patient) {
+          if (!Array.isArray(patient.content)) {
+            patient.content = [];
+          }
+
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
+
           patient.history.push({
             requestor: patient.owner,
             type: "removed",
@@ -406,7 +411,7 @@ export const patientSlice = createSlice({
           if (!Array.isArray(patient.history)) {
             patient.history = [];
           }
-          
+
           patient.history.push({
             requestor: patient.owner,
             type: "added",

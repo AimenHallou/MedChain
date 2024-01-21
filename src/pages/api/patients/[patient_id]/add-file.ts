@@ -3,21 +3,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../../db/database";
 import { Patient } from "../../../../objects/types";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { patient_id } = req.query;
-
-  if (typeof patient_id !== "string") {
-    return res.status(400).json({ error: "Invalid patient ID" });
-  }
-
-  if (req.method === "PUT") {
-    handleAddFile(patient_id, req.body, res);
-  } else {
-    res.setHeader("Allow", ["PUT"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-}
-
 function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
   const { file } = body;
 
@@ -52,4 +37,19 @@ function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
       );
     }
   );
+}
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { patient_id } = req.query;
+
+  if (typeof patient_id !== "string") {
+    return res.status(400).json({ error: "Invalid patient ID" });
+  }
+
+  if (req.method === "PUT") {
+    handleAddFile(patient_id, req.body, res);
+  } else {
+    res.setHeader("Allow", ["PUT"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
 }

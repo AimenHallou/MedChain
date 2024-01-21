@@ -46,6 +46,8 @@ const GenericHistory: FC<HistoryProps> = ({ title, data }) => {
               return Ownership(entry, index);
             case "added":
               return Added(entry, index);
+            case "removed":
+              return Removed(entry, index);
             default:
               return (
                 <div
@@ -199,6 +201,21 @@ const Added = (
       className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
     >
       New file added at
+      <p>{entry.timestamp}</p>
+    </div>
+  );
+};
+
+const Removed = (
+  entry: Patient["history"][number],
+  key: React.Key | null | undefined
+) => {
+  return (
+    <div
+      key={key}
+      className="text-sm text-gray-200 bg-gray-800 p-3 my-2 rounded-md shadow-lg"
+    >
+      File removed at
       <p>{entry.timestamp}</p>
     </div>
   );

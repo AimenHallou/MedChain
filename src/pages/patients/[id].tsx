@@ -243,7 +243,7 @@ const PatientPage: FC = () => {
             )
               .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
               .catch((error) =>
-                console.error("Error in accepting access request:", error)
+                console.error("Error in adding a file:", error)
               );
           } else {
             console.error("Unexpected result type from FileReader");
@@ -256,7 +256,11 @@ const PatientPage: FC = () => {
 
   const handleRemoveFile = (fileName: string) => {
     if (currentUserAddress === patient?.owner) {
-      dispatch(removeFile({ patientId: patient.patient_id, fileName }));
+      dispatch(removeFile({ patientId: patient.patient_id, fileName }))
+        .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+        .catch((error) =>
+          console.error("Error in removing a file:", error)
+        );
     }
   };
 
