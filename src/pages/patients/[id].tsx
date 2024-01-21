@@ -211,7 +211,28 @@ const PatientPage: FC = () => {
   };
 
   const handleFileClick = async (file: FileData) => {
-    if (file.ipfsCID) {
+    console.log(file.base64);
+    if (file.base64) {
+      const byteString = atob(file.base64);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const int8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        int8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([arrayBuffer], {
+        type: "application/octet-stream",
+      });
+
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } else if (file.ipfsCID) {
       const base64Content = await handleFetchFile(file.ipfsCID);
       if (base64Content) {
         console.log(base64Content);
@@ -258,9 +279,7 @@ const PatientPage: FC = () => {
     if (currentUserAddress === patient?.owner) {
       dispatch(removeFile({ patientId: patient.patient_id, fileName }))
         .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
-        .catch((error) =>
-          console.error("Error in removing a file:", error)
-        );
+        .catch((error) => console.error("Error in removing a file:", error));
     }
   };
 
