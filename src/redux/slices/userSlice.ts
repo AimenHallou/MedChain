@@ -32,23 +32,43 @@ export const createUser = createAsyncThunk(
   }
 );
 
-// Async thunk for reading notifications
-export const readNotifications = createAsyncThunk(
-  "users/readNotifications",
-  async (payload: { address: string }) => {
-    const response = await fetch(`/api/users/${payload.address}/readNotifications`, {
+export const updateUser = createAsyncThunk(
+  "users/updateUser",
+  async (user: User) => {
+    const response = await fetch(`/api/users/${user.address}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(user),
     });
+    if (!response.ok) {
+      throw new Error("Failed to update user");
+    }
+    const updatedUser = await response.json();
+    return updatedUser;
+  }
+);
+
+// Async thunk for reading notifications
+export const readNotifications = createAsyncThunk(
+  "users/readNotifications",
+  async (payload: { address: string }) => {
+    const response = await fetch(
+      `/api/users/${payload.address}/readNotifications`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (!response.ok) {
       throw new Error("Failed to read notifications");
     }
     return { address: payload.address, notifications: await response.json() };
   }
 );
-
 
 export const userSlice = createSlice({
   name: "user",
@@ -64,7 +84,9 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ address: string; notification: UserNotification }>
     ) => {
-      const user = state.users.find((u) => u.address === action.payload.address);
+      const user = state.users.find(
+        (u) => u.address === action.payload.address
+      );
       if (user) {
         user.notifications.push(action.payload.notification);
       }
@@ -73,7 +95,9 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ address: string; notificationId: string }>
     ) => {
-      const user = state.users.find((u) => u.address === action.payload.address);
+      const user = state.users.find(
+        (u) => u.address === action.payload.address
+      );
       if (user) {
         user.notifications = user.notifications.filter(
           (notif) => notif.id !== action.payload.notificationId
@@ -84,7 +108,9 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ address: string; notificationId: string }>
     ) => {
-      const user = state.users.find((u) => u.address === action.payload.address);
+      const user = state.users.find(
+        (u) => u.address === action.payload.address
+      );
       if (user) {
         const notification = user.notifications.find(
           (notif) => notif.id === action.payload.notificationId
@@ -104,9 +130,19 @@ export const userSlice = createSlice({
         state.users.push(action.payload);
       })
       .addCase(readNotifications.fulfilled, (state, action) => {
-        const user = state.users.find((u) => u.address === action.payload.address);
+        const user = state.users.find(
+          (u) => u.address === action.payload.address
+        );
         if (user) {
           user.notifications = action.payload.notifications;
+        }
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        const index = state.users.findIndex(
+          (u) => u.address === action.payload.address
+        );
+        if (index !== -1) {
+          state.users[index] = action.payload;
         }
       });
   },

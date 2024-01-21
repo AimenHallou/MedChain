@@ -7,6 +7,7 @@ import {
   setCurrentUser,
   fetchUsers,
   createUser,
+  updateUser,
 } from "../../redux/slices/userSlice";
 import { RootState } from "../../redux/store";
 import { useAppDispatch } from "../../app/hook";
@@ -39,13 +40,15 @@ const UserAccount: FC = () => {
     dispatch(fetchUsers())
       .then(unwrapResult)
       .then(() => {
-              const existingUser = users.find((user) => user.address === currentUserAddress);
-              if (existingUser) {
-                setNewUserName(existingUser.name);
-                setHealthcareType(existingUser.healthcareType);
-                setOrganizationName(existingUser.organizationName);
-                setWeb3Address(currentUserAddress);
-          };
+        const existingUser = users.find(
+          (user) => user.address === currentUserAddress
+        );
+        if (existingUser) {
+          setNewUserName(existingUser.name);
+          setHealthcareType(existingUser.healthcareType);
+          setOrganizationName(existingUser.organizationName);
+          setWeb3Address(currentUserAddress);
+        }
       })
       .catch((error) => console.error("Failed to fetch users:", error));
   }, [dispatch]);
@@ -93,7 +96,6 @@ const UserAccount: FC = () => {
           setHealthcareType(existingUser.healthcareType);
           setOrganizationName(existingUser.organizationName);
         } else {
-
         }
       } catch (error) {
         if (error.code === 4001) {
@@ -107,18 +109,35 @@ const UserAccount: FC = () => {
     }
   };
 
+  const handleUpdateUser = () => {
+    if (web3Address && newUserName) {
+      dispatch(
+        updateUser({
+          address: web3Address,
+          name: newUserName,
+          healthcareType: healthcareType,
+          organizationName: organizationName,
+          notifications: [],
+        })
+      );
+      dispatch(setCurrentUser(web3Address));
+    }
+  };
+
   const handleLogout = () => {
     setWeb3Address(null);
     dispatch(setCurrentUser(null));
-    setNewUserName('');
-    setHealthcareType('');
-    setOrganizationName('');
-};
+    setNewUserName("");
+    setHealthcareType("");
+    setOrganizationName("");
+  };
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
       <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
-      {!web3Address && !currentUserAddress && <NotLoggedInView handleLogin={handleLogin} />}
+        {!web3Address && !currentUserAddress && (
+          <NotLoggedInView handleLogin={handleLogin} />
+        )}
         {currentUserAddress && (
           <UserDetailView
             web3Address={web3Address}
@@ -126,6 +145,7 @@ const UserAccount: FC = () => {
             handleLogin={handleLogin}
             handleLogout={handleLogout}
             handleAddUser={handleAddUser}
+            handleUpdateUser={handleUpdateUser}
             newUserName={newUserName}
             setNewUserName={setNewUserName}
             healthcareType={healthcareType}
@@ -134,7 +154,7 @@ const UserAccount: FC = () => {
             setOrganizationName={setOrganizationName}
           />
         )}
-  
+
         {web3Address && userExists && (
           <PatientDetailView
             showSection={showSection}
@@ -143,7 +163,7 @@ const UserAccount: FC = () => {
         )}
       </div>
     </div>
-  );  
+  );
 };
 
 export default UserAccount;
