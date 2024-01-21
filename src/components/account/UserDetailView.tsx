@@ -1,5 +1,4 @@
 // src/components/account/UserDetailView.tsx
-
 import React, { useState } from "react";
 
 type UserDetailViewProps = {
@@ -33,83 +32,94 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
 }) => {
   const [editMode, setEditMode] = useState(false);
 
-  const renderEditForm = () => (
-    <>
+  const renderForm = (isAddingUser: boolean) => (
+    <div className="space-y-4 bg-gray-800 p-4 rounded-lg shadow-md">
       <input
         type="text"
         value={newUserName}
         placeholder="Name"
         onChange={(e) => setNewUserName(e.target.value)}
-        className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
+        className="block w-full px-3 py-2 rounded-md text-gray-700"
       />
       <input
         type="text"
         value={healthcareType}
         placeholder="Type of Healthcare Provider"
         onChange={(e) => setHealthcareType(e.target.value)}
-        className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
+        className="block w-full px-3 py-2 rounded-md text-gray-700"
       />
       <input
         type="text"
         value={organizationName}
         placeholder="Organization Name"
         onChange={(e) => setOrganizationName(e.target.value)}
-        className="block bg-gray-800 placeholder-gray-400 text-white border border-gray-600 rounded p-2 w-full my-2"
+        className="block w-full px-3 py-2 rounded-md text-gray-700"
       />
-      <button
-        onClick={() => {
-          handleUpdateUser();
-          setEditMode(false);
-        }}
-        className="block bg-blue-500 text-white px-4 py-2 rounded-lg my-2"
-      >
-        Update User
-      </button>
-    </>
-  );
-  return (
-    <>
-      <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold">User Account</h2>
-      </div>
-      <div className="mb-4">
-        <div className="mb-4">
-          <div className="font-bold mb-2">Address: {web3Address || "N/A"}</div>
-          <div className="font-bold mb-2">Name: {newUserName || "N/A"}</div>
-          <div className="font-bold mb-2">
-            Healthcare Type: {healthcareType || "N/A"}
-          </div>
-          <div className="font-bold mb-2">
-            Organization: {organizationName || "N/A"}
-          </div>
-          {web3Address && userExists && !editMode && (
-            <button
-              onClick={() => setEditMode(true)}
-              className="block bg-blue-500 text-white px-4 py-2 rounded-lg my-2"
-            >
-              Edit Account
-            </button>
-          )}
-          {editMode && renderEditForm()}
-        </div>
-        <div className="flex justify-center mt-4">
+      <div className="flex justify-between">
+        <button
+          onClick={() => {
+            if (isAddingUser) {
+              handleAddUser();
+            } else {
+              handleUpdateUser();
+            }
+            setEditMode(false);
+          }}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          {isAddingUser ? "Add User" : "Update User"}
+        </button>
+        {!isAddingUser && (
           <button
-            onClick={web3Address ? handleLogout : handleLogin}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => setEditMode(false)}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg"
           >
-            {web3Address ? "Logout" : "Login with MetaMask"}
+            Cancel
           </button>
-          {web3Address && !userExists && (
-            <button
-              onClick={handleAddUser}
-              className="block bg-blue-500 text-white px-4 py-2 rounded-lg"
-            >
-              Add User
-            </button>
-          )}
-        </div>
+        )}
       </div>
-    </>
+    </div>
+  );
+
+  return (
+    <div className="max-w-md mx-auto mt-10">
+      <h2 className="text-3xl font-bold text-center text-gray-100 mb-6">
+        User Account
+      </h2>
+      {web3Address ? (
+        <>
+          {!userExists || editMode ? (
+            renderForm(!userExists)
+          ) : (
+            <div className="bg-gray-800 p-4 rounded-lg shadow-md text-white">
+              <p>Address: {web3Address}</p>
+              <p>Name: {newUserName || "N/A"}</p>
+              <p>Healthcare Type: {healthcareType || "N/A"}</p>
+              <p>Organization: {organizationName || "N/A"}</p>
+              <button
+                onClick={() => setEditMode(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+              >
+                Edit Account
+              </button>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-500 text-white px-4 py-2 rounded-lg mt-4"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={handleLogin}
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg"
+        >
+          Login with MetaMask
+        </button>
+      )}
+    </div>
   );
 };
 

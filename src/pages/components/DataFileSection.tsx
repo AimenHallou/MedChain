@@ -7,6 +7,7 @@ import { AiFillFileText, AiFillFileAdd } from "react-icons/ai";
 import { TiDelete } from "react-icons/ti";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { FileData } from "../../objects/types";
+import { editFile } from "../../redux/slices/patientSlice";
 
 type DataFileSectionProps = {
   dataId: string;
@@ -20,6 +21,7 @@ type DataFileSectionProps = {
   handleAddFile: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleRemoveFile: (fileName: string) => void;
   handleFileClick: (file: FileData) => void;
+  handleDataTypeChange: (fileIndex: number, newDataType: string) => void;
 };
 
 const DataFileSection: React.FC<DataFileSectionProps> = ({
@@ -33,14 +35,14 @@ const DataFileSection: React.FC<DataFileSectionProps> = ({
   selectedUsers,
   handleAddFile,
   handleRemoveFile,
-  handleFileClick
+  handleFileClick,
+  handleDataTypeChange,
 }) => {
   const dispatch: AppDispatch = useDispatch();
   const currentUser = useSelector(
     (state: RootState) => state.user.currentUserAddress
   );
 
-  const [filesData, setFilesData] = useState<FileData[]>([]);
   const dataTypes = [
     "Lab results",
     "Medical images",
@@ -99,122 +101,126 @@ const DataFileSection: React.FC<DataFileSectionProps> = ({
     contentArray = content;
   }
 
-  return (
-    <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-6 flex-col sm:flex-row">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">
-            Attached Files
-          </h2>
-          {(selectedRequestor || selectedUsers) && (
-            <p className="text-gray-300 italic">Select Files to share</p>
-          )}
-        </div>
+  const renderHeader = () => (
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold text-gray-100">Attached Files</h2>
+      <div>
         {isOwner && (
           <div className="flex">
+            {editing && (
+              <button
+                className="flex items-center gap-2 text-blue-500 px-4 py-2 rounded hover:bg-blue-900 transition duration-200"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <AiFillFileAdd className="h-8 w-8" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleAddFile}
+                />
+              </button>
+            )}
             <button
-              className="flex items-center gap-2 text-blue-500  px-4 py-2 rounded hover:bg-blue-900 transition duration-200"
+              className="flex items-center gap-2 text-blue-500 px-4 py-2 rounded hover:bg-blue-900 transition duration-200 mr-2"
               onClick={() => setEditing(!editing)}
             >
               <BiSolidEditAlt className="h-8 w-8" />
             </button>
-            <button
-              className="flex items-center gap-2 text-blue-500  px-4 py-2 rounded hover:bg-blue-900 transition duration-200"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <AiFillFileAdd className="h-8 w-8" />
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                style={{ display: "none" }}
-                onChange={handleAddFile}
-              />
-            </button>
           </div>
         )}
+        {(selectedRequestor || selectedUsers) && (
+          <p className="text-gray-300 italic ml-4">Select Files to share</p>
+        )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contentArray
-          .filter((file) => accessibleFiles.includes(file.name))
-          .map((file, index) => (
-            <div
-              key={index}
-              className={`file-card relative flex flex-col items-center justify-between p-4 rounded-lg cursor-pointer border-2 border-transparent`}
-              onClick={() => {
-                handleFileClick(file);
+    </div>
+  );
 
-                if (
-                  ((currentUser === owner && selectedUsers) ||
-                    selectedRequestor) &&
-                  selectedFiles.includes(file.name)
-                ) {
-                  setSelectedFiles(
-                    selectedFiles.filter(
-                      (selectedFile) => selectedFile !== file.name
-                    )
-                  );
-                } else if (
-                  ((currentUser === owner && selectedUsers) ||
-                    selectedRequestor) &&
-                  !selectedFiles.includes(file.name)
-                ) {
-                  setSelectedFiles([...selectedFiles, file.name]);
-                }
-              }}
-            >
-              <div className="relative">
-                <AiFillFileText
-                  className={`file-image w-16 h-16 mb-2 ${
-                    selectedFiles.includes(file.name) &&
-                    (selectedRequestor || selectedUsers)
-                      ? "text-blue-600"
-                      : "text-gray-400"
-                  }`}
-                />
-                {isOwner && editing && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFile(file.name);
-                    }}
-                    className="absolute bottom-14 left-12 z-10"
-                  >
-                    <TiDelete className="h-8 w-8 text-red-700" />
-                  </button>
-                )}
-              </div>
-              <div className="text-gray-100 font-bold text-center truncate w-full">
-                {file.name}
-              </div>
-              {file.dataType ? (
-                <div className="text-gray-400 text-sm mb-2">
-                  {file.dataType}
-                </div>
-              ) : (
-                <div className="text-red-600 text-sm mb-2">
-                  File type missing
-                </div>
-              )}
+  const renderFileCards = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {contentArray
+        .filter((file) => accessibleFiles.includes(file.name))
+        .map((file, index) => (
+          <div
+            key={index}
+            className={`file-card relative flex flex-col items-center justify-between p-4 rounded-lg cursor-pointer border-2 border-transparent`}
+            onClick={() => {
+              if (!editing) handleFileClick(file);
+
+              if (
+                ((currentUser === owner && selectedUsers) ||
+                  selectedRequestor) &&
+                selectedFiles.includes(file.name)
+              ) {
+                setSelectedFiles(
+                  selectedFiles.filter(
+                    (selectedFile) => selectedFile !== file.name
+                  )
+                );
+              } else if (
+                ((currentUser === owner && selectedUsers) ||
+                  selectedRequestor) &&
+                !selectedFiles.includes(file.name)
+              ) {
+                setSelectedFiles([...selectedFiles, file.name]);
+              }
+            }}
+          >
+            <div className="relative">
+              <AiFillFileText
+                className={`file-image w-16 h-16 mb-2 ${
+                  selectedFiles.includes(file.name) &&
+                  (selectedRequestor || selectedUsers)
+                    ? "text-blue-600"
+                    : "text-gray-400"
+                }`}
+              />
               {isOwner && editing && (
-                <div className="flex flex-col space-y-2 absolute bottom-0.5 right-2">
-                  <select
-                    value={file.dataType}
-                    onChange={(e) => {}}
-                    className="bg-gray-800 text-white rounded mt-2 z-10"
-                  >
-                    <option value="">Select data type</option>
-                    {dataTypes.map((dataType) => (
-                      <option key={dataType} value={dataType}>
-                        {dataType}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveFile(file.name);
+                  }}
+                  className="absolute bottom-14 left-12 z-10"
+                >
+                  <TiDelete className="h-8 w-8 text-red-700" />
+                </button>
               )}
             </div>
-          ))}
-      </div>
+            <div className="text-gray-100 font-bold text-center truncate w-full">
+              {file.name}
+            </div>
+            {file.dataType ? (
+              <div className="text-gray-400 text-sm mb-2">{file.dataType}</div>
+            ) : (
+              <div className="text-red-600 text-sm mb-2">File type missing</div>
+            )}
+            {isOwner && editing && (
+              <div className="flex flex-col space-y-2 absolute bottom-0.5 right-2">
+                <select
+                  value={file.dataType}
+                  onChange={(e) => handleDataTypeChange(index, e.target.value)}
+                  className="bg-gray-800 text-white rounded mt-2 z-10"
+                >
+                  <option value="">Select data type</option>
+                  {dataTypes.map((dataType) => (
+                    <option key={dataType} value={dataType}>
+                      {dataType}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        ))}
+    </div>
+  );
+
+  return (
+    <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+      {renderHeader()}
+      {renderFileCards()}
     </div>
   );
 };

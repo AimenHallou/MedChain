@@ -232,6 +232,27 @@ export const removeFile = createAsyncThunk(
   }
 );
 
+export const editFile = createAsyncThunk(
+  "patients/editFile",
+  async (payload: { patientId: string; file: FileData }) => {
+    const response = await fetch(
+      `/api/patients/${payload.patientId}/edit-file`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ file: payload.file }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to edit file");
+    }
+    const updatedPatient = await response.json();
+    return updatedPatient;
+  }
+);
+
 export const updateSharedFiles = createAsyncThunk(
   "patients/updateSharedFiles",
   async (payload: { patientId: string; address: string; files: string[] }) => {
@@ -415,6 +436,33 @@ export const patientSlice = createSlice({
           patient.history.push({
             requestor: patient.owner,
             type: "added",
+            timestamp: new Date().toISOString(),
+          });
+        }
+      })
+      .addCase(editFile.fulfilled, (state, action) => {
+        const { patientId, file } = action.payload;
+        const patient = state.find((p) => p.patient_id === patientId);
+
+        if (patient) {
+          if (!Array.isArray(patient.content)) {
+            patient.content = [];
+          }
+
+          const fileIndex = patient.content.findIndex(
+            (f) => f.name === file.name
+          );
+          if (fileIndex >= 0) {
+            patient.content[fileIndex] = file; // Update with the whole file object
+          }
+
+          if (!Array.isArray(patient.history)) {
+            patient.history = [];
+          }
+
+          patient.history.push({
+            requestor: patient.owner,
+            type: "edited",
             timestamp: new Date().toISOString(),
           });
         }

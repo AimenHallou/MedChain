@@ -15,6 +15,7 @@ import {
   fetchSinglePatient,
   removeFile,
   addFile,
+  editFile,
 } from "../../redux/slices/patientSlice";
 import { v4 as uuid } from "uuid";
 import { FileData } from "../../objects/types";
@@ -283,6 +284,32 @@ const PatientPage: FC = () => {
     }
   };
 
+  const handleDataTypeChange = (fileIndex, newDataType) => {
+    if (!patient || !Array.isArray(patient.content)) return;
+
+    const fileToEdit = patient.content[fileIndex];
+    if (typeof fileToEdit !== "object") {
+      console.error("Invalid file data at index:", fileIndex);
+      return;
+    }
+
+    const updatedFile = {
+      ...fileToEdit,
+      dataType: newDataType,
+    };
+
+    console.log("Updated file:", updatedFile);
+
+    dispatch(
+      editFile({
+        patientId: patient.patient_id,
+        file: updatedFile,
+      })
+    )
+      .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
+      .catch((error) => console.error("Failed to edit file data type:", error));
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
       <div className="w-full lg:w-[20rem] bg-gray-700 text-white shadow-md rounded-md overflow-hidden m-4 border-2 border-gray-600">
@@ -351,6 +378,7 @@ const PatientPage: FC = () => {
             owner={patient.owner}
             sharedWith={patient.sharedWith}
             selectedFiles={selectedFiles}
+            handleDataTypeChange={handleDataTypeChange}
             setSelectedFiles={setSelectedFiles}
             selectedRequestor={selectedRequestor}
             selectedUsers={selectedUsers}
