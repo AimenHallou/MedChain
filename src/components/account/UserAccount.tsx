@@ -8,6 +8,7 @@ import {
   fetchUsers,
   createUser,
   updateUser,
+  deleteUser,
 } from "../../redux/slices/userSlice";
 import { RootState } from "../../redux/store";
 import { useAppDispatch } from "../../app/hook";
@@ -132,6 +133,19 @@ const UserAccount: FC = () => {
     setOrganizationName("");
   };
 
+  const handleDeleteUser = () => {
+    if (web3Address) {
+      console.log(`Deleting user with address: ${web3Address}`);
+      dispatch(deleteUser(web3Address));
+
+      setWeb3Address(null);
+      dispatch(setCurrentUser(null));
+      setNewUserName("");
+      setHealthcareType("");
+      setOrganizationName("");
+    }
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4">
       <div className="bg-gray-700 p-6 rounded mt-10 text-white lg:w-[30rem] border-2 border-gray-600">
@@ -146,6 +160,7 @@ const UserAccount: FC = () => {
             handleLogout={handleLogout}
             handleAddUser={handleAddUser}
             handleUpdateUser={handleUpdateUser}
+            handleDeleteUser={handleDeleteUser}
             newUserName={newUserName}
             setNewUserName={setNewUserName}
             healthcareType={healthcareType}

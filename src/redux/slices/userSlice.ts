@@ -70,6 +70,19 @@ export const readNotifications = createAsyncThunk(
   }
 );
 
+export const deleteUser = createAsyncThunk(
+  "users/deleteUser",
+  async (address: string) => {
+    const response = await fetch(`/api/users/${address}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete user");
+    }
+    return address;
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -143,6 +156,14 @@ export const userSlice = createSlice({
         );
         if (index !== -1) {
           state.users[index] = action.payload;
+        }
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.users = state.users.filter(
+          (user) => user.address !== action.payload
+        );
+        if (state.currentUserAddress === action.payload) {
+          state.currentUserAddress = null;
         }
       });
   },

@@ -35,6 +35,7 @@ const PatientPage: FC = () => {
   const patient = useSelector((state: RootState) =>
     state.patients.find((p) => p.patient_id === id)
   );
+  console.log("Patient:", patient)
   const user = useSelector((state: RootState) => state.user);
   const users = useSelector((state: RootState) => state.user.users);
 

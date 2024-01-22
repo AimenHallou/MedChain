@@ -7,13 +7,14 @@ type UserDetailViewProps = {
   handleLogin: () => void;
   handleLogout: () => void;
   handleAddUser: () => void;
+  handleUpdateUser: () => void;
+  handleDeleteUser: () => void;
   newUserName: string;
   setNewUserName: React.Dispatch<React.SetStateAction<string>>;
   healthcareType: string;
   setHealthcareType: React.Dispatch<React.SetStateAction<string>>;
   organizationName: string;
   setOrganizationName: React.Dispatch<React.SetStateAction<string>>;
-  handleUpdateUser: () => void;
 };
 
 const UserDetailView: React.FC<UserDetailViewProps> = ({
@@ -29,6 +30,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
   organizationName,
   setOrganizationName,
   handleUpdateUser,
+  handleDeleteUser,
 }) => {
   const [editMode, setEditMode] = useState(false);
 
@@ -98,7 +100,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
               <p>Organization: {organizationName || "N/A"}</p>
               <button
                 onClick={() => setEditMode(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4 mr-2"
               >
                 Edit Account
               </button>
