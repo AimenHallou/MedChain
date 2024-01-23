@@ -180,7 +180,7 @@ const DataFileSection: React.FC<DataFileSectionProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRemoveFile(file.name);
+                    handleRemoveFile(file.ipfsCID);
                   }}
                   className="absolute bottom-14 left-12 z-10"
                 >

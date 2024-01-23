@@ -35,7 +35,7 @@ const PatientPage: FC = () => {
   const patient = useSelector((state: RootState) =>
     state.patients.find((p) => p.patient_id === id)
   );
-  console.log("Patient:", patient)
+  console.log("Patient:", patient);
   const user = useSelector((state: RootState) => state.user);
   const users = useSelector((state: RootState) => state.user.users);
 
@@ -93,33 +93,33 @@ const PatientPage: FC = () => {
   const handleShare = () => {
     if (sharedAddress) {
       console.log("Shared address is present:", sharedAddress);
-  
+
       let files = [];
       if (patient.content) {
         try {
-          const content = Array.isArray(patient.content) 
-            ? patient.content 
+          const content = Array.isArray(patient.content)
+            ? patient.content
             : JSON.parse(patient.content);
-          files = content.map(fileData => fileData.name);
+          files = content.map((fileData) => fileData.name);
         } catch (error) {
           console.error("Error parsing patient content:", error);
         }
       }
-  
+
       const payload = {
         patientId: patient.patient_id,
         address: sharedAddress,
         files: files,
       };
       console.log("Payload being dispatched:", payload);
-  
+
       dispatch(sharePatient(payload));
-  
+
       setSharedAddress("");
     } else {
       console.log("Shared address is missing or empty.");
     }
-  };  
+  };
 
   const handleUnshare = (address: string) => {
     if (!patient) return;
@@ -260,11 +260,13 @@ const PatientPage: FC = () => {
         reader.onloadend = () => {
           if (typeof reader.result === "string") {
             const base64String = reader.result.split(",")[1];
+            const ipfsCID = uuid();
+
             const fileData = {
               base64: base64String,
               name: file.name,
               dataType: "",
-              ipfsCID: "",
+              ipfsCID: ipfsCID,
             };
 
             dispatch(
@@ -287,9 +289,9 @@ const PatientPage: FC = () => {
     }
   };
 
-  const handleRemoveFile = (fileName: string) => {
+  const handleRemoveFile = (ipfsCID: string) => {
     if (currentUserAddress === patient?.owner) {
-      dispatch(removeFile({ patientId: patient.patient_id, fileName }))
+      dispatch(removeFile({ patientId: patient.patient_id, ipfsCID: ipfsCID }))
         .then(() => dispatch(fetchSinglePatient(patient.patient_id)))
         .catch((error) => console.error("Error in removing a file:", error));
     }
@@ -306,7 +308,7 @@ const PatientPage: FC = () => {
     let patientContent;
     try {
       if (typeof patient.content === "string")
-      patientContent = JSON.parse(patient.content);
+        patientContent = JSON.parse(patient.content);
     } catch (error) {
       console.log("Invalid patient content data:", error);
       return;

@@ -212,7 +212,7 @@ export const cancelRequest = createAsyncThunk(
 
 export const removeFile = createAsyncThunk(
   "patients/removeFile",
-  async (payload: { patientId: string; fileName: string }) => {
+  async (payload: { patientId: string; ipfsCID: string }) => {
     const response = await fetch(
       `/api/patients/${payload.patientId}/remove-file`,
       {
@@ -221,7 +221,7 @@ export const removeFile = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fileName: payload.fileName,
+          ipfsCID: payload.ipfsCID,
         }),
       }
     );

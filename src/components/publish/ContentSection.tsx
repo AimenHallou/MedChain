@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setBase64Content, setFormContent } from "../../redux/slices/formSlice";
 import { FileData } from "../../objects/types";
+import { uuid } from "uuidv4";
 
 const ContentSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,7 @@ const ContentSection: React.FC = () => {
 
       files.forEach((file, index) => {
         const reader = new FileReader();
+        const ipfsCID = uuid();
 
         reader.onloadend = () => {
           if (typeof reader.result === "string") {
@@ -30,7 +32,7 @@ const ContentSection: React.FC = () => {
               base64: base64String,
               name: file.name,
               dataType: "",
-              ipfsCID: ""
+              ipfsCID: ipfsCID,
             });
             if (fileContents.length === files.length) {
               const newFilesData = [...filesData, ...fileContents];

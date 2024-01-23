@@ -4,7 +4,7 @@ import db from "../../../../../db/database";
 import { Patient } from "../../../../objects/types";
 
 function handleRemoveFile(patient_id: string, body: any, res: NextApiResponse) {
-  const { fileName } = body;
+  const { ipfsCID } = body;
 
   db.get(
     `SELECT history, content FROM patients WHERE patient_id = ?`,
@@ -18,9 +18,9 @@ function handleRemoveFile(patient_id: string, body: any, res: NextApiResponse) {
       }
 
       let content = JSON.parse(row.content?.toString() || "[]");
-      content = content.filter(file => file.name !== fileName);
+      content = content.filter(file => file.ipfsCID !== ipfsCID);
       let history = JSON.parse(row.history?.toString() || "[]");
-      history.unshift({ type: "removed", timestamp: new Date().toISOString(), fileName });
+      history.unshift({ type: "removed", timestamp: new Date().toISOString(), ipfsCID });
 
       db.run(
         `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,
@@ -32,7 +32,7 @@ function handleRemoveFile(patient_id: string, body: any, res: NextApiResponse) {
               details: updateErr.message,
             });
           }
-          res.json({ message: `File ${fileName} removed from patient with id: ${patient_id}` });
+          res.json({ message: `File ${ipfsCID} removed from patient with id: ${patient_id}` });
         }
       );
     }
