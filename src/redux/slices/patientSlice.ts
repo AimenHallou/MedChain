@@ -347,10 +347,28 @@ export const patientSlice = createSlice({
           (patient) => patient.patient_id === patientId
         );
         if (patient) {
-          if (!patient.sharedWith) {
+          if (typeof patient.sharedWith === "string") {
+            try {
+              patient.sharedWith = JSON.parse(patient.sharedWith);
+            } catch (error) {
+              console.error("Error parsing sharedWith:", error);
+              patient.sharedWith = {};
+            }
+          } else if (!patient.sharedWith) {
             patient.sharedWith = {};
           }
-          patient.sharedWith[address] = files;
+
+          if (typeof patient.history === "string") {
+            try {
+              patient.history = JSON.parse(patient.history);
+            } catch (error) {
+              console.error("Error parsing patient.history:", error);
+              patient.history = [];
+            }
+          } else if (!patient.history) {
+            patient.history = [];
+          }
+
           patient.history.push({
             requestor: address,
             type: "shared",

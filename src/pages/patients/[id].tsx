@@ -93,23 +93,33 @@ const PatientPage: FC = () => {
   const handleShare = () => {
     if (sharedAddress) {
       console.log("Shared address is present:", sharedAddress);
-
+  
+      let files = [];
+      if (patient.content) {
+        try {
+          const content = Array.isArray(patient.content) 
+            ? patient.content 
+            : JSON.parse(patient.content);
+          files = content.map(fileData => fileData.name);
+        } catch (error) {
+          console.error("Error parsing patient content:", error);
+        }
+      }
+  
       const payload = {
         patientId: patient.patient_id,
         address: sharedAddress,
-        files: patient.content
-          ? patient.content.map((fileData) => fileData.name)
-          : [],
+        files: files,
       };
       console.log("Payload being dispatched:", payload);
-
+  
       dispatch(sharePatient(payload));
-
+  
       setSharedAddress("");
     } else {
       console.log("Shared address is missing or empty.");
     }
-  };
+  };  
 
   const handleUnshare = (address: string) => {
     if (!patient) return;

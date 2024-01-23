@@ -36,14 +36,27 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   entity,
 }) => {
   sharedWith = useMemo(() => {
-    return JSON.parse(sharedWith.toString());
+    if (typeof sharedWith === 'string') {
+      try {
+        return JSON.parse(sharedWith);
+      } catch (error) {
+        console.error("Error parsing sharedWith:", error);
+      }
+    }
+    return sharedWith || {};
   }, [sharedWith]);
+  
   const entitySharedWith = useMemo(() => {
-    return JSON.parse(entity.sharedWith.toString());
+    if (typeof entity.sharedWith === 'string') {
+      try {
+        return JSON.parse(entity.sharedWith);
+      } catch (error) {
+        console.error("Error parsing entity.sharedWith:", error);
+      }
+    }
+    return entity.sharedWith || {};
   }, [entity.sharedWith]);
-  useEffect(() => {
-    console.log("sharedWith prop updated:", sharedWith);
-  }, [sharedWith]);
+  
 
   const parsedSharedWith =
     sharedWith && typeof sharedWith === "object" ? Object.keys(sharedWith) : [];
@@ -96,7 +109,7 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
 
   return (
     <div className="justify-center">
-      <input
+      {/* <input
         className="shadow appearance-none rounded-t-lg w-full py-2 px-3 bg-gray-800 text-gray-700 leading-tight mt-2"
         type="text"
         placeholder="Enter new owner's address"
@@ -126,7 +139,7 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
         }}
       >
         Share Patient
-      </button>
+      </button> */}
       <div className="py-2">{renderSharedAddresses()}</div>
     </div>
   );

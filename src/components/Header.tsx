@@ -21,9 +21,9 @@ const Header: FC = () => {
         </Link>
       </nav>
       <div className="flex gap-4">
-        <span className="relative inline-block cursor-pointer">
+        {/* <span className="relative inline-block cursor-pointer">
           <NotificationDropdown />
-        </span>
+        </span> */}
         <Link href="/account">
           <button className="px-6 py-3 bg-blue-button text-white rounded cursor-pointer">
             {currentUser
@@ -32,7 +32,7 @@ const Header: FC = () => {
           </button>
         </Link>
         <Link className="flex items-center" href="/settings">
-          <MdSettings size={24}/>
+          <MdSettings size={24} />
         </Link>
       </div>
     </header>
