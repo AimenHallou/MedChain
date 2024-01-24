@@ -36,7 +36,7 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
   entity,
 }) => {
   sharedWith = useMemo(() => {
-    if (typeof sharedWith === 'string') {
+    if (typeof sharedWith === "string") {
       try {
         return JSON.parse(sharedWith);
       } catch (error) {
@@ -45,18 +45,18 @@ const EntityOwnerActions: FC<EntityOwnerActionsProps> = ({
     }
     return sharedWith || {};
   }, [sharedWith]);
-  
+
   const entitySharedWith = useMemo(() => {
-    if (typeof entity.sharedWith === 'string') {
+    if (entity && typeof entity.sharedWith === "string") {
       try {
         return JSON.parse(entity.sharedWith);
       } catch (error) {
         console.error("Error parsing entity.sharedWith:", error);
+        return {};
       }
     }
-    return entity.sharedWith || {};
-  }, [entity.sharedWith]);
-  
+    return entity?.sharedWith || {};
+  }, [entity?.sharedWith]);
 
   const parsedSharedWith =
     sharedWith && typeof sharedWith === "object" ? Object.keys(sharedWith) : [];
