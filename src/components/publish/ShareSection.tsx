@@ -19,6 +19,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({
   };
 
   const handleAddSharedUser = () => {
+    if (shareWith === "") return;
     setSharedUsers([...sharedUsers, shareWith]);
     setShareWith("");
   };

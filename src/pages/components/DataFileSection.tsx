@@ -200,7 +200,7 @@ const DataFileSection: React.FC<DataFileSectionProps> = ({
               <div className="flex flex-col space-y-2 absolute bottom-0.5 right-2">
                 <select
                   value={file.dataType}
-                  onChange={(e) => handleDataTypeChange(index, e.target.value)}
+                  onChange={(e) => handleDataTypeChange(file.ipfsCID, e.target.value)}
                   className="bg-gray-800 text-white rounded mt-2 z-10"
                 >
                   <option value="">Select data type</option>

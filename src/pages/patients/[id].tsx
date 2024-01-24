@@ -297,14 +297,14 @@ const PatientPage: FC = () => {
     }
   };
 
-  const handleDataTypeChange = (fileIndex, newDataType) => {
-    console.log("File index:", fileIndex);
+  const handleDataTypeChange = (ipfsCID, newDataType) => {
+    console.log("File IPFS CID:", ipfsCID);
     console.log("New data type:", newDataType);
     if (!patient) {
       console.log("Patient data is missing.");
       return;
     }
-
+  
     let patientContent;
     try {
       if (typeof patient.content === "string")
@@ -313,26 +313,32 @@ const PatientPage: FC = () => {
       console.log("Invalid patient content data:", error);
       return;
     }
-
+  
     if (!Array.isArray(patientContent)) {
       console.log("Invalid patient content data.");
       console.log("Patient content data type:", typeof patientContent);
       return;
     }
-
-    const fileToEdit = patientContent[fileIndex];
-    if (typeof fileToEdit !== "object") {
-      console.error("Invalid file data at index:", fileIndex);
+  
+    const fileToEditIndex = patientContent.findIndex(file => file.ipfsCID === ipfsCID);
+    if (fileToEditIndex === -1) {
+      console.error("File not found with IPFS CID:", ipfsCID);
       return;
     }
-
+  
+    const fileToEdit = patientContent[fileToEditIndex];
+    if (typeof fileToEdit !== "object") {
+      console.error("Invalid file data for IPFS CID:", ipfsCID);
+      return;
+    }
+  
     const updatedFile = {
       ...fileToEdit,
       dataType: newDataType,
     };
-
+  
     console.log("Updated file:", updatedFile);
-
+  
     dispatch(
       editFile({
         patientId: patient.patient_id,
@@ -345,6 +351,7 @@ const PatientPage: FC = () => {
       })
       .catch((error) => console.error("Failed to edit file data type:", error));
   };
+  
 
   return (
     <div className="flex flex-col lg:flex-row justify-center items-start lg:space-x-4 mt-10 mx-4">
