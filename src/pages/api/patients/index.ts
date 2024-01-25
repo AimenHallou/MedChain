@@ -6,26 +6,26 @@ import fs from "fs";
 import { Patient } from "../../../objects/types";
 
 // Configure Web3
-const web3 = new Web3("http://127.0.0.1:8545");
-const contractJSON = JSON.parse(
-  fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
-);
-const abi = contractJSON.abi;
-import developmentConfig from "../../../../config/development";
-import productionConfig from "../../../../config/production";
-import { getSetting } from "../../../utils/config";
+// const web3 = new Web3("http://127.0.0.1:8545");
+// const contractJSON = JSON.parse(
+//   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
+// );
+// const abi = contractJSON.abi;
+// import developmentConfig from "../../../../config/development";
+// import productionConfig from "../../../../config/production";
+// import { getSetting } from "../../../utils/config";
 
-let config;
+// let config;
 
-if (process.env.NODE_ENV === "production") {
-  config = productionConfig;
-} else {
-  config = developmentConfig;
-}
-const contractAddress = config.patientRegistryContract;
-const contractInstance = new web3.eth.Contract(abi, contractAddress);
+// if (process.env.NODE_ENV === "production") {
+//   config = productionConfig;
+// } else {
+//   config = developmentConfig;
+// }
+// const contractAddress = config.patientRegistryContract;
+// const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
-const storageMode = getSetting("storageMode");
+// const storageMode = getSetting("storageMode");
 
 const fetchPatients = (res: NextApiResponse) => {
   db.all("SELECT * FROM patients", [], (err, rows) => {
@@ -53,18 +53,18 @@ const handleCreatePatient = async (
   } = req.body;
 
   try {
-    if (storageMode === "blockchain") {
-      const txReceipt = await contractInstance.methods
-        .createPatient(patient_id, history[0], "")
-        .send({
-          from: owner,
-          gas: 3000000,
-          gasPrice: "20000000000",
-        });
-      history.push(`Transaction hash: ${txReceipt.transactionHash}`);
-    } else {
-      history.push(`Transaction hash: ${"N/A"}`);
-    }
+    // if (storageMode === "blockchain") {
+    //   const txReceipt = await contractInstance.methods
+    //     .createPatient(patient_id, history[0], "")
+    //     .send({
+    //       from: owner,
+    //       gas: 3000000,
+    //       gasPrice: "20000000000",
+    //     });
+    //   history.push(`Transaction hash: ${txReceipt.transactionHash}`);
+    // } else {
+    // }
+    history.push(`Transaction hash: ${"N/A"}`);
 
     db.run(
       "INSERT INTO patients(patient_id, owner, createdDate, content, sharedWith, history, accessRequests) VALUES(?, ?, ?, ?, ?, ?, ?)",
