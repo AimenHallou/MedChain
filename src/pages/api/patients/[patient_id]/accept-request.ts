@@ -9,18 +9,18 @@ import productionConfig from "../../../../../config/production";
 import { getSetting } from "../../../../utils/config";
 
 // Configure Web3
-const web3 = new Web3("http://127.0.0.1:8545");
-const contractJSON = JSON.parse(
-  fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
-);
-const abi = contractJSON.abi;
+// const web3 = new Web3("http://127.0.0.1:8545");
+// const contractJSON = JSON.parse(
+//   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
+// );
+// const abi = contractJSON.abi;
 
-let config =
-  process.env.NODE_ENV === "production" ? productionConfig : developmentConfig;
-const contractAddress = config.patientRegistryContract;
-const contractInstance = new web3.eth.Contract(abi, contractAddress);
+// let config =
+//   process.env.NODE_ENV === "production" ? productionConfig : developmentConfig;
+// const contractAddress = config.patientRegistryContract;
+// const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
-const storageMode = getSetting("storageMode");
+// const storageMode = getSetting("storageMode");
 
 async function handleAcceptRequest(
   patient_id: string,
@@ -66,15 +66,15 @@ async function handleAcceptRequest(
         );
 
         try {
-          if (storageMode === "blockchain") {
-            await contractInstance.methods
-              .acceptAccessRequest(patient_id, requestor, files)
-              .send({
-                from: requestor,
-                gas: 3000000,
-                gasPrice: "20000000000",
-              });
-          }
+          // if (storageMode === "blockchain") {
+          //   await contractInstance.methods
+          //     .acceptAccessRequest(patient_id, requestor, files)
+          //     .send({
+          //       from: requestor,
+          //       gas: 3000000,
+          //       gasPrice: "20000000000",
+          //     });
+          // }
         } catch (error) {
           console.error("Error interacting with the contract", error);
           return res.status(500).send("Error interacting with blockchain");

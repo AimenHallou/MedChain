@@ -8,18 +8,18 @@ import { Patient } from "../../../../objects/types";
 import { getSetting } from "../../../../utils/config";
 
 // Configure Web3
-const web3 = new Web3("http://127.0.0.1:8545");
-const contractJSON = JSON.parse(
-  fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
-);
-const abi = contractJSON.abi;
+// const web3 = new Web3("http://127.0.0.1:8545");
+// const contractJSON = JSON.parse(
+//   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
+// );
+// const abi = contractJSON.abi;
 
-// Get the configuration depending on the environment
-const { serverRuntimeConfig } = getConfig();
-const contractAddress = serverRuntimeConfig.patientRegistryContract;
-const contractInstance = new web3.eth.Contract(abi, contractAddress);
+// // Get the configuration depending on the environment
+// const { serverRuntimeConfig } = getConfig();
+// const contractAddress = serverRuntimeConfig.patientRegistryContract;
+// const contractInstance = new web3.eth.Contract(abi, contractAddress);
 
-const storageMode = getSetting("storageMode");
+// const storageMode = getSetting("storageMode");
 
 async function handleCancelRequest(
   patient_id: string,
@@ -57,15 +57,15 @@ async function handleCancelRequest(
       );
 
       try {
-        if (storageMode === "blockchain") {
-          await contractInstance.methods
-            .cancelAccessRequest(patient_id, requestor)
-            .send({
-              from: requestor,
-              gas: 3000000,
-              gasPrice: "20000000000",
-            });
-        }
+        // if (storageMode === "blockchain") {
+        //   await contractInstance.methods
+        //     .cancelAccessRequest(patient_id, requestor)
+        //     .send({
+        //       from: requestor,
+        //       gas: 3000000,
+        //       gasPrice: "20000000000",
+        //     });
+        // }
       } catch (error) {
         return res
           .status(500)
