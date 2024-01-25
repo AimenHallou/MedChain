@@ -7,6 +7,7 @@ const initialState: Patient[] = [];
 export const fetchPatients = createAsyncThunk(
   "patients/fetchPatients",
   async () => {
+    console.log("fetchPatients")
     const response = await fetch("/api/patients");
     const patients = await response.json();
     return patients;
