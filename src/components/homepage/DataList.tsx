@@ -128,7 +128,11 @@ const PatientList: FC = () => {
       <div className="flex items-center w-full mb-4 space-x-4">
         <h2 className="text-lg font-bold">{currentViewConfig.title}</h2>
         <div onClick={() => setView(currentViewConfig.nextView)}>
-          {view === "patients" ? (
+          <FaUser
+            size={18}
+            className="hover:text-gray-400 transition-colors duration-200"
+          />
+          {/* {view === "patients" ? (
             <FaDatabase
               size={18}
               className="cursor-pointer hover:text-gray-400 transition-colors duration-200"
@@ -138,7 +142,7 @@ const PatientList: FC = () => {
               size={18}
               className="cursor-pointer hover:text-gray-400 transition-colors duration-200"
             />
-          )}
+          )} */}
         </div>
         <SearchBar onSearch={handleSearch} />
         <PublisherFilter
@@ -171,11 +175,13 @@ const PatientList: FC = () => {
 
       {displayedItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4">
-          {displayedItems.map((item, index) =>
-                        <PatientCard
-                        key={item.patient_id || `fallback-${index}`}
-                        {...item}
-                      />
+          {displayedItems.map(
+            (item, index) => (
+              <PatientCard
+                key={item.patient_id || `fallback-${index}`}
+                {...item}
+              />
+            )
             // view === "patients" ? (
             //   <PatientCard
             //     key={item.patient_id || `fallback-${index}`}

@@ -31,7 +31,7 @@ const HomePage: FC<HomePageProps> = ({ searchTerm }) => {
         </div>
         <div className="col-span-8">
           <PatientList />
-          <button onClick={toggle}>Toggle Modal</button>
+          {/* <button onClick={toggle}>Toggle Modal</button> */}
         </div>
       </div>
     </div>
