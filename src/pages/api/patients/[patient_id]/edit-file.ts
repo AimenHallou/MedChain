@@ -1,66 +1,47 @@
 // pages/api/patients/[patient_id]/edit-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
-import { Patient } from "../../../../objects/types";
+import { client } from "../../../../../db/mongodb";
 
-function handleEditFile(patient_id: string, body: any, res: NextApiResponse) {
+const dbName = 'medchain';
+
+async function handleEditFile(patient_id: string, body: any, res: NextApiResponse) {
   const { file } = body;
 
   if (!file || !file.ipfsCID) {
     return res.status(400).json({ error: "Invalid file data" });
   }
 
-  db.get(
-    `SELECT history, content FROM patients WHERE patient_id = ?`,
-    [patient_id],
-    (err, row: Patient | undefined) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query error", details: err.message });
-      }
-      if (!row) {
-        return res
-          .status(404)
-          .json({ error: `No patient found with ID: ${patient_id}` });
-      }
+  try {
+    const db = client.db(dbName);
+    const patient = await db.collection("patients").findOne({ patient_id });
 
-      let content = JSON.parse(row.content?.toString() || "[]");
-      const fileIndex = content.findIndex((f) => f.ipfsCID === file.ipfsCID);
-
-      if (fileIndex !== -1) {
-        content[fileIndex] = file;
-      } else {
-        return res
-          .status(404)
-          .json({ error: "File not found in patient record" });
-      }
-
-      let history = JSON.parse(row.history?.toString() || "[]");
-      history.unshift({
-        type: "edited",
-        timestamp: new Date().toISOString(),
-        file,
-      });
-
-      db.run(
-        `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,
-        [JSON.stringify(content), JSON.stringify(history), patient_id],
-        (updateErr) => {
-          if (updateErr) {
-            return res.status(500).json({
-              error:
-                "An error occurred while updating the file in the patient record.",
-              details: updateErr.message,
-            });
-          }
-          res.json({
-            message: `File details updated for patient with id: ${patient_id}`,
-          });
-        }
-      );
+    if (!patient) {
+      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+
+    let content = patient.content || [];
+    const fileIndex = content.findIndex(f => f.ipfsCID === file.ipfsCID);
+
+    if (fileIndex !== -1) {
+      content[fileIndex] = file;
+    } else {
+      return res.status(404).json({ error: "File not found in patient record" });
+    }
+
+    let history = patient.history || [];
+    history.unshift({ type: "edited", timestamp: new Date().toISOString(), file });
+
+    await db.collection("patients").updateOne(
+      { patient_id },
+      { $set: { content, history } }
+    );
+
+    res.json({ message: `File details updated for patient with id: ${patient_id}` });
+
+  } catch (err) {
+    console.error("Error in database operation", err);
+    res.status(500).json({ error: "Database operation error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

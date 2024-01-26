@@ -9,12 +9,38 @@ const initialState: UsersState = {
 
 // Async thunk for fetching all users
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  const response = await fetch("/api/users");
-  const users = await response.json();
-  return users.map((user) => ({
-    ...user,
-    notifications: JSON.parse(user.notifications || "[]"),
-  }));
+  try {
+    const response = await fetch("/api/users");
+
+    // Check if the response status is OK
+    if (!response.ok) {
+      throw new Error(`Error fetching users: ${response.statusText}`);
+    }
+
+    // Read the response as text first
+    const text = await response.text();
+
+    // Check if the response text is not empty
+    if (!text) {
+      throw new Error("Response body is empty");
+    }
+
+    try {
+      console.log("Fetched text:", text);
+      const users = JSON.parse(text);
+      console.log("Parsed users:", users);
+
+      return users.map((user) => ({
+        ...user,
+      }));
+    } catch (parseError) {
+      console.error("Failed to parse response as JSON:", parseError);
+      throw new Error("Failed to parse response as JSON");
+    }
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    throw error;
+  }
 });
 
 // Async thunk for adding a new user

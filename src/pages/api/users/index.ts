@@ -1,110 +1,58 @@
 // pages/api/users/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../db/database";
+import { client } from "../../../../db/mongodb";
 
-const handleGet = (req: NextApiRequest, res: NextApiResponse) => {
-  db.all("SELECT * FROM users", [], (err, rows) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ error: "Database query error", details: err.message });
-    }
-    res.status(200).json(rows);
-  });
+const dbName = 'medchain';
+
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const db = client.db(dbName);
+    const users = await db.collection("users").find({}).toArray();
+    const usersFormatted = users.map(user => ({
+      ...user,
+      _id: user._id.toString(),
+    }));
+    res.status(200).json(usersFormatted);
+  } catch (err) {
+    res.status(500).json({ error: "Database query error", details: err.message });
+  }
 };
 
-const handlePost = (req: NextApiRequest, res: NextApiResponse) => {
-  const { address, name, healthcareType, organizationName, notifications } =
-    req.body;
+const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { address, name, healthcareType, organizationName, notifications } = req.body;
 
-  db.run(
-    "INSERT INTO users (address, name, healthcareType, organizationName, notifications) VALUES (?, ?, ?, ?, ?)",
-    [
+  try {
+    const db = client.db(dbName);
+    const result = await db.collection("users").insertOne({
       address,
       name,
       healthcareType,
       organizationName,
-      JSON.stringify(notifications),
-    ],
-    function (err) {
-      if (err) {
-        return res.status(500).json({
-          error: "An error occurred while inserting into the database.",
-          details: err.message,
-        });
-      }
+      notifications
+    });
 
-      db.get("SELECT * FROM users WHERE address = ?", [address], (err, row) => {
-        if (err) {
-          return res
-            .status(500)
-            .json({ error: "Database query error", details: err.message });
-        }
-        res.status(201).json(row);
-      });
+    if (result.acknowledged) {
+      const newUser = await db.collection("users").findOne({ _id: result.insertedId });
+      res.status(201).json(newUser);
+    } else {
+      throw new Error("Insert operation not acknowledged");
     }
-  );
+  } catch (err) {
+    res.status(500).json({ error: "Error inserting into database", details: err.message });
+  }
 };
 
-const handleDelete = (req: NextApiRequest, res: NextApiResponse) => {
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const { address } = req.body;
 
-  console.log("Deleting user and associated patients for address:", address);
-
-  db.run("BEGIN TRANSACTION", (beginErr) => {
-    if (beginErr) {
-      console.error("Error beginning transaction:", beginErr.message);
-      return res
-        .status(500)
-        .json({ error: "Transaction start error", details: beginErr.message });
-    }
-
-    db.run("DELETE FROM users WHERE address = ?", [address], (userErr) => {
-      if (userErr) {
-        console.error("Error deleting user:", userErr.message);
-        db.run("ROLLBACK");
-        return res.status(500).json({
-          error: "An error occurred while deleting the user.",
-          details: userErr.message,
-        });
-      }
-
-      console.log("User deleted successfully. Deleting associated patients...");
-
-      db.run(
-        "DELETE FROM patients WHERE owner = ?",
-        [address],
-        (patientErr) => {
-          if (patientErr) {
-            console.error("Error deleting patients:", patientErr.message);
-            db.run("ROLLBACK");
-            return res.status(500).json({
-              error: "An error occurred while deleting the user's patients.",
-              details: patientErr.message,
-            });
-          }
-
-          console.log(
-            "Patients deleted successfully. Committing transaction..."
-          );
-
-          db.run("COMMIT", (commitErr) => {
-            if (commitErr) {
-              console.error("Error during commit:", commitErr.message);
-              db.run("ROLLBACK");
-              return res.status(500).json({
-                error: "An error occurred while committing the transaction.",
-                details: commitErr.message,
-              });
-            }
-            res.status(200).json({
-              message: `User with address ${address} and all associated patients successfully deleted.`,
-            });
-          });
-        }
-      );
-    });
-  });
+  try {
+    const db = client.db(dbName);
+    await db.collection("users").deleteOne({ address });
+    await db.collection("patients").deleteMany({ owner: address });
+    res.status(200).json({ message: `User with address ${address} and all associated patients successfully deleted.` });
+  } catch (err) {
+    res.status(500).json({ error: "Error in database operation", details: err.message });
+  }
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -122,4 +70,4 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       res.setHeader("Allow", ["GET", "POST", "DELETE"]);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};

@@ -1,25 +1,8 @@
 // pages/api/patients/[patient_id]/cancel-request.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
-import Web3 from "web3";
-import fs from "fs";
-import getConfig from "next/config";
-import { Patient } from "../../../../objects/types";
-import { getSetting } from "../../../../utils/config";
+import { client } from "../../../../../db/mongodb";
 
-// Configure Web3
-// const web3 = new Web3("http://127.0.0.1:8545");
-// const contractJSON = JSON.parse(
-//   fs.readFileSync("./build/contracts/PatientRegistry.json", "utf8")
-// );
-// const abi = contractJSON.abi;
-
-// // Get the configuration depending on the environment
-// const { serverRuntimeConfig } = getConfig();
-// const contractAddress = serverRuntimeConfig.patientRegistryContract;
-// const contractInstance = new web3.eth.Contract(abi, contractAddress);
-
-// const storageMode = getSetting("storageMode");
+const dbName = 'medchain';
 
 async function handleCancelRequest(
   patient_id: string,
@@ -28,67 +11,32 @@ async function handleCancelRequest(
 ) {
   const { requestor } = body;
 
-  db.get(
-    `SELECT history, owner, accessRequests FROM patients WHERE patient_id = ?`,
-    [patient_id],
-    async (err, row: Patient | undefined) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query error", details: err.message });
-      }
+  try {
+    const db = client.db(dbName);
+    const patient = await db.collection("patients").findOne({ patient_id });
 
-      if (!row) {
-        return res
-          .status(404)
-          .json({ error: `No patient found with ID: ${patient_id}` });
-      }
-
-      let accessRequests = Array.isArray(row.accessRequests)
-        ? row.accessRequests
-        : [];
-      accessRequests = accessRequests.filter(
-        (req: string) => req !== requestor
-      );
-
-      let history = JSON.parse(row.history.toString());
-      history.unshift(
-        {type: "cancelled", timestamp: new Date().toISOString(), requestor}
-      );
-
-      try {
-        // if (storageMode === "blockchain") {
-        //   await contractInstance.methods
-        //     .cancelAccessRequest(patient_id, requestor)
-        //     .send({
-        //       from: requestor,
-        //       gas: 3000000,
-        //       gasPrice: "20000000000",
-        //     });
-        // }
-      } catch (error) {
-        return res
-          .status(500)
-          .json({ error: "Error interacting with blockchain" });
-      }
-
-      db.run(
-        `UPDATE patients SET accessRequests = ?, history = ? WHERE patient_id = ?`,
-        [JSON.stringify(accessRequests), JSON.stringify(history), patient_id],
-        function (err) {
-          if (err) {
-            return res.status(500).json({
-              error: "An error occurred while updating the database.",
-              details: err.message,
-            });
-          }
-          res.json({
-            message: `Access request cancelled for patient ${patient_id}`,
-          });
-        }
-      );
+    if (!patient) {
+      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+
+    let accessRequests = patient.accessRequests || [];
+    accessRequests = accessRequests.filter(req => req !== requestor);
+
+    let history = patient.history || [];
+    history.unshift({ type: "cancelled", timestamp: new Date().toISOString(), requestor });
+
+    // Update the database
+    await db.collection("patients").updateOne(
+      { patient_id },
+      { $set: { accessRequests, history } }
+    );
+
+    res.json({ message: `Access request cancelled for patient ${patient_id}` });
+
+  } catch (err) {
+    console.error("Error in database operation", err);
+    res.status(500).json({ error: "Database operation error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
