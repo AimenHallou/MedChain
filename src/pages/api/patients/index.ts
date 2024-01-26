@@ -1,12 +1,23 @@
 // pages/api/patients/index.ts
+import { MongoClient, ServerApiVersion } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../db/mongodb";
+import { uri } from "../../../../db/mongodb";
 
 const dbName = 'medchain';
 
 const fetchPatients = async (res: NextApiResponse) => {
   console.log("Attempting to fetch patients");
+
+  const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  });
+
   try {
+    await client.connect();
     const db = client.db(dbName);
     console.log("Connected to the database, fetching patients");
     const patients = await db.collection("patients").find({}).toArray();
@@ -29,7 +40,16 @@ const handleCreatePatient = async (req: NextApiRequest, res: NextApiResponse) =>
     accessRequests,
   } = req.body;
 
+  const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  });
+
   try {
+    await client.connect();
     const db = client.db(dbName);
     const result = await db.collection("patients").insertOne({
       patient_id,

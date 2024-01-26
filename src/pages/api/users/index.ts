@@ -1,11 +1,21 @@
 // pages/api/users/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../db/mongodb";
+import { client, uri } from "../../../../db/mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
 const dbName = 'medchain';
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  });
+
   try {
+    await client.connect();
     const db = client.db(dbName);
     const users = await db.collection("users").find({}).toArray();
     const usersFormatted = users.map(user => ({

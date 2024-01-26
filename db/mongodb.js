@@ -40,8 +40,7 @@ async function initializeCollections(db) {
 }
 
 module.exports = {
+  uri,
   client,
   connectToDatabase,
 };
-
-connectToDatabase().catch(console.error);
