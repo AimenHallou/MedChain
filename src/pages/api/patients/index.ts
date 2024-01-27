@@ -5,15 +5,39 @@ import { uri } from "../../../../db/mongodb";
 
 const dbName = 'medchain';
 
-const fetchPatients = async (res: NextApiResponse) => {
-  console.log("Attempting to fetch patients");
+const fetchPatients = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.query.test) {
+    // Simple test endpoint
+    console.log("Test endpoint hit");
+    return res.status(200).json({ message: "Test successful" });
+  }
 
-  const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
+  if (req.query.dbTest) {
+    // Database test endpoint
+    console.log("Database test endpoint hit");
+    const client = new MongoClient(uri, {
+      serverApi: ServerApiVersion.v1,
+    });
+
+    try {
+      console.time("dbOperationTime");
+      await client.connect();
+      const db = client.db(dbName);
+      const patients = await db.collection("patients").find({}).toArray();
+      console.timeEnd("dbOperationTime");
+      return res.status(200).json(patients);
+    } catch (err) {
+      console.error("Error while fetching patients (DB test):", err);
+      return res.status(500).json({ error: "Database query error", details: err.message });
+    } finally {
+      await client.close();
     }
+  }
+
+  // Normal fetch patients logic
+  console.log("Attempting to fetch patients");
+  const client = new MongoClient(uri, {
+    serverApi: ServerApiVersion.v1,
   });
 
   try {
@@ -26,6 +50,8 @@ const fetchPatients = async (res: NextApiResponse) => {
   } catch (err) {
     console.error("Error while fetching patients:", err);
     res.status(500).json({ error: "Database query error", details: err.message });
+  } finally {
+    await client.close();
   }
 };
 
@@ -76,7 +102,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log(`Received request: ${req.method}`);
   switch (req.method) {
     case "GET":
-      fetchPatients(res);
+      fetchPatients(req, res);
       break;
     case "POST":
       handleCreatePatient(req, res);
