@@ -1,57 +1,36 @@
 // pages/api/patients/index.ts
 import { MongoClient, ServerApiVersion } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { uri } from "../../../../db/mongodb";
+import { client, uri } from "../../../../db/mongodb";
 
 const dbName = 'medchain';
 
-const fetchPatients = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.query.test) {
-    // Simple test endpoint
-    console.log("Test endpoint hit");
-    return res.status(200).json({ message: "Test successful" });
-  }
-
-  if (req.query.dbTest) {
-    // Database test endpoint
-    console.log("Database test endpoint hit");
-    const client = new MongoClient(uri, {
-      serverApi: ServerApiVersion.v1,
-    });
-
-    try {
-      console.time("dbOperationTime");
-      await client.connect();
-      const db = client.db(dbName);
-      const patients = await db.collection("patients").find({}).toArray();
-      console.timeEnd("dbOperationTime");
-      return res.status(200).json(patients);
-    } catch (err) {
-      console.error("Error while fetching patients (DB test):", err);
-      return res.status(500).json({ error: "Database query error", details: err.message });
-    } finally {
-      await client.close();
-    }
-  }
-
-  // Normal fetch patients logic
+const fetchPatients = async (res: NextApiResponse) => {
   console.log("Attempting to fetch patients");
+
   const client = new MongoClient(uri, {
     serverApi: ServerApiVersion.v1,
   });
 
   try {
+    console.time("MongoDBConnectionTime");
     await client.connect();
+    console.timeEnd("MongoDBConnectionTime");
+    console.log("Connected to the database");
+
     const db = client.db(dbName);
-    console.log("Connected to the database, fetching patients");
+    console.time("FetchPatientsTime");
     const patients = await db.collection("patients").find({}).toArray();
+    console.timeEnd("FetchPatientsTime");
     console.log("Patients fetched successfully");
+
     res.status(200).json(patients);
   } catch (err) {
     console.error("Error while fetching patients:", err);
     res.status(500).json({ error: "Database query error", details: err.message });
   } finally {
     await client.close();
+    console.log("Database connection closed");
   }
 };
 
@@ -83,7 +62,7 @@ const handleCreatePatient = async (req: NextApiRequest, res: NextApiResponse) =>
       createdDate,
       content,
       sharedWith,
-      history: history ? JSON.stringify(history) : "[]", // Assuming history is an array
+      history: history ? JSON.stringify(history) : "[]",
       accessRequests,
     });
 
@@ -102,7 +81,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log(`Received request: ${req.method}`);
   switch (req.method) {
     case "GET":
-      fetchPatients(req, res);
+      fetchPatients(res);
       break;
     case "POST":
       handleCreatePatient(req, res);
