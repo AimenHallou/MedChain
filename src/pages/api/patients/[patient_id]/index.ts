@@ -1,19 +1,15 @@
 // pages/api/patients/[patient_id]/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-import { ObjectId } from 'mongodb';
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function fetchPatient(patient_id: string, res: NextApiResponse) {
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
-      return res
-        .status(404)
-        .json({ error: `No patient found with ID: ${patient_id}` });
+      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
     res.status(200).json(patient);
   } catch (err) {

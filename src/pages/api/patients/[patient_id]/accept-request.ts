@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/accept-request.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleAcceptRequest(
   patient_id: string,
@@ -12,8 +11,8 @@ async function handleAcceptRequest(
   const { requestor, files } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
       return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
@@ -28,10 +27,10 @@ async function handleAcceptRequest(
     let history = patient.history || [];
     history.unshift({ type: "accepted", timestamp: new Date().toISOString(), requestor });
 
-    await db.collection("patients").updateOne(
-      { patient_id },
-      { $set: { accessRequests, sharedWith, history } }
-    );
+    patient.accessRequests = accessRequests;
+    patient.sharedWith = sharedWith;
+    patient.history = history;
+    await patient.save();
 
     res.json({ message: `Access request accepted for patient ${patient_id}` });
 

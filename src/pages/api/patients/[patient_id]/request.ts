@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/request.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = "medchain";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleRequestAccess(
   patient_id: string,
@@ -12,8 +11,9 @@ async function handleRequestAccess(
   const { requestor } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
       return res
@@ -21,25 +21,27 @@ async function handleRequestAccess(
         .json({ error: `No patient found with ID: ${patient_id}` });
     }
 
-    let history = Array.isArray(patient.history) ? patient.history : [];
-    history.unshift({ type: "request", timestamp: new Date().toISOString(), requestor });
-
-    let accessRequests = Array.isArray(patient.accessRequests) ? patient.accessRequests : [];
-    accessRequests.push(requestor);
-
-    await db.collection("patients").updateOne(
+    await Patient.updateOne(
       { patient_id },
-      { 
-        $set: { accessRequests, history } 
+      {
+        $push: {
+          history: {
+            type: "request",
+            timestamp: new Date().toISOString(),
+            requestor,
+          },
+          accessRequests: requestor,
+        },
       }
     );
 
-    const updatedPatient = await db.collection("patients").findOne({ patient_id });
+    const updatedPatient = await Patient.findOne({ patient_id });
     res.json(updatedPatient);
-
   } catch (err) {
     console.error("Error in database operation", err);
-    res.status(500).json({ error: "Database operation error", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
   }
 }
 

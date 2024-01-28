@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/unshare.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleUnsharePatient(
   patient_id: string,
@@ -12,37 +11,41 @@ async function handleUnsharePatient(
   const { address } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
-      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+      return res
+        .status(404)
+        .json({ error: `No patient found with ID: ${patient_id}` });
     }
 
-    let accessRequests = patient.accessRequests || [];
-    accessRequests = accessRequests.filter(item => item !== address);
-
+    // Update sharedWith and history
     let sharedWith = patient.sharedWith || {};
     delete sharedWith[address];
 
-    let history = patient.history || [];
-    history.unshift({
+    const historyUpdate = {
       type: "unshared",
       timestamp: new Date().toISOString(),
       address,
-    });
+    };
 
-    await db.collection("patients").updateOne(
+    await Patient.updateOne(
       { patient_id },
-      { $set: { accessRequests, sharedWith, history } }
+      {
+        $set: { sharedWith },
+        $push: { history: historyUpdate },
+      }
     );
 
-    const updatedPatient = await db.collection("patients").findOne({ patient_id });
+    const updatedPatient = await Patient.findOne({ patient_id });
     res.json(updatedPatient);
-
   } catch (err) {
     console.error("Error in database operation", err);
-    res.status(500).json({ error: "Database operation error", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
   }
 }
 

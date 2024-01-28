@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/cancel-request.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleCancelRequest(
   patient_id: string,
@@ -12,27 +11,19 @@ async function handleCancelRequest(
   const { requestor } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
       return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
 
-    let accessRequests = patient.accessRequests || [];
-    accessRequests = accessRequests.filter(req => req !== requestor);
+    patient.accessRequests = patient.accessRequests.filter(req => req !== requestor);
+    patient.history.unshift({ type: "cancelled", timestamp: new Date().toISOString(), requestor });
 
-    let history = patient.history || [];
-    history.unshift({ type: "cancelled", timestamp: new Date().toISOString(), requestor });
-
-    // Update the database
-    await db.collection("patients").updateOne(
-      { patient_id },
-      { $set: { accessRequests, history } }
-    );
+    await patient.save();
 
     res.json({ message: `Access request cancelled for patient ${patient_id}` });
-
   } catch (err) {
     console.error("Error in database operation", err);
     res.status(500).json({ error: "Database operation error", details: err.message });

@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/edit-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleEditFile(patient_id: string, body: any, res: NextApiResponse) {
   const { file } = body;
@@ -12,8 +11,8 @@ async function handleEditFile(patient_id: string, body: any, res: NextApiRespons
   }
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
       return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
@@ -21,7 +20,6 @@ async function handleEditFile(patient_id: string, body: any, res: NextApiRespons
 
     let content = patient.content || [];
     const fileIndex = content.findIndex(f => f.ipfsCID === file.ipfsCID);
-
     if (fileIndex !== -1) {
       content[fileIndex] = file;
     } else {
@@ -31,13 +29,11 @@ async function handleEditFile(patient_id: string, body: any, res: NextApiRespons
     let history = patient.history || [];
     history.unshift({ type: "edited", timestamp: new Date().toISOString(), file });
 
-    await db.collection("patients").updateOne(
-      { patient_id },
-      { $set: { content, history } }
-    );
+    patient.content = content;
+    patient.history = history;
+    await patient.save();
 
     res.json({ message: `File details updated for patient with id: ${patient_id}` });
-
   } catch (err) {
     console.error("Error in database operation", err);
     res.status(500).json({ error: "Database operation error", details: err.message });

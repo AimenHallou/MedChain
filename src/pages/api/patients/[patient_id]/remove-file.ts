@@ -1,36 +1,47 @@
 // pages/api/patients/[patient_id]/remove-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
-const dbName = 'medchain';
-
-async function handleRemoveFile(patient_id: string, body: any, res: NextApiResponse) {
+async function handleRemoveFile(
+  patient_id: string,
+  body: any,
+  res: NextApiResponse
+) {
   const { ipfsCID } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
 
-    if (!patient) {
-      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
-    }
-
-    let content = patient.content || [];
-    content = content.filter(file => file.ipfsCID !== ipfsCID);
-    let history = patient.history || [];
-    history.unshift({ type: "removed", timestamp: new Date().toISOString(), ipfsCID });
-
-    // Update patient with new content and history
-    await db.collection("patients").updateOne(
+    const patient = await Patient.findOneAndUpdate(
       { patient_id },
-      { $set: { content, history } }
+      {
+        $pull: { content: { ipfsCID } },
+        $push: {
+          history: {
+            type: "removed",
+            timestamp: new Date().toISOString(),
+            ipfsCID,
+          },
+        },
+      },
+      { new: true }
     );
 
-    res.json({ message: `File ${ipfsCID} removed from patient with id: ${patient_id}` });
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ error: `No patient found with ID: ${patient_id}` });
+    }
 
+    res.json({
+      message: `File ${ipfsCID} removed from patient with id: ${patient_id}`,
+    });
   } catch (err) {
     console.error("Error in database operation", err);
-    res.status(500).json({ error: "Database operation error", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
   }
 }
 

@@ -1,8 +1,7 @@
 // pages/api/patients/[patient_id]/update-shared.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleUpdateSharedFiles(
   patient_id: string,
@@ -12,30 +11,42 @@ async function handleUpdateSharedFiles(
   const { address, files } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect();
+
+    const patient = await Patient.findOne({ patient_id });
 
     if (!patient) {
-      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
+      return res
+        .status(404)
+        .json({ error: `No patient found with ID: ${patient_id}` });
     }
 
+    // Update sharedWith and history
     let sharedWith = patient.sharedWith || {};
     sharedWith[address] = files;
 
-    let history = patient.history || [];
-    history.unshift({ type: "updated", timestamp: new Date().toISOString(), address });
+    const historyUpdate = {
+      type: "updated",
+      timestamp: new Date().toISOString(),
+      address,
+    };
 
-    // Update the database
-    await db.collection("patients").updateOne(
+    await Patient.updateOne(
       { patient_id },
-      { $set: { sharedWith, history } }
+      {
+        $set: { sharedWith },
+        $push: { history: historyUpdate },
+      }
     );
 
-    res.json({ message: `Shared files updated for patient with id: ${patient_id}` });
-
+    res.json({
+      message: `Shared files updated for patient with id: ${patient_id}`,
+    });
   } catch (err) {
     console.error("Error in database operation", err);
-    res.status(500).json({ error: "Database operation error", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
   }
 }
 

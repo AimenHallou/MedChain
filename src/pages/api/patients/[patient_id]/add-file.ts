@@ -1,33 +1,28 @@
 // pages/api/patients/[patient_id]/add-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { client } from "../../../../../db/mongodb";
-
-const dbName = 'medchain';
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
 async function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
   const { file } = body;
 
   try {
-    const db = client.db(dbName);
-    const patient = await db.collection("patients").findOne({ patient_id });
+    await dbConnect(); 
+    const patient = await Patient.findOne({ patient_id }); 
 
     if (!patient) {
       return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
 
-    let content = patient.content || [];
-    content.push(file);
-    let history = patient.history || [];
-    history.unshift({ type: "added", timestamp: new Date().toISOString() });
+    patient.content = patient.content || [];
+    patient.content.push(file);
 
-    // Update the database
-    await db.collection("patients").updateOne(
-      { patient_id },
-      { $set: { content, history } }
-    );
+    patient.history = patient.history || [];
+    patient.history.unshift({ type: "added", timestamp: new Date().toISOString() });
+
+    await patient.save();
 
     res.json({ message: `File added to patient with id: ${patient_id}` });
-
   } catch (err) {
     console.error("Error in database operation", err);
     res.status(500).json({ error: "Database operation error", details: err.message });
