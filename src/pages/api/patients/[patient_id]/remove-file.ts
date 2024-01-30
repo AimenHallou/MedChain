@@ -1,42 +1,48 @@
 // pages/api/patients/[patient_id]/remove-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
-import { Patient } from "../../../../objects/types";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
-function handleRemoveFile(patient_id: string, body: any, res: NextApiResponse) {
+async function handleRemoveFile(
+  patient_id: string,
+  body: any,
+  res: NextApiResponse
+) {
   const { ipfsCID } = body;
 
-  db.get(
-    `SELECT history, content FROM patients WHERE patient_id = ?`,
-    [patient_id],
-    (err, row: Patient | undefined) => {
-      if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
-      }
-      if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
-      }
+  try {
+    await dbConnect();
 
-      let content = JSON.parse(row.content?.toString() || "[]");
-      content = content.filter(file => file.ipfsCID !== ipfsCID);
-      let history = JSON.parse(row.history?.toString() || "[]");
-      history.unshift({ type: "removed", timestamp: new Date().toISOString(), ipfsCID });
+    const patient = await Patient.findOneAndUpdate(
+      { patient_id },
+      {
+        $pull: { content: { ipfsCID } },
+        $push: {
+          history: {
+            type: "removed",
+            timestamp: new Date().toISOString(),
+            ipfsCID,
+          },
+        },
+      },
+      { new: true }
+    );
 
-      db.run(
-        `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,
-        [JSON.stringify(content), JSON.stringify(history), patient_id],
-        (updateErr) => {
-          if (updateErr) {
-            return res.status(500).json({
-              error: "An error occurred while removing the file from the patient record.",
-              details: updateErr.message,
-            });
-          }
-          res.json({ message: `File ${ipfsCID} removed from patient with id: ${patient_id}` });
-        }
-      );
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+
+    res.json({
+      message: `File ${ipfsCID} removed from patient with id: ${patient_id}`,
+    });
+  } catch (err) {
+    console.error("Error in database operation", err);
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

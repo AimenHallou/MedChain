@@ -40,7 +40,11 @@ const UserAccount: FC = () => {
   useEffect(() => {
     dispatch(fetchUsers())
       .then(unwrapResult)
+      .then((fetchedUsers) => {
+        console.log("Fetched Userss:", fetchedUsers);
+      })
       .then(() => {
+        console.log("Current User Address:", currentUserAddress);
         const existingUser = users.find(
           (user) => user.address === currentUserAddress
         );
@@ -51,7 +55,9 @@ const UserAccount: FC = () => {
           setWeb3Address(currentUserAddress);
         }
       })
-      .catch((error) => console.error("Failed to fetch users:", error));
+      .catch((error) => {
+        console.error("Failed to fetch users:", error);
+      });
   }, [dispatch]);
 
   const handleAddUser = () => {

@@ -1,52 +1,53 @@
 // pages/api/patients/[patient_id]/update-shared.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
-import { Patient } from "../../../../objects/types";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
-function handleUpdateSharedFiles(
+async function handleUpdateSharedFiles(
   patient_id: string,
   body: any,
   res: NextApiResponse
 ) {
   const { address, files } = body;
 
-  db.get(
-    `SELECT history, sharedWith FROM patients WHERE patient_id = ?`,
-    [patient_id],
-    (err, row: Patient | undefined) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query error", details: err.message });
-      }
-      if (!row) {
-        return res
-          .status(404)
-          .json({ error: `No patient found with ID: ${patient_id}` });
-      }
+  try {
+    await dbConnect();
 
-      let sharedWith = JSON.parse(row.sharedWith.toString() || "{}");
-      sharedWith[address] = files;
-      let history = JSON.parse(row.history.toString() || "[]");
-      history.unshift(
-        {type: "updated", timestamp: new Date().toISOString(), address}
-      );
+    const patient = await Patient.findOne({ patient_id });
 
-      db.run(
-        `UPDATE patients SET sharedWith = ?, history = ? WHERE patient_id = ?`,
-        [JSON.stringify(sharedWith), JSON.stringify(history), patient_id],
-        (updateErr) => {
-          if (updateErr) {
-            return res.status(500).json({
-              error:
-                "An error occurred while updating shared files in the database.",
-              details: updateErr.message,
-            });
-          }
-        }
-      );
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+
+    // Update sharedWith and history
+    let sharedWith = patient.sharedWith || {};
+    sharedWith[address] = files;
+
+    const historyUpdate = {
+      type: "updated",
+      timestamp: new Date().toISOString(),
+      address,
+    };
+
+    await Patient.updateOne(
+      { patient_id },
+      {
+        $set: { sharedWith },
+        $push: { history: historyUpdate },
+      }
+    );
+
+    res.json({
+      message: `Shared files updated for patient with id: ${patient_id}`,
+    });
+  } catch (err) {
+    console.error("Error in database operation", err);
+    res
+      .status(500)
+      .json({ error: "Database operation error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

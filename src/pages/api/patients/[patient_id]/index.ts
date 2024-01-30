@@ -1,25 +1,20 @@
 // pages/api/patients/[patient_id]/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
-function fetchPatient(patient_id: string, res: NextApiResponse) {
-   db.get(
-    "SELECT * FROM patients WHERE patient_id = ?",
-    [patient_id],
-    (err, row:any) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query error", details: err.message });
-      }
-      if (!row) {
-        return res
-          .status(404)
-          .json({ error: `No patient found with ID: ${patient_id}` });
-      }
-      res.status(200).json(row);
+async function fetchPatient(patient_id: string, res: NextApiResponse) {
+  try {
+    await dbConnect();
+    const patient = await Patient.findOne({ patient_id });
+
+    if (!patient) {
+      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+    res.status(200).json(patient);
+  } catch (err) {
+    res.status(500).json({ error: "Database query error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

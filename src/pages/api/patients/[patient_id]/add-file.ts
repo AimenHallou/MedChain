@@ -1,42 +1,32 @@
 // pages/api/patients/[patient_id]/add-file.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../../../db/database";
-import { Patient } from "../../../../objects/types";
+import { dbConnect } from "../../../../../db/mongodb";
+import Patient from "../../../../../db/models/Patient";
 
-function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
+async function handleAddFile(patient_id: string, body: any, res: NextApiResponse) {
   const { file } = body;
 
-  db.get(
-    `SELECT history, content FROM patients WHERE patient_id = ?`,
-    [patient_id],
-    (err, row: Patient | undefined) => {
-      if (err) {
-        return res.status(500).json({ error: "Database query error", details: err.message });
-      }
-      if (!row) {
-        return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
-      }
+  try {
+    await dbConnect(); 
+    const patient = await Patient.findOne({ patient_id }); 
 
-      let content = JSON.parse(row.content?.toString() || "[]");
-      content.push(file);
-      let history = JSON.parse(row.history.toString() || "[]");
-      history.unshift({type: "added", timestamp: new Date().toISOString()});
-
-      db.run(
-        `UPDATE patients SET content = ?, history = ? WHERE patient_id = ?`,
-        [JSON.stringify(content), JSON.stringify(history), patient_id],
-        (updateErr) => {
-          if (updateErr) {
-            return res.status(500).json({
-              error: "An error occurred while adding the file to the patient record.",
-              details: updateErr.message,
-            });
-          }
-          res.json({ message: `File added to patient with id: ${patient_id}` });
-        }
-      );
+    if (!patient) {
+      return res.status(404).json({ error: `No patient found with ID: ${patient_id}` });
     }
-  );
+
+    patient.content = patient.content || [];
+    patient.content.push(file);
+
+    patient.history = patient.history || [];
+    patient.history.unshift({ type: "added", timestamp: new Date().toISOString() });
+
+    await patient.save();
+
+    res.json({ message: `File added to patient with id: ${patient_id}` });
+  } catch (err) {
+    console.error("Error in database operation", err);
+    res.status(500).json({ error: "Database operation error", details: err.message });
+  }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
